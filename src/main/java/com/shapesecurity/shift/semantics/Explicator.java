@@ -163,10 +163,10 @@ public class Explicator {
 	@NotNull
 	private final ScopeLookup scopeLookup;
 	@NotNull
-	private HashTable<com.shapesecurity.shift.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.empty();
+	private HashTable<com.shapesecurity.shift.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingEquality();
 	// map from AST loops and labelled statement to their corresponding Target nodes. Loops have an outer and an inner, for break and continue respectively.
 	@NotNull
-	private ImmutableList<ImmutableList<Variable>> temporaries = ImmutableList.list(ImmutableList.nil());
+	private ImmutableList<ImmutableList<Variable>> temporaries = ImmutableList.of(ImmutableList.empty());
 	// Stack of function-local temporaries. Whenever you begin explicating a function, push a new empty list; when you finish, pop it. TODO this is a somewhat hacky way of accomplishing this. It would be better to be intraproceedural or something.
 
 	// todo runtime errors for with, direct eval
@@ -190,7 +190,7 @@ public class Explicator {
 		Node result = exp.explicate();
 		ImmutableList<Variable> maybeGlobals = exp.functionVariablesHelper(script);
 		ImmutableList<Variable> scriptLocals =
-			maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.temporaries.maybeHead().just());
+			maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.temporaries.maybeHead().fromJust());
 		ImmutableList<String> scriptVarDecls =
 			maybeGlobals.filter(x -> exp.scopeLookup.isGlobal(x) && x.declarations.isNotEmpty()).map(x -> x.name);
 		return new Semantics(result, scriptLocals, scriptVarDecls);
@@ -203,8 +203,8 @@ public class Explicator {
 		ImmutableList<Variable> scriptLocals =
 			exp.functionVariablesHelper(module)
 				.filter(x -> !exp.scopeLookup.isGlobal(x))
-				.append(exp.temporaries.maybeHead().just());
-		return new Semantics(result, scriptLocals, ImmutableList.nil());
+				.append(exp.temporaries.maybeHead().fromJust());
+		return new Semantics(result, scriptLocals, ImmutableList.empty());
 	}
 
 	private Node explicate() {
@@ -217,7 +217,7 @@ public class Explicator {
 	private ImmutableList<Variable> simpleParamsHelper(FormalParameters params) {
 		assert params.rest.isNothing();
 		return params.items.map(
-			b -> scopeLookup.findVariableDeclaredBy((BindingIdentifier) b).just()
+			b -> scopeLookup.findVariableDeclaredBy((BindingIdentifier) b).fromJust()
 		);
 	}
 
@@ -229,14 +229,14 @@ public class Explicator {
 		Either<GlobalReference, LocalReference> ref, NodeWithValue rhs, boolean strict
 	) { // handles const-ness correctly. not to be used with variable or function declarations.
 		if (ref.isRight()) {
-			Variable variable = ref.right().just().variable;
+			Variable variable = ref.right().fromJust().variable;
 			if (variable.declarations.exists(decl -> decl.kind == Declaration.Kind.Const || decl.kind == Declaration.Kind.FunctionExpressionName)) { // note that this is an AssignmentExpression or similar, not a VariableDeclaration, so this is *not* the initialization of the variable, i.e., it is certainly an improper write to a constant variable.
 				assert variable.declarations.length == 1;
 				// TODO maybe warn about writing to a constant variable?
 				if (strict || variable.declarations.maybeHead()
-					.just().kind == Declaration.Kind.Const) { // writing to const variables is always a TypeError, even in strict mode: https://github.com/tc39/test262/pull/430#issuecomment-139423863
+					.fromJust().kind == Declaration.Kind.Const) { // writing to const variables is always a TypeError, even in strict mode: https://github.com/tc39/test262/pull/430#issuecomment-139423863
 					return new BlockWithValue(
-						ImmutableList.list(rhs, new Throw(new New(new GlobalReference("TypeError"), ImmutableList.nil()))),
+						ImmutableList.of(rhs, new Throw(new New(new GlobalReference("TypeError"), ImmutableList.empty()))),
 						// TODO throw an actual TypeError, not whatever the global TypeError value happens to be at the moment (it is writable)
 						new LiteralUndefined()
 					);
@@ -255,7 +255,7 @@ public class Explicator {
 	// given a FunctionDeclaration or FunctionExpression, find all the variables created in it or its children not crossing function boundaries
 	// which is to say, all variables which calling this function recursively might shadow
 	private ImmutableList<Variable> functionVariablesHelper(@NotNull com.shapesecurity.shift.ast.Node node) {
-		return scopeLookup.findScopeFor(node).maybe(ImmutableList.nil(), this::functionVariablesHelper);
+		return scopeLookup.findScopeFor(node).maybe(ImmutableList.empty(), this::functionVariablesHelper);
 	}
 
 	// helper for the above. find variables in the given scope and its descendants, up to function boundaries
@@ -264,20 +264,20 @@ public class Explicator {
 		ImmutableList<Variable> initial = ImmutableList.from(new ArrayList<>(scope.variables()));
 		if (scope.type == Scope.Type.FunctionName) {
 			assert scope.children.length == 1; // in ES5, anyway...
-			assert scope.children.maybeHead().just().type == Scope.Type.Function;
-			return initial.append(this.functionVariablesHelper(scope.children.maybeHead().just()));
+			assert scope.children.maybeHead().fromJust().type == Scope.Type.Function;
+			return initial.append(this.functionVariablesHelper(scope.children.maybeHead().fromJust()));
 		}
 		// this will need to include parameter scope in ES6
 		return initial.append(scope.children.flatMap(s ->
 			s.type == Scope.Type.Function || s.type == Scope.Type.FunctionName
-				? ImmutableList.nil()
+				? ImmutableList.empty()
 				: this.functionVariablesHelper(s)
 		));
 	}
 
 	@NotNull
 	private Either<GlobalReference, LocalReference> refHelper(BindingIdentifier bindingIdentifier) {
-		Variable variable = scopeLookup.findVariableReferencedBy(bindingIdentifier).just();
+		Variable variable = scopeLookup.findVariableReferencedBy(bindingIdentifier).fromJust();
 		return scopeLookup.isGlobal(variable) ?
 			Either.left(new GlobalReference(bindingIdentifier.name)) :
 			Either.right(new LocalReference(variable));
@@ -301,16 +301,16 @@ public class Explicator {
 	// TODO ensure that function declarations in switch statements get hoisted to the top of the switch, per 13.12.6 (I think)
 	@NotNull
 	private Block explicateBody(ImmutableList<Statement> statements, boolean strict) {
-		ImmutableList<Node> res = ImmutableList.nil();
+		ImmutableList<Node> res = ImmutableList.empty();
 		// hoist functions
 		for (Statement s : statements) {
 			if (s instanceof FunctionDeclaration) {
 				FunctionDeclaration functionDeclaration = (FunctionDeclaration) s;
-				Variable variable = scopeLookup.findVariablesForFuncDecl(functionDeclaration).a;
+				Variable variable = scopeLookup.findVariablesForFuncDecl(functionDeclaration).left;
 				Either<GlobalReference, LocalReference> ref = refHelper(variable);
 
-				Scope myScope = scopeLookup.findScopeFor(functionDeclaration).just();
-				Maybe<Variable> name = Maybe.nothing();
+				Scope myScope = scopeLookup.findScopeFor(functionDeclaration).fromJust();
+				Maybe<Variable> name = Maybe.empty();
 				ImmutableList<Variable> parameters = simpleParamsHelper(functionDeclaration.params);
 				res = res.cons(new VariableAssignment(
 					ref,
@@ -329,26 +329,26 @@ public class Explicator {
 		@NotNull Maybe<Variable> name, @NotNull Scope scope, @NotNull ImmutableList<Variable> parameters,
 		@NotNull FunctionBody functionBody, boolean strict
 	) {
-		Maybe<Variable> arguments = Maybe.nothing();
+		Maybe<Variable> arguments = Maybe.empty();
 		if (scope.type == Scope.Type.FunctionName) {
-			scope = scope.children.maybeHead().just();
+			scope = scope.children.maybeHead().fromJust();
 		}
 		for (Variable v : scope.variables()) {
 			if (v.name.equals("arguments")) {
-				arguments = Maybe.just(v);
+				arguments = Maybe.of(v);
 				break;
 			}
 		}
 		strict = strict || isStrict(functionBody.directives);
-		this.temporaries = this.temporaries.cons(ImmutableList.nil());
+		this.temporaries = this.temporaries.cons(ImmutableList.empty());
 		Block body = explicateBody(functionBody.statements, strict);
-		ImmutableList<Variable> fnTemporaries = this.temporaries.maybeHead().just();
-		this.temporaries = this.temporaries.maybeTail().just();
+		ImmutableList<Variable> fnTemporaries = this.temporaries.maybeHead().fromJust();
+		this.temporaries = this.temporaries.maybeTail().fromJust();
 		ImmutableList<Variable> locals = fnTemporaries.append(functionVariablesHelper(scope)); // todo concatlists, I guess
 		// TODO capture may have duplicate entries: `function g(x){function h(){x+x}}`
 		ImmutableList<Variable> captured = scope.through.entries()
-			.flatMap(p -> p.b.map(r -> r.node.<Variable>either(
-				bi -> scopeLookup.findVariableReferencedBy(bi).just(),
+			.flatMap(p -> p.right.map(r -> r.node.<Variable>either(
+				bi -> scopeLookup.findVariableReferencedBy(bi).fromJust(),
 				scopeLookup::findVariableReferencedBy
 			)))
 			.filter(v -> !scopeLookup.isGlobal(v)); // everything needing capture
@@ -360,20 +360,20 @@ public class Explicator {
 		if (statement instanceof BlockStatement) {
 			return explicateBody(((BlockStatement) statement).block.statements, strict);
 		} else if (statement instanceof BreakStatement) {
-			Pair<com.shapesecurity.shift.ast.Node, Integer> _break = jumpMap.get(statement).just();
-			return new Break(targets.get(_break.a).just().a, _break.b);
+			Pair<com.shapesecurity.shift.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
+			return new Break(targets.get(_break.left).fromJust().left, _break.right);
 		} else if (statement instanceof ContinueStatement) {
-			Pair<com.shapesecurity.shift.ast.Node, Integer> _break = jumpMap.get(statement).just();
-			return new Break(targets.get(_break.a).just().b.just(), _break.b);
+			Pair<com.shapesecurity.shift.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
+			return new Break(targets.get(_break.left).fromJust().right.fromJust(), _break.right);
 		} else if (statement instanceof DebuggerStatement) {
 			return Void.INSTANCE;
 		} else if (statement instanceof DoWhileStatement) { // exactly the same as WhileStatement, except that the test is last instead of first
 			DoWhileStatement doWhileStatement = (DoWhileStatement) statement;
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
-			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.just(innerTarget)));
+			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
-			Block body = new Block(ImmutableList.<Node>list(
+			Block body = new Block(ImmutableList.<Node>of(
 				explicateStatement(doWhileStatement.body, strict),
 				innerTarget,
 				new IfElse(
@@ -383,7 +383,7 @@ public class Explicator {
 				)
 			));
 			Loop loop = new Loop(body);
-			return new Block(ImmutableList.list(loop, outerTarget));
+			return new Block(ImmutableList.of(loop, outerTarget));
 		} else if (statement instanceof ExpressionStatement) {
 			return explicateExpressionDiscardingValue(((ExpressionStatement) statement).expression, strict);
 		} else if (statement instanceof EmptyStatement) {
@@ -411,7 +411,7 @@ public class Explicator {
 			ForInStatement forInStatement = (ForInStatement) statement;
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
-			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.just(innerTarget)));
+			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
 			BindingIdentifier binding;
@@ -420,7 +420,7 @@ public class Explicator {
 				VariableDeclaration variableDeclaration = (VariableDeclaration) forInStatement.left;
 				assert variableDeclaration.declarators.length == 1; // TODO maybe remove this
 				// assumes ES5
-				binding = (BindingIdentifier) variableDeclaration.declarators.maybeHead().just().binding;
+				binding = (BindingIdentifier) variableDeclaration.declarators.maybeHead().fromJust().binding;
 				isDeclaration = true;
 			} else if (forInStatement.left instanceof BindingIdentifier) {
 				binding = (BindingIdentifier) forInStatement.left;
@@ -430,7 +430,7 @@ public class Explicator {
 			}
 
 			return makeUnvaluedTemporary(object -> makeUnvaluedTemporary(counter -> makeUnvaluedTemporary(keys -> {
-				Block body = new Block(ImmutableList.<Node>list(
+				Block body = new Block(ImmutableList.<Node>of(
 					new IfElse(
 						new RelationalComparison(
 							RelationalComparison.Operator.LessThan,
@@ -440,10 +440,10 @@ public class Explicator {
 						new Block(Void.INSTANCE),
 						new Block(breakNode)
 					))
-					.append(ImmutableList.list(
+					.append(ImmutableList.of(
 						new IfElse(
 							new In(new MemberAccess(keys, counter), object),
-							new Block(ImmutableList.list(
+							new Block(ImmutableList.of(
 								isDeclaration ?
 									new VariableAssignment(refHelper(binding), new MemberAccess(keys, counter), strict) :
 									variableAssignmentHelper(refHelper(binding), new MemberAccess(keys, counter), strict),
@@ -459,7 +459,7 @@ public class Explicator {
 						)
 					)));
 				Loop loop = new Loop(body);
-				return new Block(ImmutableList.list(
+				return new Block(ImmutableList.of(
 					new VariableAssignment(object, explicateExpressionReturningValue(forInStatement.right, strict), false),
 					new VariableAssignment(keys, new Keys(object), false),
 					new VariableAssignment(counter, new LiteralNumber(0), false),
@@ -471,25 +471,25 @@ public class Explicator {
 			ForStatement forStatement = (ForStatement) statement;
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
-			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.just(innerTarget)));
+			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
-			Block body = new Block(forStatement.test.map(t -> ((ImmutableList<Node>) ImmutableList.<Node>list(
+			Block body = new Block(forStatement.test.map(t -> ((ImmutableList<Node>) ImmutableList.<Node>of(
 				new IfElse(
 					explicateExpressionReturningValue(t, strict),
 					new Block(Void.INSTANCE),
 					new Block(breakNode)
-				)))).orJust(ImmutableList.nil())
-				.append(ImmutableList.list(
+				)))).orJust(ImmutableList.empty())
+				.append(ImmutableList.of(
 					explicateStatement(forStatement.body, strict),
 					innerTarget
 				))
-				.append(forStatement.update.map(e -> ((ImmutableList<Node>) ImmutableList.list((Node) explicateExpressionDiscardingValue(
+				.append(forStatement.update.map(e -> ((ImmutableList<Node>) ImmutableList.of((Node) explicateExpressionDiscardingValue(
 					e,
 					strict
-				)))).orJust(ImmutableList.nil())));
+				)))).orJust(ImmutableList.empty())));
 			Loop loop = new Loop(body);
-			return new Block(ImmutableList.list(forStatement.init.map(i -> (Node) new Block(ImmutableList.list(
+			return new Block(ImmutableList.of(forStatement.init.map(i -> (Node) new Block(ImmutableList.of(
 				explicateVariableDeclarationExpression(i, strict),
 				loop
 			))).orJust(loop), outerTarget));
@@ -497,11 +497,11 @@ public class Explicator {
 			// todo maybe warn people about using block-level function declarations.
 			FunctionDeclaration functionDeclaration = (FunctionDeclaration) statement;
 			Pair<Variable, Maybe<Variable>> functionVariables = scopeLookup.findVariablesForFuncDecl(functionDeclaration);
-			if (functionVariables.b.isJust()) {
+			if (functionVariables.right.isJust()) {
 				// this is from annex B.3.3
 				return new VariableAssignment(
-					new LocalReference(functionVariables.b.just()),
-					new LocalReference(functionVariables.a),
+					new LocalReference(functionVariables.right.fromJust()),
+					new LocalReference(functionVariables.left),
 					false
 				);
 			} else {
@@ -516,8 +516,8 @@ public class Explicator {
 		} else if (statement instanceof LabeledStatement) {
 			LabeledStatement labeledStatement = (LabeledStatement) statement;
 			BreakTarget target = new BreakTarget();
-			targets = targets.put(labeledStatement.body, new Pair<>(target, Maybe.nothing()));
-			return new Block(ImmutableList.list(explicateStatement(labeledStatement.body, strict), target));
+			targets = targets.put(labeledStatement.body, new Pair<>(target, Maybe.empty()));
+			return new Block(ImmutableList.of(explicateStatement(labeledStatement.body, strict), target));
 		} else if (statement instanceof ReturnStatement) {
 			ReturnStatement returnStatement = (ReturnStatement) statement;
 			return new Return(
@@ -527,16 +527,16 @@ public class Explicator {
 			// TODO hoist function declarations. This will require modifying asg SwitchStatements to have a Declarations block of statements, horrifyingly enough. probably also need to fix scope analysis.
 			com.shapesecurity.shift.ast.SwitchStatement switchStatement = (com.shapesecurity.shift.ast.SwitchStatement) statement;
 			BreakTarget target = new BreakTarget();
-			targets = targets.put(statement, new Pair<>(target, Maybe.nothing()));
+			targets = targets.put(statement, new Pair<>(target, Maybe.empty()));
 
-			return new Block(ImmutableList.list(
+			return new Block(ImmutableList.of(
 				let(
 					explicateExpressionReturningValue(switchStatement.discriminant, strict),
 					d -> new Block(new SwitchStatement(
 						d,
 						switchStatement.cases.map(c -> explicateSwitchCase(c, strict)),
-						new Block(ImmutableList.nil()),
-						ImmutableList.nil()
+						new Block(ImmutableList.empty()),
+						ImmutableList.empty()
 					))
 				),
 				target
@@ -545,9 +545,9 @@ public class Explicator {
 			// TODO hoist function declarations. This will require modifying asg SwitchStatements to have a Declarations block of statements, horrifyingly enough. probably also need to fix scope analysis.
 			SwitchStatementWithDefault switchStatement = (SwitchStatementWithDefault) statement;
 			BreakTarget target = new BreakTarget();
-			targets = targets.put(statement, new Pair<>(target, Maybe.nothing()));
+			targets = targets.put(statement, new Pair<>(target, Maybe.empty()));
 
-			return new Block(ImmutableList.list(
+			return new Block(ImmutableList.of(
 				let(
 					explicateExpressionReturningValue(switchStatement.discriminant, strict),
 					d -> new Block(new SwitchStatement(
@@ -567,17 +567,17 @@ public class Explicator {
 		} else if (statement instanceof TryCatchStatement) {
 			TryCatchStatement tryCatchStatement = (TryCatchStatement) statement;
 			Variable catchVariable =
-				scopeLookup.findVariableDeclaredBy((BindingIdentifier) tryCatchStatement.catchClause.binding).just();
+				scopeLookup.findVariableDeclaredBy((BindingIdentifier) tryCatchStatement.catchClause.binding).fromJust();
 			return new TryCatchFinally(
 				explicateBody(tryCatchStatement.body.statements, strict),
-				Maybe.just(new Pair<>(catchVariable, explicateBody(tryCatchStatement.catchClause.body.statements, strict))),
-				new Block(ImmutableList.nil())
+				Maybe.of(new Pair<>(catchVariable, explicateBody(tryCatchStatement.catchClause.body.statements, strict))),
+				new Block(ImmutableList.empty())
 			);
 		} else if (statement instanceof TryFinallyStatement) {
 			TryFinallyStatement tryFinallyStatement = (TryFinallyStatement) statement;
 			Maybe<Pair<Variable, Block>> catchBody = tryFinallyStatement.catchClause.map(c ->
 				new Pair<>(
-					scopeLookup.findVariableDeclaredBy((BindingIdentifier) c.binding).just(),
+					scopeLookup.findVariableDeclaredBy((BindingIdentifier) c.binding).fromJust(),
 					explicateBody(c.body.statements, strict)
 				)
 			);
@@ -593,9 +593,9 @@ public class Explicator {
 			WhileStatement whileStatement = (WhileStatement) statement;
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
-			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.just(innerTarget)));
+			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
-			Block body = new Block(ImmutableList.<Node>list(
+			Block body = new Block(ImmutableList.<Node>of(
 				new IfElse(
 					explicateExpressionReturningValue(whileStatement.test, strict),
 					new Block(Void.INSTANCE),
@@ -605,7 +605,7 @@ public class Explicator {
 				innerTarget
 			));
 			Loop loop = new Loop(body);
-			return new Block(ImmutableList.list(loop, outerTarget));
+			return new Block(ImmutableList.of(loop, outerTarget));
 		} else if (statement instanceof WithStatement) {
 			return new Halt(); // TODO maybe warn.
 		}
@@ -678,7 +678,7 @@ public class Explicator {
 					objectRef -> letWithValue(
 						explicateExpressionReturningValue(computedMemberExpression.expression, strict),
 						fieldRef -> new BlockWithValue(
-							ImmutableList.list(new RequireObjectCoercible(objectRef)),
+							ImmutableList.of(new RequireObjectCoercible(objectRef)),
 							letWithValue(
 								new TypeCoercionString(fieldRef),
 								prop -> new MemberAssignment(
@@ -719,7 +719,7 @@ public class Explicator {
 				return letWithValue(
 					explicateExpressionSuper(memberExpression._object, strict),
 					contextRef -> new Call(
-						Maybe.just(contextRef),
+						Maybe.of(contextRef),
 						memberExpression instanceof StaticMemberExpression
 							? new MemberAccess(
 							contextRef,
@@ -737,7 +737,7 @@ public class Explicator {
 				);
 			}
 			NodeWithValue callee = explicateExpressionSuper(c.callee, strict);
-			return new Call(Maybe.nothing(), callee, arguments);
+			return new Call(Maybe.empty(), callee, arguments);
 		} else if (expression instanceof CompoundAssignmentExpression) {
 			return explicateCompoundAssignmentExpression((CompoundAssignmentExpression) expression, strict);
 		} else if (expression instanceof ComputedMemberExpression) {
@@ -751,7 +751,7 @@ public class Explicator {
 			return makeTemporary(
 				// TODO there are several other ways of doing this; the temporary is not necessary if we have proper completion values
 				ref -> new BlockWithValue(
-					ImmutableList.list(
+					ImmutableList.of(
 						new IfElse(
 							explicateExpressionReturningValue(conditionalExpression.test, strict),
 							new Block(new VariableAssignment(
@@ -772,7 +772,7 @@ public class Explicator {
 			FunctionExpression functionExpression = (FunctionExpression) expression;
 			return explicateGeneralFunction(
 				functionExpression.name.flatMap(scopeLookup::findVariableDeclaredBy),
-				scopeLookup.findScopeFor(functionExpression).just(),
+				scopeLookup.findScopeFor(functionExpression).fromJust(),
 				simpleParamsHelper(functionExpression.params),
 				functionExpression.body,
 				strict
@@ -874,7 +874,7 @@ public class Explicator {
 					objectRef -> letWithValue(
 						field,
 						fieldRef -> new BlockWithValue(
-							ImmutableList.list(new RequireObjectCoercible(objectRef)),
+							ImmutableList.of(new RequireObjectCoercible(objectRef)),
 							letWithValue(
 								new TypeCoercionString(fieldRef),
 								// todo we don't actually need a new temporary for this (here or elsewhere); we can just reuse fieldRef
@@ -882,7 +882,7 @@ public class Explicator {
 									letWithValue(
 										new TypeCoercionNumber(new MemberAccess(objectRef, prop)),
 										oldVal -> new BlockWithValue(
-											ImmutableList.list(new MemberAssignment(
+											ImmutableList.of(new MemberAssignment(
 												objectRef,
 												prop,
 												new FloatMath(
@@ -938,10 +938,10 @@ public class Explicator {
 	@NotNull
 	private Node explicateVariableDeclaration(@NotNull VariableDeclaration variableDeclaration, boolean strict) {
 		return new Block(
-			Maybe.catMaybes(variableDeclaration.declarators.map(d -> d.init.isNothing() ? Maybe.nothing() :
-				Maybe.just(new VariableAssignment(
+			Maybe.catMaybes(variableDeclaration.declarators.map(d -> d.init.isNothing() ? Maybe.empty() :
+				Maybe.of(new VariableAssignment(
 					refHelper((BindingIdentifier) d.binding),
-					explicateExpressionReturningValue(d.init.just(), strict),
+					explicateExpressionReturningValue(d.init.fromJust(), strict),
 					strict
 				))
 			))
@@ -1014,7 +1014,7 @@ public class Explicator {
 
 		if (binaryExpression.operator == com.shapesecurity.shift.ast.operators.BinaryOperator.Sequence) { // unlike all other cases, we do not need the RHS.
 			return new BlockWithValue(
-				ImmutableList.list(explicateExpressionDiscardingValue(binaryExpression.left, strict)),
+				ImmutableList.of(explicateExpressionDiscardingValue(binaryExpression.left, strict)),
 				right
 			);
 		}
@@ -1241,7 +1241,7 @@ public class Explicator {
 				objectRef -> letWithValue(
 					field,
 					fieldRef -> new BlockWithValue(
-						ImmutableList.list(new RequireObjectCoercible(objectRef)),
+						ImmutableList.of(new RequireObjectCoercible(objectRef)),
 						letWithValue(
 							new TypeCoercionString(fieldRef),
 							prop -> new MemberAssignment(
@@ -1288,9 +1288,9 @@ public class Explicator {
 				ref,
 				explicatePropertyName(getter.name, strict),
 				new MemberAssignmentProperty.Getter(explicateGeneralFunction(
-					Maybe.nothing(),
-					scopeLookup.findScopeFor(getter).just(),
-					ImmutableList.nil(),
+					Maybe.empty(),
+					scopeLookup.findScopeFor(getter).fromJust(),
+					ImmutableList.empty(),
 					getter.body,
 					strict
 				))
@@ -1301,8 +1301,8 @@ public class Explicator {
 				ref,
 				explicatePropertyName(setter.name, strict),
 				new MemberAssignmentProperty.Setter(explicateGeneralFunction(
-					Maybe.nothing(),
-					scopeLookup.findScopeFor(setter).just(),
+					Maybe.empty(),
+					scopeLookup.findScopeFor(setter).fromJust(),
 					scopeLookup.findVariableDeclaredBy((BindingIdentifier) setter.param).toList(),
 					setter.body,
 					strict
@@ -1340,16 +1340,16 @@ public class Explicator {
 	@NotNull
 	private NodeWithValue makeTemporary(F<LocalReference, NodeWithValue> withTemporary) {
 		LocalReference ref = new TemporaryReference();
-		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().just().cons(ref.variable);
-		this.temporaries = this.temporaries.maybeTail().just().cons(curTemps);
+		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().fromJust().cons(ref.variable);
+		this.temporaries = this.temporaries.maybeTail().fromJust().cons(curTemps);
 		return withTemporary.apply(ref);
 	}
 
 	@NotNull
 	private Node makeUnvaluedTemporary(F<LocalReference, Node> withTemporary) { // TODO would be nice to join this with the above
 		LocalReference ref = new TemporaryReference();
-		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().just().cons(ref.variable);
-		this.temporaries = this.temporaries.maybeTail().just().cons(curTemps);
+		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().fromJust().cons(ref.variable);
+		this.temporaries = this.temporaries.maybeTail().fromJust().cons(curTemps);
 		return withTemporary.apply(ref);
 	}
 
@@ -1364,7 +1364,7 @@ public class Explicator {
 	@NotNull
 	private Node let(NodeWithValue value, F<LocalReference, Node> function) {
 		return makeUnvaluedTemporary(ref ->
-			new Block(ImmutableList.list(
+			new Block(ImmutableList.of(
 				new VariableAssignment(ref, value, false),
 				function.apply(ref)
 			)));

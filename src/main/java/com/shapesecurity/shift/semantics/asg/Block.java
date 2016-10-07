@@ -27,7 +27,7 @@ public class Block implements Node {
 	}
 
 	public Block(@NotNull Node child) {
-		this.children = ImmutableList.list(child);
+		this.children = ImmutableList.of(child);
 	}
 
 	public boolean isNoOp() {

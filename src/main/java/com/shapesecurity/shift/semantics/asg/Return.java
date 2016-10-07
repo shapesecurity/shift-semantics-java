@@ -27,6 +27,6 @@ public class Return implements Node {
 	}
 
 	public Return(@NotNull NodeWithValue expression) {
-		this.expression = Maybe.just(expression);
+		this.expression = Maybe.of(expression);
 	}
 }

@@ -22,7 +22,7 @@ public class ExplicatorTest {
 		assertTrue(((NonEmptyImmutableList<Node>) ((Block) s.node).children).head instanceof VariableAssignment);
 		VariableAssignment va = (VariableAssignment) ((NonEmptyImmutableList<Node>) ((Block) s.node).children).head;
 		assertTrue(va.ref.isLeft());
-		assertEquals("a", va.ref.left().just().name);
+		assertEquals("a", va.ref.left().fromJust().name);
 		assertTrue(va.value instanceof LiteralNumber);
 		assertEquals(0.0, ((LiteralNumber) va.value).value, 0.0);
 	}
@@ -37,8 +37,8 @@ public class ExplicatorTest {
 		assertTrue(c.callee instanceof GlobalReference);
 		assertEquals("a", ((GlobalReference) c.callee).name);
 		assertEquals(1, c.arguments.length);
-		assertTrue(c.arguments.maybeHead().just() instanceof LiteralNumber);
-		assertEquals(0.0, ((LiteralNumber) c.arguments.maybeHead().just()).value, 0.0);
+		assertTrue(c.arguments.maybeHead().fromJust() instanceof LiteralNumber);
+		assertEquals(0.0, ((LiteralNumber) c.arguments.maybeHead().fromJust()).value, 0.0);
 	}
 
 	public static String COVERAGE_PROGRAM =

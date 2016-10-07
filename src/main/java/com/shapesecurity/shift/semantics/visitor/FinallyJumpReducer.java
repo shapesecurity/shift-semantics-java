@@ -71,12 +71,12 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	@NotNull
 	private State loopHelper(@NotNull Node loopNode, @NotNull State body) { // no labels in loop bounds
 		HashTable<Node, Pair<Node, Integer>> knownJumps = body.knownJumps;
-		knownJumps = body.unlabelledBreaks.foldLeft((table, kv) -> table.put(kv.a, new Pair<>(loopNode, kv.b)), knownJumps);
-		knownJumps = body.unlabelledContinues.foldLeft((table, kv) -> table.put(kv.a, new Pair<>(loopNode, kv.b)), knownJumps);
+		knownJumps = body.unlabelledBreaks.foldLeft((table, kv) -> table.put(kv.left, new Pair<>(loopNode, kv.right)), knownJumps);
+		knownJumps = body.unlabelledContinues.foldLeft((table, kv) -> table.put(kv.left, new Pair<>(loopNode, kv.right)), knownJumps);
 		return new State(
-			HashTable.emptyP(),
+			HashTable.emptyUsingIdentity(),
 			body.labelledBreaks,
-			HashTable.emptyP(),
+			HashTable.emptyUsingIdentity(),
 			body.labelledContinues,
 			knownJumps
 		);
@@ -85,11 +85,11 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	@NotNull
 	private State switchHelper(@NotNull Node switchNode, @NotNull State body) { // no labels in discriminant
 		return new State(
-			HashTable.emptyP(),
+			HashTable.emptyUsingIdentity(),
 			body.labelledBreaks,
 			body.unlabelledContinues,
 			body.labelledContinues,
-			body.unlabelledBreaks.foldLeft((table, kv) -> table.put(kv.a, new Pair<>(switchNode, kv.b)), body.knownJumps)
+			body.unlabelledBreaks.foldLeft((table, kv) -> table.put(kv.left, new Pair<>(switchNode, kv.right)), body.knownJumps)
 		);
 	}
 
@@ -97,24 +97,24 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	@Override
 	public State reduceBreakStatement(@NotNull BreakStatement node) {
 		if (node.label.isJust()) {
-			String label = node.label.just();
+			String label = node.label.fromJust();
 			return new State(
-				HashTable.emptyP(),
-				HashTable.<String, ImmutableList<Pair<BreakStatement, Integer>>>empty().put(
+				HashTable.emptyUsingIdentity(),
+				HashTable.<String, ImmutableList<Pair<BreakStatement, Integer>>>emptyUsingEquality().put(
 					label,
-					ImmutableList.list(new Pair<>(node, 0))
+					ImmutableList.of(new Pair<>(node, 0))
 				),
-				HashTable.emptyP(),
-				HashTable.empty(),
-				HashTable.emptyP()
+				HashTable.emptyUsingIdentity(),
+				HashTable.emptyUsingEquality(),
+				HashTable.emptyUsingIdentity()
 			);
 		} else {
 			return new State(
-				HashTable.<BreakStatement, Integer>emptyP().put(node, 0),
-				HashTable.empty(),
-				HashTable.emptyP(),
-				HashTable.empty(),
-				HashTable.emptyP()
+				HashTable.<BreakStatement, Integer>emptyUsingIdentity().put(node, 0),
+				HashTable.emptyUsingEquality(),
+				HashTable.emptyUsingIdentity(),
+				HashTable.emptyUsingEquality(),
+				HashTable.emptyUsingIdentity()
 			);
 		}
 	}
@@ -123,24 +123,24 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	@Override
 	public State reduceContinueStatement(@NotNull ContinueStatement node) {
 		if (node.label.isJust()) {
-			String label = node.label.just();
+			String label = node.label.fromJust();
 			return new State(
-				HashTable.emptyP(),
-				HashTable.empty(),
-				HashTable.emptyP(),
-				HashTable.<String, ImmutableList<Pair<ContinueStatement, Integer>>>empty().put(
+				HashTable.emptyUsingIdentity(),
+				HashTable.emptyUsingEquality(),
+				HashTable.emptyUsingIdentity(),
+				HashTable.<String, ImmutableList<Pair<ContinueStatement, Integer>>>emptyUsingEquality().put(
 					label,
-					ImmutableList.list(new Pair<>(node, 0))
+					ImmutableList.of(new Pair<>(node, 0))
 				),
-				HashTable.emptyP()
+				HashTable.emptyUsingIdentity()
 			);
 		} else {
 			return new State(
-				HashTable.emptyP(),
-				HashTable.empty(),
-				HashTable.<ContinueStatement, Integer>emptyP().put(node, 0),
-				HashTable.empty(),
-				HashTable.emptyP()
+				HashTable.emptyUsingIdentity(),
+				HashTable.emptyUsingEquality(),
+				HashTable.<ContinueStatement, Integer>emptyUsingIdentity().put(node, 0),
+				HashTable.emptyUsingEquality(),
+				HashTable.emptyUsingIdentity()
 			);
 		}
 	}
@@ -179,16 +179,16 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	@NotNull
 	@Override
 	public State reduceLabeledStatement(@NotNull LabeledStatement node, @NotNull State body) {
-		ImmutableList<Pair<BreakStatement, Integer>> newBreaks = body.labelledBreaks.get(node.label).orJust(ImmutableList.nil());
+		ImmutableList<Pair<BreakStatement, Integer>> newBreaks = body.labelledBreaks.get(node.label).orJust(ImmutableList.empty());
 		ImmutableList<Pair<ContinueStatement, Integer>> newContinues =
-			body.labelledContinues.get(node.label).orJust(ImmutableList.nil());
+			body.labelledContinues.get(node.label).orJust(ImmutableList.empty());
 		HashTable<String, ImmutableList<Pair<BreakStatement, Integer>>> labelledBreaks = body.labelledBreaks.remove(node.label);
 		HashTable<String, ImmutableList<Pair<ContinueStatement, Integer>>> labelledContinues =
 			body.labelledContinues.remove(node.label);
 
 		HashTable<Node, Pair<Node, Integer>> knownJumps = body.knownJumps;
-		knownJumps = newBreaks.foldLeft((table, kv) -> table.put(kv.a, new Pair<>(node.body, kv.b)), knownJumps);
-		knownJumps = newContinues.foldLeft((table, kv) -> table.put(kv.a, new Pair<>(node.body, kv.b)), knownJumps);
+		knownJumps = newBreaks.foldLeft((table, kv) -> table.put(kv.left, new Pair<>(node.body, kv.right)), knownJumps);
+		knownJumps = newContinues.foldLeft((table, kv) -> table.put(kv.left, new Pair<>(node.body, kv.right)), knownJumps);
 
 		return new State(
 			body.unlabelledBreaks,
@@ -263,11 +263,11 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		}
 
 		public State() {
-			this.unlabelledBreaks = HashTable.emptyP();
-			this.labelledBreaks = HashTable.empty();
-			this.unlabelledContinues = HashTable.emptyP();
-			this.labelledContinues = HashTable.empty();
-			this.knownJumps = HashTable.emptyP();
+			this.unlabelledBreaks = HashTable.emptyUsingIdentity();
+			this.labelledBreaks = HashTable.emptyUsingEquality();
+			this.unlabelledContinues = HashTable.emptyUsingIdentity();
+			this.labelledContinues = HashTable.emptyUsingEquality();
+			this.knownJumps = HashTable.emptyUsingIdentity();
 		}
 
 		public State(@NotNull State a, @NotNull State b) {
@@ -281,9 +281,9 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		public State incrementFinalizers() {
 			return new State(
 				this.unlabelledBreaks.map(x -> x + 1),
-				this.labelledBreaks.map(l -> l.map(p -> new Pair<>(p.a, p.b + 1))),
+				this.labelledBreaks.map(l -> l.map(p -> new Pair<>(p.left, p.right + 1))),
 				this.unlabelledContinues.map(x -> x + 1),
-				this.labelledContinues.map(l -> l.map(p -> new Pair<>(p.a, p.b + 1))),
+				this.labelledContinues.map(l -> l.map(p -> new Pair<>(p.left, p.right + 1))),
 				this.knownJumps
 			);
 		}

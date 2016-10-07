@@ -22,8 +22,8 @@ public class TemporaryReference extends LocalReference {
 	public TemporaryReference() {
 		super(new Variable(
 			"LOCAL",
-			ImmutableList.nil(),
-			ImmutableList.nil()
+			ImmutableList.empty(),
+			ImmutableList.empty()
 		)); // TODO consider if this is what we actually want to do
 	}
 }
