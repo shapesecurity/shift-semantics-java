@@ -27,7 +27,7 @@ In `pom.xml`, under `project.dependencies`, add this dependency.
 
 ## Purpose
 
-There is a great deal of information about a given ECMASCRIPT program which is specified by the ECMAScript spec but not explicitly represented in the Shift AST: everything from identifier resolution (which identifiers refer to which variables) to evaluation order. The explicator exposes as much of that information as is practical while discarding irrelevant details, such as the names of local variables. In short, it attempts to capture all of and only the information needed to actually execute a program, so that tools such as compilers need not concern themselves with details about the original source text.
+There is a great deal of information about a given ECMAScript program which is specified by the ECMAScript spec but not explicitly represented in the Shift AST: everything from identifier resolution (which identifiers refer to which variables) to evaluation order. The explicator exposes as much of that information as is practical while discarding irrelevant details, such as the names of local variables. In short, it attempts to capture all of and only the information needed to actually execute a program, so that tools such as compilers need not concern themselves with details about the original source text.
 
 ## Design
 
