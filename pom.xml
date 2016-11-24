@@ -12,52 +12,15 @@
 	<description>generate an abstract semantic graph from a Shift AST</description>
 
 	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
 		<repository>
-			<id>shift-semantics</id>
-			<url>http://artifactory.shape/artifactory/icbm-jars</url>
-			<name>Shift Semantics</name>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>central</id>
-			<name>central</name>
-			<url>http://artifactory.shape/artifactory/central</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-
-		<repository>
-			<id>icbm-jars</id>
-			<name>icbm-jars</name>
-			<url>http://artifactory.shape/artifactory/icbm-jars</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>central</id>
-			<name>Shape Central Cache</name>
-			<url>http://artifactory.shape/artifactory/central</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</pluginRepository>
-	</pluginRepositories>
 
 	<dependencies>
 		<dependency>
