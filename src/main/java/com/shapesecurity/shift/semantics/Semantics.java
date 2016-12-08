@@ -28,7 +28,7 @@ public class Semantics {
 	@NotNull
 	public final ImmutableList<String> scriptVarDecls;
 
-	Semantics(@NotNull Node node, @NotNull ImmutableList<Variable> locals, @NotNull ImmutableList<String> scriptVarDecls) {
+	public Semantics(@NotNull Node node, @NotNull ImmutableList<Variable> locals, @NotNull ImmutableList<String> scriptVarDecls) {
 		this.node = node;
 		this.locals = locals;
 		this.scriptVarDecls = scriptVarDecls;
