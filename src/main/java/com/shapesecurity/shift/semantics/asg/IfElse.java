@@ -17,9 +17,27 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class IfElse implements Node {
 	@NotNull
 	public final NodeWithValue test; // TODO could be a type coercion node
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof IfElse)) return false;
+		IfElse ifElse = (IfElse) o;
+		return Objects.equals(test, ifElse.test) &&
+				Objects.equals(consequent, ifElse.consequent) &&
+				Objects.equals(alternate, ifElse.alternate);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(test, consequent, alternate);
+	}
+
 	@NotNull
 	public final Block consequent;
 	@NotNull

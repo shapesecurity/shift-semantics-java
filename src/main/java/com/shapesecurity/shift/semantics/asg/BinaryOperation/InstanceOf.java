@@ -18,9 +18,26 @@ package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class InstanceOf extends BinaryOperation {
 	@NotNull
 	public final NodeWithValue left;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof InstanceOf)) return false;
+		InstanceOf that = (InstanceOf) o;
+		return Objects.equals(left, that.left) &&
+				Objects.equals(right, that.right);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(left, right);
+	}
+
 	@NotNull
 	public final NodeWithValue right;
 

@@ -15,7 +15,22 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class LiteralNumber implements Node, Literal {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof LiteralNumber)) return false;
+		LiteralNumber that = (LiteralNumber) o;
+		return Double.compare(that.value, value) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
+	}
+
 	public final double value;
 
 	public LiteralNumber(double value) {

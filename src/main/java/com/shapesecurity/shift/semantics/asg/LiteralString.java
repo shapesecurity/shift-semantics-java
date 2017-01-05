@@ -17,9 +17,24 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class LiteralString implements Literal {
 	@NotNull
 	public final String value;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof LiteralString)) return false;
+		LiteralString that = (LiteralString) o;
+		return Objects.equals(value, that.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
+	}
 
 	public LiteralString(String value) {
 		this.value = value;

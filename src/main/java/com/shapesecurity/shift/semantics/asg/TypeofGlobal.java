@@ -17,9 +17,24 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class TypeofGlobal implements NodeWithValue {
 	@NotNull
 	public final String which;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof TypeofGlobal)) return false;
+		TypeofGlobal that = (TypeofGlobal) o;
+		return Objects.equals(which, that.which);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(which);
+	}
 
 	public TypeofGlobal(@NotNull String which) {
 		this.which = which;

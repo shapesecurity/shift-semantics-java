@@ -17,9 +17,24 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class TypeCoercionString implements NodeWithValue {
 	@NotNull
 	public final NodeWithValue expression;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof TypeCoercionString)) return false;
+		TypeCoercionString that = (TypeCoercionString) o;
+		return Objects.equals(expression, that.expression);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(expression);
+	}
 
 	public TypeCoercionString(@NotNull NodeWithValue expression) {
 		this.expression = expression;

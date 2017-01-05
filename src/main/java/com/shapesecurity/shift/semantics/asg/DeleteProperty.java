@@ -17,7 +17,24 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class DeleteProperty implements NodeWithValue {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof DeleteProperty)) return false;
+		DeleteProperty that = (DeleteProperty) o;
+		return strict == that.strict &&
+				Objects.equals(object, that.object) &&
+				Objects.equals(fieldExpression, that.fieldExpression);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(object, fieldExpression, strict);
+	}
+
 	@NotNull
 	public final NodeWithValue object;
 	@NotNull

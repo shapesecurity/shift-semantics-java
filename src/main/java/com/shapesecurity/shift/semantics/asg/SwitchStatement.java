@@ -19,12 +19,32 @@ import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.ImmutableList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class SwitchStatement implements Node {
 	@NotNull
 	public final LocalReference discriminant;
 	@NotNull
 	public final ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof SwitchStatement)) return false;
+		SwitchStatement that = (SwitchStatement) o;
+		return Objects.equals(discriminant, that.discriminant) &&
+				Objects.equals(preDefaultCases, that.preDefaultCases) &&
+				Objects.equals(defaultCase, that.defaultCase) &&
+				Objects.equals(postDefaultCases, that.postDefaultCases);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(discriminant, preDefaultCases, defaultCase, postDefaultCases);
+	}
+
 	@NotNull
+
 	public final Block defaultCase;
 	@NotNull
 	public final ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases;

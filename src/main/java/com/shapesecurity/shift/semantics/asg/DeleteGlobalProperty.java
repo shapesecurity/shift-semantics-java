@@ -17,7 +17,22 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class DeleteGlobalProperty implements NodeWithValue {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof DeleteGlobalProperty)) return false;
+		DeleteGlobalProperty that = (DeleteGlobalProperty) o;
+		return Objects.equals(which, that.which);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(which);
+	}
+
 	@NotNull
 	public final String which;
 

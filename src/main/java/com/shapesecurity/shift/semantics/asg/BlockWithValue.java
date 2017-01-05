@@ -18,10 +18,28 @@ package com.shapesecurity.shift.semantics.asg;
 import com.shapesecurity.functional.data.ImmutableList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class BlockWithValue implements NodeWithValue {
 	@NotNull
 	public Block head;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof BlockWithValue)) return false;
+		BlockWithValue that = (BlockWithValue) o;
+		return Objects.equals(head, that.head) &&
+				Objects.equals(result, that.result);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(head, result);
+	}
+
 	@NotNull
+
 	public NodeWithValue result;
 
 	public BlockWithValue(@NotNull Block head, @NotNull NodeWithValue result) {

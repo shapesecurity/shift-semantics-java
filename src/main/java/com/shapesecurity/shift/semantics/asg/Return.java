@@ -18,9 +18,24 @@ package com.shapesecurity.shift.semantics.asg;
 import com.shapesecurity.functional.data.Maybe;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Return implements Node {
 	@NotNull
 	public final Maybe<NodeWithValue> expression;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Return)) return false;
+		Return aReturn = (Return) o;
+		return Objects.equals(expression, aReturn.expression);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(expression);
+	}
 
 	public Return(@NotNull Maybe<NodeWithValue> expression) {
 		this.expression = expression;

@@ -17,11 +17,27 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class LiteralRegExp implements Literal {
 	@NotNull
 	public final String pattern;
 	@NotNull
 	public final String flags;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof LiteralRegExp)) return false;
+		LiteralRegExp that = (LiteralRegExp) o;
+		return Objects.equals(pattern, that.pattern) &&
+				Objects.equals(flags, that.flags);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(pattern, flags);
+	}
 
 	public LiteralRegExp(@NotNull String pattern, @NotNull String flags) {
 		this.pattern = pattern;

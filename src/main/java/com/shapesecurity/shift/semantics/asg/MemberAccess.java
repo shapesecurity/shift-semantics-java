@@ -17,9 +17,26 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class MemberAccess implements NodeWithValue {
 	@NotNull
 	public final NodeWithValue object;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof MemberAccess)) return false;
+		MemberAccess that = (MemberAccess) o;
+		return Objects.equals(object, that.object) &&
+				Objects.equals(fieldExpression, that.fieldExpression);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(object, fieldExpression);
+	}
+
 	@NotNull
 	public final NodeWithValue fieldExpression;
 

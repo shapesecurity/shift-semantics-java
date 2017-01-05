@@ -17,7 +17,22 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Keys implements NodeWithValue {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Keys)) return false;
+		Keys keys = (Keys) o;
+		return Objects.equals(_object, keys._object);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(_object);
+	}
+
 	@NotNull
 	public final NodeWithValue _object;
 

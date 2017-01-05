@@ -17,7 +17,22 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class GlobalReference implements NodeWithValue {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof GlobalReference)) return false;
+		GlobalReference that = (GlobalReference) o;
+		return Objects.equals(name, that.name);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name);
+	}
+
 	public final String name;
 
 	public GlobalReference(@NotNull String name) {

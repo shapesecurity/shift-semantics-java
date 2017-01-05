@@ -17,9 +17,24 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class RequireObjectCoercible implements NodeWithValue {
 	@NotNull
 	public final NodeWithValue expression;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof RequireObjectCoercible)) return false;
+		RequireObjectCoercible that = (RequireObjectCoercible) o;
+		return Objects.equals(expression, that.expression);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(expression);
+	}
 
 	public RequireObjectCoercible(@NotNull NodeWithValue expression) {
 		this.expression = expression;

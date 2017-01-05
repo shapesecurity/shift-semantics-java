@@ -15,7 +15,22 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class LiteralBoolean implements Literal {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof LiteralBoolean)) return false;
+		LiteralBoolean that = (LiteralBoolean) o;
+		return value == that.value;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
+	}
+
 	public final boolean value;
 
 	public LiteralBoolean(boolean value) {

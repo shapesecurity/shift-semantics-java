@@ -17,9 +17,24 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Throw implements Node {
 	@NotNull
 	public final NodeWithValue expression;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Throw)) return false;
+		Throw aThrow = (Throw) o;
+		return Objects.equals(expression, aThrow.expression);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(expression);
+	}
 
 	public Throw(@NotNull NodeWithValue expression) {
 		this.expression = expression;

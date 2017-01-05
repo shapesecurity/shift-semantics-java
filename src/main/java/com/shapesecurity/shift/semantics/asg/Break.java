@@ -17,9 +17,26 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Break implements Node {
 	@NotNull
 	public final BreakTarget target;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Break)) return false;
+		Break aBreak = (Break) o;
+		return finalliesBroken == aBreak.finalliesBroken &&
+				Objects.equals(target, aBreak.target);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(target, finalliesBroken);
+	}
+
 	public final int finalliesBroken;
 
 	public Break(@NotNull BreakTarget target, int finalliesBroken) {

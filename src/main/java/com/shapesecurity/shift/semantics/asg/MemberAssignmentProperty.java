@@ -17,6 +17,8 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public interface MemberAssignmentProperty {
 	class StaticValue implements MemberAssignmentProperty {
 		@NotNull
@@ -33,6 +35,19 @@ public interface MemberAssignmentProperty {
 
 		public Getter(@NotNull LiteralFunction value) {
 			this.value = value;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (!(o instanceof Getter)) return false;
+			Getter getter = (Getter) o;
+			return Objects.equals(value, getter.value);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(value);
 		}
 	}
 

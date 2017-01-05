@@ -19,9 +19,27 @@ import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Call implements NodeWithValue {
 	@NotNull
 	public final NodeWithValue callee;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Call)) return false;
+		Call call = (Call) o;
+		return Objects.equals(callee, call.callee) &&
+				Objects.equals(arguments, call.arguments) &&
+				Objects.equals(context, call.context);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(callee, arguments, context);
+	}
+
 	@NotNull
 	public final ImmutableList<NodeWithValue> arguments;
 	@NotNull

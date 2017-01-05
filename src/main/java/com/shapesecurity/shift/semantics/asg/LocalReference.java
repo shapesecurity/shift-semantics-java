@@ -18,9 +18,24 @@ package com.shapesecurity.shift.semantics.asg;
 import com.shapesecurity.shift.scope.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class LocalReference implements NodeWithValue {
 	@NotNull
 	public Variable variable;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof LocalReference)) return false;
+		LocalReference that = (LocalReference) o;
+		return Objects.equals(variable, that.variable);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(variable);
+	}
 
 	public LocalReference(@NotNull Variable variable) {
 		this.variable = variable;

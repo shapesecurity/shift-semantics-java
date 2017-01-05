@@ -17,9 +17,24 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Loop implements Node {
 	@NotNull
 	public final Block block;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Loop)) return false;
+		Loop loop = (Loop) o;
+		return Objects.equals(block, loop.block);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(block);
+	}
 
 	public Loop(@NotNull Block block) {
 		this.block = block;

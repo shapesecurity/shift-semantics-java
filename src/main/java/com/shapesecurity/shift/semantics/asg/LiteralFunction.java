@@ -19,11 +19,33 @@ import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.scope.Variable;
 
+import java.util.Objects;
+
 public class LiteralFunction implements Literal {
 	public final Maybe<Variable> name;
 	public final Maybe<Variable> arguments;
 	public final ImmutableList<Variable> parameters;
 	public final ImmutableList<Variable> locals;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof LiteralFunction)) return false;
+		LiteralFunction that = (LiteralFunction) o;
+		return isStrict == that.isStrict &&
+				Objects.equals(name, that.name) &&
+				Objects.equals(arguments, that.arguments) &&
+				Objects.equals(parameters, that.parameters) &&
+				Objects.equals(locals, that.locals) &&
+				Objects.equals(captured, that.captured) &&
+				Objects.equals(body, that.body);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, arguments, parameters, locals, captured, body, isStrict);
+	}
+
 	public final ImmutableList<Variable> captured;
 	public final Block body;
 	public final boolean isStrict;

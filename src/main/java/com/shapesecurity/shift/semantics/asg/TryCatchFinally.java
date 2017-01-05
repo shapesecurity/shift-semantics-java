@@ -20,11 +20,29 @@ import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.scope.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class TryCatchFinally implements Node {
 	@NotNull
 	public final Block tryBody;
 	@NotNull
 	public final Maybe<Pair<Variable, Block>> catchBody;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof TryCatchFinally)) return false;
+		TryCatchFinally that = (TryCatchFinally) o;
+		return Objects.equals(tryBody, that.tryBody) &&
+				Objects.equals(catchBody, that.catchBody) &&
+				Objects.equals(finallyBody, that.finallyBody);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(tryBody, catchBody, finallyBody);
+	}
+
 	@NotNull
 	public final Block finallyBody;
 

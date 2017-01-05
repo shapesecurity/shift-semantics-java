@@ -18,6 +18,8 @@ package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class FloatMath extends BinaryOperation {
 	@NotNull
 	public final Operator operator;
@@ -25,6 +27,21 @@ public class FloatMath extends BinaryOperation {
 	public final NodeWithValue left;
 	@NotNull
 	public final NodeWithValue right;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof FloatMath)) return false;
+		FloatMath floatMath = (FloatMath) o;
+		return operator == floatMath.operator &&
+				Objects.equals(left, floatMath.left) &&
+				Objects.equals(right, floatMath.right);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(operator, left, right);
+	}
 
 	public FloatMath(@NotNull Operator operator, @NotNull NodeWithValue left, @NotNull NodeWithValue right) {
 		this.operator = operator;

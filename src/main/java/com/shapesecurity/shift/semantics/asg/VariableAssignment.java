@@ -18,7 +18,24 @@ package com.shapesecurity.shift.semantics.asg;
 import com.shapesecurity.functional.data.Either;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class VariableAssignment implements NodeWithValue {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof VariableAssignment)) return false;
+		VariableAssignment that = (VariableAssignment) o;
+		return strict == that.strict &&
+				Objects.equals(ref, that.ref) &&
+				Objects.equals(value, that.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(ref, value, strict);
+	}
+
 	@NotNull
 	public final Either<GlobalReference, LocalReference> ref;
 	@NotNull

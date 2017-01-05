@@ -18,11 +18,29 @@ package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class IntMath extends BinaryOperation {
 	@NotNull
 	public final Operator operator;
 	@NotNull
 	public final NodeWithValue left;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof IntMath)) return false;
+		IntMath intMath = (IntMath) o;
+		return operator == intMath.operator &&
+				Objects.equals(left, intMath.left) &&
+				Objects.equals(right, intMath.right);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(operator, left, right);
+	}
+
 	@NotNull
 	public final NodeWithValue right;
 

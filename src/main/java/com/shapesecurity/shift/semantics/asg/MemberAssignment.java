@@ -17,6 +17,8 @@ package com.shapesecurity.shift.semantics.asg;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class MemberAssignment implements NodeWithValue {
 	@NotNull
 	public final NodeWithValue object;
@@ -25,6 +27,22 @@ public class MemberAssignment implements NodeWithValue {
 	@NotNull
 	public final MemberAssignmentProperty.StaticValue property;
 	public final boolean strict;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof MemberAssignment)) return false;
+		MemberAssignment that = (MemberAssignment) o;
+		return strict == that.strict &&
+				Objects.equals(object, that.object) &&
+				Objects.equals(fieldExpression, that.fieldExpression) &&
+				Objects.equals(property, that.property);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(object, fieldExpression, property, strict);
+	}
 
 	public MemberAssignment(
 		@NotNull NodeWithValue object, @NotNull NodeWithValue fieldExpression,
