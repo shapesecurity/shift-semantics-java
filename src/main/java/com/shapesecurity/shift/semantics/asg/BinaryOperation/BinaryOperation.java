@@ -16,6 +16,7 @@
 package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class BinaryOperation implements NodeWithValue {
 	public static BinaryOperation fromOperator(BinaryOperator operator, NodeWithValue left, NodeWithValue right) {
@@ -33,4 +34,10 @@ public abstract class BinaryOperation implements NodeWithValue {
 			throw new RuntimeException("Not reached");
 		}
 	}
+
+	@NotNull
+	public abstract NodeWithValue left();
+
+	@NotNull
+	public abstract NodeWithValue right();
 }

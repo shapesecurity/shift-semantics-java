@@ -15,5 +15,10 @@
  */
 package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 
-public interface UnaryOperation {
+import com.shapesecurity.shift.semantics.asg.NodeWithValue;
+import org.jetbrains.annotations.NotNull;
+
+public abstract class UnaryOperation implements NodeWithValue {
+    @NotNull
+    public abstract NodeWithValue expression();
 }

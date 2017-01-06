@@ -19,9 +19,14 @@ import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
 // Expression must not be an undefined reference.
-public class Typeof implements UnaryOperation, NodeWithValue {
+public class Typeof extends UnaryOperation {
 	@NotNull
 	public final NodeWithValue expression;
+
+	@NotNull
+	public NodeWithValue expression() {
+		return this.expression;
+	}
 
 	public Typeof(@NotNull NodeWithValue expression) {
 		this.expression = expression;

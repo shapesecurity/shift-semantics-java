@@ -18,9 +18,14 @@ package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
-public class VoidOp implements UnaryOperation, NodeWithValue {
+public class VoidOp extends UnaryOperation {
 	@NotNull
 	public final NodeWithValue expression;
+
+	@NotNull
+	public NodeWithValue expression() {
+		return this.expression;
+	}
 
 	public VoidOp(@NotNull NodeWithValue expression) {
 		this.expression = expression;

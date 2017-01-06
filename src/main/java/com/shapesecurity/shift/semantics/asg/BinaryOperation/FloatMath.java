@@ -32,6 +32,18 @@ public class FloatMath extends BinaryOperation {
 		this.right = right;
 	}
 
+	@Override
+	@NotNull
+	public NodeWithValue left() {
+		return this.left;
+	}
+
+	@Override
+	@NotNull
+	public NodeWithValue right() {
+		return this.right;
+	}
+
 	public enum Operator implements BinaryOperator {
 		Plus("+"),
 		Minus("-"),
@@ -40,7 +52,7 @@ public class FloatMath extends BinaryOperation {
 		Rem("%");
 
 		@NotNull
-		private final String name;
+		public final String name;
 
 		Operator(@NotNull String name) {
 			this.name = name;

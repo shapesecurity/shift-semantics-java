@@ -24,6 +24,18 @@ public class InstanceOf extends BinaryOperation {
 	@NotNull
 	public final NodeWithValue right;
 
+	@Override
+	@NotNull
+	public NodeWithValue left() {
+		return this.left;
+	}
+
+	@Override
+	@NotNull
+	public NodeWithValue right() {
+		return this.right;
+	}
+
 	public InstanceOf(@NotNull NodeWithValue left, @NotNull NodeWithValue right) {
 		this.left = left;
 		this.right = right;

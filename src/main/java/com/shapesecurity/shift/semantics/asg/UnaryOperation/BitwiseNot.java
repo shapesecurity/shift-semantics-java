@@ -18,9 +18,14 @@ package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
-public class BitwiseNot implements UnaryOperation, NodeWithValue {
+public class BitwiseNot extends UnaryOperation {
 	@NotNull
 	public final NodeWithValue expression;
+
+	@NotNull
+	public NodeWithValue expression() {
+		return this.expression;
+	}
 
 	public BitwiseNot(@NotNull NodeWithValue expression) {
 		this.expression = expression;

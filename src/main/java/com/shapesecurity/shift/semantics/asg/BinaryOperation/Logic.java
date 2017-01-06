@@ -32,12 +32,24 @@ public class Logic extends BinaryOperation {
 		this.right = right;
 	}
 
+	@Override
+	@NotNull
+	public NodeWithValue left() {
+		return this.left;
+	}
+
+	@Override
+	@NotNull
+	public NodeWithValue right() {
+		return this.right;
+	}
+
 	public enum Operator implements BinaryOperator {
 		And("&&"),
 		Or("||");
 
 		@NotNull
-		private final String name;
+		public final String name;
 
 		Operator(@NotNull String name) {
 			this.name = name;

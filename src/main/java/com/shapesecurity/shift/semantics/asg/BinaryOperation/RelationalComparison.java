@@ -32,6 +32,18 @@ public class RelationalComparison extends BinaryOperation {
 		this.right = right;
 	}
 
+	@Override
+	@NotNull
+	public NodeWithValue left() {
+		return this.left;
+	}
+
+	@Override
+	@NotNull
+	public NodeWithValue right() {
+		return this.right;
+	}
+
 	public enum Operator implements BinaryOperator {
 		LessThan("<"),
 		LessThanEqual("<="),
@@ -39,7 +51,7 @@ public class RelationalComparison extends BinaryOperation {
 		GreaterThanEqual(">=");
 
 		@NotNull
-		private final String name;
+		public final String name;
 
 		Operator(@NotNull String name) {
 			this.name = name;

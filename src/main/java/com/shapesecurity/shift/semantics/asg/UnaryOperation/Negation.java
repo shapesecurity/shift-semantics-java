@@ -18,9 +18,14 @@ package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
-public class Negation implements UnaryOperation, NodeWithValue {
+public class Negation extends UnaryOperation {
 	@NotNull
 	public final NodeWithValue expression;
+
+	@NotNull
+	public NodeWithValue expression() {
+		return this.expression;
+	}
 
 	public Negation(@NotNull NodeWithValue expression) {
 		this.expression = expression;
