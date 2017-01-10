@@ -29,8 +29,6 @@ public class ReconstructingReducerTest {
 
         Semantics asg = Explicator.deriveSemantics(Parser.parseScript(programText));
         Semantics reconstructedAsg = new Semantics(new ReconstructingReducer().visit(asg.node), asg.locals, asg.scriptVarDecls);
-        // assertTrue(((BlockWithValue) ((Call) (reconstructedAsg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof VariableAssignment);
         assertTrue(asg.node.equals(reconstructedAsg.node));
-
     }
 }

@@ -238,7 +238,7 @@ public class Explicator {
 					return new BlockWithValue(
 						ImmutableList.of(rhs, new Throw(new New(new GlobalReference("TypeError"), ImmutableList.empty()))),
 						// TODO throw an actual TypeError, not whatever the global TypeError value happens to be at the moment (it is writable)
-						new LiteralUndefined()
+						LiteralUndefined.INSTANCE
 					);
 				} else {
 					return rhs; // silently fail to write to function-expression names
@@ -255,7 +255,7 @@ public class Explicator {
 	// given a FunctionDeclaration or FunctionExpression, find all the variables created in it or its children not crossing function boundaries
 	// which is to say, all variables which calling this function recursively might shadow
 	private ImmutableList<Variable> functionVariablesHelper(@NotNull com.shapesecurity.shift.ast.Node node) {
-		return scopeLookup.findScopeFor(node).maybe(ImmutableList.empty(), this::functionVariablesHelper);
+		return scopeLookup.findScopeFor(node).<ImmutableList<Variable>>maybe(ImmutableList.<Variable>empty(), this::functionVariablesHelper);
 	}
 
 	// helper for the above. find variables in the given scope and its descendants, up to function boundaries
@@ -369,8 +369,8 @@ public class Explicator {
 			return Void.INSTANCE;
 		} else if (statement instanceof DoWhileStatement) { // exactly the same as WhileStatement, except that the test is last instead of first
 			DoWhileStatement doWhileStatement = (DoWhileStatement) statement;
-			BreakTarget outerTarget = new BreakTarget();
-			BreakTarget innerTarget = new BreakTarget();
+			BreakTarget outerTarget = BreakTarget.INSTANCE;
+			BreakTarget innerTarget = BreakTarget.INSTANCE;
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 			Block body = new Block(ImmutableList.<Node>of(
@@ -409,8 +409,8 @@ public class Explicator {
             }
              */
 			ForInStatement forInStatement = (ForInStatement) statement;
-			BreakTarget outerTarget = new BreakTarget();
-			BreakTarget innerTarget = new BreakTarget();
+			BreakTarget outerTarget = BreakTarget.INSTANCE;
+			BreakTarget innerTarget = BreakTarget.INSTANCE;
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
@@ -469,8 +469,8 @@ public class Explicator {
 			})));
 		} else if (statement instanceof ForStatement) {
 			ForStatement forStatement = (ForStatement) statement;
-			BreakTarget outerTarget = new BreakTarget();
-			BreakTarget innerTarget = new BreakTarget();
+			BreakTarget outerTarget = BreakTarget.INSTANCE;
+			BreakTarget innerTarget = BreakTarget.INSTANCE;
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
@@ -515,7 +515,7 @@ public class Explicator {
 			return new IfElse(test, new Block(consequent), new Block(alternate));
 		} else if (statement instanceof LabeledStatement) {
 			LabeledStatement labeledStatement = (LabeledStatement) statement;
-			BreakTarget target = new BreakTarget();
+			BreakTarget target = BreakTarget.INSTANCE;
 			targets = targets.put(labeledStatement.body, new Pair<>(target, Maybe.empty()));
 			return new Block(ImmutableList.of(explicateStatement(labeledStatement.body, strict), target));
 		} else if (statement instanceof ReturnStatement) {
@@ -526,7 +526,7 @@ public class Explicator {
 		} else if (statement instanceof com.shapesecurity.shift.ast.SwitchStatement) {
 			// TODO hoist function declarations. This will require modifying asg SwitchStatements to have a Declarations block of statements, horrifyingly enough. probably also need to fix scope analysis.
 			com.shapesecurity.shift.ast.SwitchStatement switchStatement = (com.shapesecurity.shift.ast.SwitchStatement) statement;
-			BreakTarget target = new BreakTarget();
+			BreakTarget target = BreakTarget.INSTANCE;
 			targets = targets.put(statement, new Pair<>(target, Maybe.empty()));
 
 			return new Block(ImmutableList.of(
@@ -544,7 +544,7 @@ public class Explicator {
 		} else if (statement instanceof SwitchStatementWithDefault) {
 			// TODO hoist function declarations. This will require modifying asg SwitchStatements to have a Declarations block of statements, horrifyingly enough. probably also need to fix scope analysis.
 			SwitchStatementWithDefault switchStatement = (SwitchStatementWithDefault) statement;
-			BreakTarget target = new BreakTarget();
+			BreakTarget target = BreakTarget.INSTANCE;
 			targets = targets.put(statement, new Pair<>(target, Maybe.empty()));
 
 			return new Block(ImmutableList.of(
@@ -591,8 +591,8 @@ public class Explicator {
 			return explicateVariableDeclaration(variableDeclarationStatement.declaration, strict);
 		} else if (statement instanceof WhileStatement) {
 			WhileStatement whileStatement = (WhileStatement) statement;
-			BreakTarget outerTarget = new BreakTarget();
-			BreakTarget innerTarget = new BreakTarget();
+			BreakTarget outerTarget = BreakTarget.INSTANCE;
+			BreakTarget innerTarget = BreakTarget.INSTANCE;
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 			Block body = new Block(ImmutableList.<Node>of(
@@ -607,7 +607,7 @@ public class Explicator {
 			Loop loop = new Loop(body);
 			return new Block(ImmutableList.of(loop, outerTarget));
 		} else if (statement instanceof WithStatement) {
-			return new Halt(); // TODO maybe warn.
+			return Halt.INSTANCE; // TODO maybe warn.
 		}
 		throw new UnsupportedOperationException("ES6 not supported: " + statement.getClass().getSimpleName());
 	}
@@ -629,7 +629,7 @@ public class Explicator {
 			ArrayExpression arrayExpression = (ArrayExpression) expression;
 			if (arrayExpression.elements.exists(Maybe::isNothing)) { // ie, contains hole
 				return letWithValue(
-					new LiteralEmptyArray(),
+					LiteralEmptyArray.INSTANCE,
 					arr -> new BlockWithValue(ImmutableList.cons(
 						new MemberAssignment(
 							arr,
@@ -644,10 +644,10 @@ public class Explicator {
 					), arr)
 				);
 			} else if (arrayExpression.elements.isEmpty()) {
-				return new LiteralEmptyArray();
+				return LiteralEmptyArray.INSTANCE;
 			}
 			return letWithValue(
-				new LiteralEmptyArray(),
+					LiteralEmptyArray.INSTANCE,
 				arr -> new BlockWithValue(
 					arrayExpression.elements.mapWithIndex((ind, p) -> p.map(e -> explicateSpreadElementExpression(
 						arr,
@@ -655,7 +655,7 @@ public class Explicator {
 						e,
 						strict
 					))
-						.orJust(new LiteralUndefined())),
+						.orJust(LiteralUndefined.INSTANCE)),
 					arr
 				)
 			);
@@ -709,7 +709,7 @@ public class Explicator {
 			CallExpression c = (CallExpression) expression;
 			// abort on direct eval. todo maybe warn.
 			if (c.callee instanceof IdentifierExpression && (((IdentifierExpression) c.callee).name.equals("eval"))) {
-				return new Halt();
+				return Halt.INSTANCE;
 			}
 			ImmutableList<NodeWithValue> arguments =
 				c.arguments.map(a -> explicateExpressionReturningValue((Expression) a, strict));
@@ -789,11 +789,11 @@ public class Explicator {
 		} else if (expression instanceof LiteralBooleanExpression) {
 			return new LiteralBoolean(((LiteralBooleanExpression) expression).value);
 		} else if (expression instanceof LiteralInfinityExpression) {
-			return new LiteralInfinity();
+			return LiteralInfinity.INSTANCE;
 		} else if (expression instanceof LiteralNumericExpression) {
 			return new LiteralNumber(((LiteralNumericExpression) expression).value);
 		} else if (expression instanceof LiteralNullExpression) {
-			return new LiteralNull();
+			return LiteralNull.INSTANCE;
 		} else if (expression instanceof LiteralRegExpExpression) {
 			LiteralRegExpExpression literalRegExpExpression = (LiteralRegExpExpression) expression;
 			return new LiteralRegExp(literalRegExpExpression.pattern, literalRegExpExpression.flags);
@@ -802,10 +802,10 @@ public class Explicator {
 		} else if (expression instanceof ObjectExpression) { // TODO this would be faster/better as Object.defineProperties (all at once, instead of one at a time), probably
 			ObjectExpression objectExpression = (ObjectExpression) expression;
 			if (objectExpression.properties.isEmpty()) {
-				return new LiteralEmptyObject();
+				return LiteralEmptyObject.INSTANCE;
 			}
 			return letWithValue(
-				new LiteralEmptyObject(),
+				LiteralEmptyObject.INSTANCE,
 				obj -> new BlockWithValue(
 					objectExpression.properties.map(p -> explicateObjectProperty(obj, p, strict)),
 					obj

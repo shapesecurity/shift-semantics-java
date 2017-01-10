@@ -15,5 +15,21 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class LiteralInfinity implements Literal {
+    public static final LiteralInfinity INSTANCE = new LiteralInfinity();
+
+    @Override
+    public boolean equals(Object o) {
+        return o == INSTANCE;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash();
+    }
+
+    private LiteralInfinity() {
+    }
 }

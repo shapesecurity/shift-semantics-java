@@ -15,5 +15,21 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class BreakTarget implements Node { // no-op. target of a break.
+    public static final BreakTarget INSTANCE = new BreakTarget();
+
+    @Override
+    public boolean equals(Object o) {
+        return o == INSTANCE;
+    }
+
+    private BreakTarget() {
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash();
+    }
 }

@@ -24,6 +24,19 @@ public interface MemberAssignmentProperty {
 		@NotNull
 		public final NodeWithValue value;
 
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (!(o instanceof StaticValue)) return false;
+			StaticValue that = (StaticValue) o;
+			return Objects.equals(value, that.value);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(value);
+		}
+
 		public StaticValue(@NotNull NodeWithValue value) {
 			this.value = value;
 		}

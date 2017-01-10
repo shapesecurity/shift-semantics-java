@@ -25,6 +25,8 @@ public class IntMath extends BinaryOperation {
 	public final Operator operator;
 	@NotNull
 	public final NodeWithValue left;
+	@NotNull
+	public final NodeWithValue right;
 
 	@Override
 	public boolean equals(Object o) {
@@ -41,8 +43,6 @@ public class IntMath extends BinaryOperation {
 		return Objects.hash(operator, left, right);
 	}
 
-	@NotNull
-	public final NodeWithValue right;
 
 	public IntMath(@NotNull Operator operator, @NotNull NodeWithValue left, @NotNull NodeWithValue right) {
 		this.operator = operator;

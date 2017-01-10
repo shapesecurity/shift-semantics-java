@@ -17,8 +17,23 @@ package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
 
 public class Not extends UnaryOperation {
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Not)) return false;
+		Not not = (Not) o;
+		return Objects.equals(expression, not.expression);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(expression);
+	}
+
 	@NotNull
 	public final NodeWithValue expression;
 

@@ -15,5 +15,21 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class LiteralUndefined implements Literal {
+    public static final LiteralUndefined INSTANCE = new LiteralUndefined();
+
+    @Override
+    public boolean equals(Object o) {
+        return o == INSTANCE;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash();
+    }
+
+    private LiteralUndefined() {
+    }
 }

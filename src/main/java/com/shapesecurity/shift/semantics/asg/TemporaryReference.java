@@ -26,4 +26,9 @@ public class TemporaryReference extends LocalReference {
 			ImmutableList.empty()
 		)); // TODO consider if this is what we actually want to do
 	}
+
+	// This is used in ReconstructingReducer
+	public TemporaryReference(Variable variable) {
+		super(variable);
+	}
 }

@@ -15,5 +15,21 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class LiteralEmptyArray implements Literal {
+    public static final LiteralEmptyArray INSTANCE = new LiteralEmptyArray();
+
+    @Override
+    public boolean equals(Object o) {
+        return o == INSTANCE;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash();
+    }
+
+    private LiteralEmptyArray() {
+    }
 }

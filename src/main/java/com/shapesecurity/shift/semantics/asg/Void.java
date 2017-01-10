@@ -15,6 +15,21 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class Void implements Node {
 	public static final Void INSTANCE = new Void();
+
+	@Override
+	public boolean equals(Object o) {
+		return o == INSTANCE;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash();
+	}
+
+	private Void() {
+	}
 }

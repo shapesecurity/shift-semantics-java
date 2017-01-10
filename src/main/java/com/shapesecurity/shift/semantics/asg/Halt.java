@@ -15,6 +15,22 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 // Halt. Used for unsupported code, i.e., direct eval and with.
 public class Halt implements NodeWithValue {
+    public static final Halt INSTANCE = new Halt();
+
+    @Override
+    public boolean equals(Object o) {
+        return o == INSTANCE;
+    }
+
+    private Halt() {
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash();
+    }
 }

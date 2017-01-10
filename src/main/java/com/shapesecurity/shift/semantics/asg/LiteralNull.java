@@ -15,5 +15,21 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import java.util.Objects;
+
 public class LiteralNull implements Literal {
+    public static final LiteralNull INSTANCE = new LiteralNull();
+
+    @Override
+    public boolean equals(Object o) {
+        return o == INSTANCE;
+    }
+
+    private LiteralNull() {
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash();
+    }
 }

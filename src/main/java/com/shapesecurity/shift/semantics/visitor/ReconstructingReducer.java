@@ -54,6 +54,7 @@ import com.shapesecurity.shift.semantics.asg.Node;
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
 import com.shapesecurity.shift.semantics.asg.RequireObjectCoercible;
 import com.shapesecurity.shift.semantics.asg.SwitchStatement;
+import com.shapesecurity.shift.semantics.asg.TemporaryReference;
 import com.shapesecurity.shift.semantics.asg.This;
 import com.shapesecurity.shift.semantics.asg.Throw;
 import com.shapesecurity.shift.semantics.asg.TryCatchFinally;
@@ -109,6 +110,8 @@ public class ReconstructingReducer {
             return visitGlobalReference((GlobalReference) expression);
         } else if (expression instanceof Literal) {
             return visitLiteral((Literal) expression);
+        } else if (expression instanceof TemporaryReference) {
+            return visitTemporaryReference((TemporaryReference) expression);
         } else if (expression instanceof LocalReference) {
             return visitLocalReference((LocalReference) expression);
         } else if (expression instanceof MemberAccess) {
@@ -205,23 +208,23 @@ public class ReconstructingReducer {
     }
 
     @NotNull
-    protected RequireObjectCoercible visitRequireObjectCoercible(@NotNull RequireObjectCoercible expression) {
-        return new RequireObjectCoercible(expression);
+    protected RequireObjectCoercible visitRequireObjectCoercible(@NotNull RequireObjectCoercible requireObjectCoercible) {
+        return new RequireObjectCoercible(requireObjectCoercible.expression);
     }
 
     @NotNull
-    protected TypeCoercionString visitTypeCoercionString(@NotNull TypeCoercionString expression) {
-        return new TypeCoercionString(expression);
+    protected TypeCoercionString visitTypeCoercionString(@NotNull TypeCoercionString typeCoercionString) {
+        return new TypeCoercionString(typeCoercionString.expression);
     }
 
     @NotNull
-    protected TypeCoercionNumber visitTypeCoercionNumber(@NotNull TypeCoercionNumber expression) {
-        return new TypeCoercionNumber(expression);
+    protected TypeCoercionNumber visitTypeCoercionNumber(@NotNull TypeCoercionNumber typeCoercionNumber) {
+        return new TypeCoercionNumber(typeCoercionNumber.expression);
     }
 
     @NotNull
     protected Keys visitKeys(@NotNull Keys keys) {
-        return new Keys(keys);
+        return new Keys(keys._object);
     }
 
     @NotNull
@@ -273,7 +276,7 @@ public class ReconstructingReducer {
         } else if (literal instanceof LiteralString) {
             return new LiteralString(((LiteralString) literal).value);
         } else if (literal instanceof LiteralNull) {
-            return new LiteralNull();
+            return LiteralNull.INSTANCE;
         } else if (literal instanceof LiteralFunction) {
             return new LiteralFunction(((LiteralFunction) literal).name,
                     ((LiteralFunction) literal).arguments,
@@ -283,13 +286,13 @@ public class ReconstructingReducer {
                     ((LiteralFunction) literal).body,
                     ((LiteralFunction) literal).isStrict);
         } else if (literal instanceof LiteralEmptyObject) {
-            return new LiteralEmptyObject();
+            return LiteralEmptyObject.INSTANCE;
         } else if (literal instanceof LiteralEmptyArray) {
-            return new LiteralEmptyArray();
+            return LiteralEmptyArray.INSTANCE;
         } else if (literal instanceof LiteralRegExp) {
             return new LiteralRegExp(((LiteralRegExp) literal).pattern, ((LiteralRegExp) literal).flags);
         } else if (literal instanceof LiteralInfinity) {
-            return new LiteralInfinity();
+            return LiteralInfinity.INSTANCE;
         }
         throw new RuntimeException("Literal not implemented: " + literal.getClass().getSimpleName());
     }
@@ -302,6 +305,11 @@ public class ReconstructingReducer {
     @NotNull
     protected GlobalReference visitGlobalReference(GlobalReference ref) {
         return new GlobalReference(ref.name);
+    }
+
+    @NotNull
+    protected LocalReference visitTemporaryReference(TemporaryReference ref) {
+        return new TemporaryReference(ref.variable);
     }
 
     @NotNull
