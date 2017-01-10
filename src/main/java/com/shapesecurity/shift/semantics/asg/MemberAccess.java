@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class MemberAccess implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue object;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof MemberAccess)) return false;
 		MemberAccess that = (MemberAccess) o;
@@ -37,10 +38,10 @@ public class MemberAccess implements NodeWithValue {
 		return Objects.hash(object, fieldExpression);
 	}
 
-	@NotNull
+	@Nonnull
 	public final NodeWithValue fieldExpression;
 
-	public MemberAccess(@NotNull NodeWithValue object, @NotNull NodeWithValue fieldExpression) {
+	public MemberAccess(@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;
 	}

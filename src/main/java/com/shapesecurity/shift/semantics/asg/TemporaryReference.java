@@ -18,6 +18,8 @@ package com.shapesecurity.shift.semantics.asg;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.shift.scope.Variable;
 
+import javax.annotation.Nonnull;
+
 public class TemporaryReference extends LocalReference {
 	public TemporaryReference() {
 		super(new Variable(
@@ -28,7 +30,7 @@ public class TemporaryReference extends LocalReference {
 	}
 
 	// This is used in ReconstructingReducer
-	public TemporaryReference(Variable variable) {
+	public TemporaryReference(@Nonnull Variable variable) {
 		super(variable);
 	}
 }

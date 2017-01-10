@@ -15,21 +15,22 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class MemberAssignment implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue object;
-	@NotNull
+	@Nonnull
 	public final NodeWithValue fieldExpression;
-	@NotNull
+	@Nonnull
 	public final MemberAssignmentProperty.StaticValue property;
 	public final boolean strict;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof MemberAssignment)) return false;
 		MemberAssignment that = (MemberAssignment) o;
@@ -45,8 +46,8 @@ public class MemberAssignment implements NodeWithValue {
 	}
 
 	public MemberAssignment(
-		@NotNull NodeWithValue object, @NotNull NodeWithValue fieldExpression,
-		@NotNull MemberAssignmentProperty.StaticValue property,
+		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression,
+		@Nonnull MemberAssignmentProperty.StaticValue property,
 		boolean strict
 	) {
 		this.object = object;
@@ -56,7 +57,7 @@ public class MemberAssignment implements NodeWithValue {
 	}
 
 	public MemberAssignment(
-		@NotNull NodeWithValue object, @NotNull NodeWithValue fieldExpression, @NotNull NodeWithValue staticValue, boolean strict
+		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull NodeWithValue staticValue, boolean strict
 	) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;

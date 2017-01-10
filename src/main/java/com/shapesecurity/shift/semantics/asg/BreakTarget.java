@@ -15,13 +15,15 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class BreakTarget implements Node { // no-op. target of a break.
-    public static final BreakTarget INSTANCE = new BreakTarget();
+    @Nonnull public static final BreakTarget INSTANCE = new BreakTarget();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o == INSTANCE;
     }
 

@@ -15,13 +15,14 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class This implements NodeWithValue {
 	public final boolean strict;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof This)) return false;
 		This aThis = (This) o;

@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class RequireObjectCoercible implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue expression;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof RequireObjectCoercible)) return false;
 		RequireObjectCoercible that = (RequireObjectCoercible) o;
@@ -36,7 +37,7 @@ public class RequireObjectCoercible implements NodeWithValue {
 		return Objects.hash(expression);
 	}
 
-	public RequireObjectCoercible(@NotNull NodeWithValue expression) {
+	public RequireObjectCoercible(@Nonnull NodeWithValue expression) {
 		this.expression = expression;
 	}
 }

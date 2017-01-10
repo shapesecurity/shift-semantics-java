@@ -16,16 +16,17 @@
 package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class BlockWithValue implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public Block head;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof BlockWithValue)) return false;
 		BlockWithValue that = (BlockWithValue) o;
@@ -38,16 +39,16 @@ public class BlockWithValue implements NodeWithValue {
 		return Objects.hash(head, result);
 	}
 
-	@NotNull
+	@Nonnull
 
 	public NodeWithValue result;
 
-	public BlockWithValue(@NotNull Block head, @NotNull NodeWithValue result) {
+	public BlockWithValue(@Nonnull Block head, @Nonnull NodeWithValue result) {
 		this.head = head;
 		this.result = result;
 	}
 
-	public BlockWithValue(@NotNull ImmutableList<Node> children, @NotNull NodeWithValue result) {
+	public BlockWithValue(@Nonnull ImmutableList<Node> children, @Nonnull NodeWithValue result) {
 		this.head = new Block(children);
 		this.result = result;
 	}

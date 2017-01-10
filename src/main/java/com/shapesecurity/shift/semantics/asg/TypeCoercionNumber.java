@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class TypeCoercionNumber implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue expression;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof TypeCoercionNumber)) return false;
 		TypeCoercionNumber that = (TypeCoercionNumber) o;
@@ -36,7 +37,7 @@ public class TypeCoercionNumber implements NodeWithValue {
 		return Objects.hash(expression);
 	}
 
-	public TypeCoercionNumber(@NotNull NodeWithValue expression) {
+	public TypeCoercionNumber(@Nonnull NodeWithValue expression) {
 		this.expression = expression;
 	}
 }

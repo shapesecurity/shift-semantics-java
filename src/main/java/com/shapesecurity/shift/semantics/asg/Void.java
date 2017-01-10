@@ -15,9 +15,11 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 public class Void implements Node {
+	@Nonnull
 	public static final Void INSTANCE = new Void();
 
 	@Override

@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Throw implements Node {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue expression;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Throw)) return false;
 		Throw aThrow = (Throw) o;
@@ -36,7 +37,7 @@ public class Throw implements Node {
 		return Objects.hash(expression);
 	}
 
-	public Throw(@NotNull NodeWithValue expression) {
+	public Throw(@Nonnull NodeWithValue expression) {
 		this.expression = expression;
 	}
 }

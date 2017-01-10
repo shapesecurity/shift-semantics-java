@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class LiteralString implements Literal {
-	@NotNull
+	@Nonnull
 	public final String value;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof LiteralString)) return false;
 		LiteralString that = (LiteralString) o;
@@ -36,7 +37,7 @@ public class LiteralString implements Literal {
 		return Objects.hash(value);
 	}
 
-	public LiteralString(String value) {
+	public LiteralString(@Nonnull String value) {
 		this.value = value;
 	}
 }

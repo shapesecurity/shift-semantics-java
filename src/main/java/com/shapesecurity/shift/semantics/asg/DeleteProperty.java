@@ -15,13 +15,14 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class DeleteProperty implements NodeWithValue {
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof DeleteProperty)) return false;
 		DeleteProperty that = (DeleteProperty) o;
@@ -35,13 +36,13 @@ public class DeleteProperty implements NodeWithValue {
 		return Objects.hash(object, fieldExpression, strict);
 	}
 
-	@NotNull
+	@Nonnull
 	public final NodeWithValue object;
-	@NotNull
+	@Nonnull
 	public final NodeWithValue fieldExpression;
 	public final boolean strict;
 
-	public DeleteProperty(@NotNull NodeWithValue object, @NotNull NodeWithValue fieldExpression, boolean strict) {
+	public DeleteProperty(@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, boolean strict) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;
 		this.strict = strict;

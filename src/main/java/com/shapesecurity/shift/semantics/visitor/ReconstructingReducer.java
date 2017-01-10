@@ -69,26 +69,26 @@ import com.shapesecurity.shift.semantics.asg.UnaryOperation.VoidOp;
 import com.shapesecurity.shift.semantics.asg.VariableAssignment;
 import com.shapesecurity.shift.semantics.asg.Void;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public class ReconstructingReducer {
-    @NotNull
-    protected Block visitBlock(Block block) {
+    @Nonnull
+    protected Block visitBlock(@Nonnull Block block) {
         return new Block(block.children.map(this::visitNode));
     }
 
-    @NotNull
-    protected Break visitBreak(Break _break) {
+    @Nonnull
+    protected Break visitBreak(@Nonnull Break _break) {
         return new Break(_break.target, _break.finalliesBroken); // TODO is not in fact cloning targets
     }
 
-    @NotNull
-    protected BreakTarget visitBreakTarget(BreakTarget breakTarget) {
+    @Nonnull
+    protected BreakTarget visitBreakTarget(@Nonnull BreakTarget breakTarget) {
         return breakTarget; // TODO is not in fact cloning targets
     }
 
-    @NotNull
-    protected Call visitCall(Call call) {
+    @Nonnull
+    protected Call visitCall(@Nonnull Call call) {
         return new Call(
                 call.context.map(this::visitLocalReference),
                 visitExpression(call.callee),
@@ -96,8 +96,8 @@ public class ReconstructingReducer {
         );
     }
 
-    @NotNull
-    protected NodeWithValue visitExpression(NodeWithValue expression) {
+    @Nonnull
+    protected NodeWithValue visitExpression(@Nonnull NodeWithValue expression) {
         if (expression instanceof Call) {
             return visitCall((Call) expression);
         } else if (expression instanceof BlockWithValue) {
@@ -162,113 +162,113 @@ public class ReconstructingReducer {
         throw new RuntimeException("Expression not implemented: " + expression.getClass().getSimpleName());
     }
 
-    @NotNull
-    protected NodeWithValue visitNot(@NotNull Not not) {
+    @Nonnull
+    protected NodeWithValue visitNot(@Nonnull Not not) {
         return new Not(visitExpression(not.expression));
     }
 
-    @NotNull
-    protected BlockWithValue visitExpressionBlock(@NotNull BlockWithValue blockWithValue) {
+    @Nonnull
+    protected BlockWithValue visitExpressionBlock(@Nonnull BlockWithValue blockWithValue) {
         return new BlockWithValue(visitBlock(blockWithValue.head), visitExpression(blockWithValue.result));
     }
 
-    @NotNull
-    protected FloatMath visitFloatMath(@NotNull FloatMath floatMath) {
+    @Nonnull
+    protected FloatMath visitFloatMath(@Nonnull FloatMath floatMath) {
         return new FloatMath(floatMath.operator, visitExpression(floatMath.left), visitExpression(floatMath.right));
     }
 
-    @NotNull
-    protected IntMath visitIntMath(@NotNull IntMath intMath) {
+    @Nonnull
+    protected IntMath visitIntMath(@Nonnull IntMath intMath) {
         return new IntMath(intMath.operator, visitExpression(intMath.left), visitExpression(intMath.right));
     }
 
-    @NotNull
-    protected InstanceOf visitInstanceOf(@NotNull InstanceOf instanceOf) {
+    @Nonnull
+    protected InstanceOf visitInstanceOf(@Nonnull InstanceOf instanceOf) {
         return new InstanceOf(instanceOf.left, instanceOf.right);
     }
 
-    @NotNull
-    protected Negation visitNegation(@NotNull Negation negation) {
+    @Nonnull
+    protected Negation visitNegation(@Nonnull Negation negation) {
         return new Negation(negation.expression);
     }
 
-    @NotNull
-    protected Equality visitEquality(@NotNull Equality equality) {
+    @Nonnull
+    protected Equality visitEquality(@Nonnull Equality equality) {
         return new Equality(equality.operator, equality.left, equality.right);
     }
 
-    @NotNull
-    protected New visitNew(@NotNull New expression) {
+    @Nonnull
+    protected New visitNew(@Nonnull New expression) {
         return new New(expression.callee, expression.arguments);
     }
 
-    @NotNull
-    protected This visitThis(@NotNull This expression) {
+    @Nonnull
+    protected This visitThis(@Nonnull This expression) {
         return new This(expression.strict);
     }
 
-    @NotNull
-    protected RequireObjectCoercible visitRequireObjectCoercible(@NotNull RequireObjectCoercible requireObjectCoercible) {
+    @Nonnull
+    protected RequireObjectCoercible visitRequireObjectCoercible(@Nonnull RequireObjectCoercible requireObjectCoercible) {
         return new RequireObjectCoercible(requireObjectCoercible.expression);
     }
 
-    @NotNull
-    protected TypeCoercionString visitTypeCoercionString(@NotNull TypeCoercionString typeCoercionString) {
+    @Nonnull
+    protected TypeCoercionString visitTypeCoercionString(@Nonnull TypeCoercionString typeCoercionString) {
         return new TypeCoercionString(typeCoercionString.expression);
     }
 
-    @NotNull
-    protected TypeCoercionNumber visitTypeCoercionNumber(@NotNull TypeCoercionNumber typeCoercionNumber) {
+    @Nonnull
+    protected TypeCoercionNumber visitTypeCoercionNumber(@Nonnull TypeCoercionNumber typeCoercionNumber) {
         return new TypeCoercionNumber(typeCoercionNumber.expression);
     }
 
-    @NotNull
-    protected Keys visitKeys(@NotNull Keys keys) {
+    @Nonnull
+    protected Keys visitKeys(@Nonnull Keys keys) {
         return new Keys(keys._object);
     }
 
-    @NotNull
-    protected TypeofGlobal visitTypeofGlobal(@NotNull TypeofGlobal typeofGlobal) {
+    @Nonnull
+    protected TypeofGlobal visitTypeofGlobal(@Nonnull TypeofGlobal typeofGlobal) {
         return new TypeofGlobal(typeofGlobal.which);
     }
 
-    @NotNull
-    protected VoidOp visitVoidOp(@NotNull VoidOp voidOp) {
+    @Nonnull
+    protected VoidOp visitVoidOp(@Nonnull VoidOp voidOp) {
         return new VoidOp(voidOp.expression);
     }
 
-    @NotNull
-    protected DeleteGlobalProperty visitDeleteGlobalProperty(@NotNull DeleteGlobalProperty expression) {
+    @Nonnull
+    protected DeleteGlobalProperty visitDeleteGlobalProperty(@Nonnull DeleteGlobalProperty expression) {
         return new DeleteGlobalProperty(expression.which);
     }
 
-    @NotNull
-    protected Logic visitLogic(@NotNull Logic expression) {
+    @Nonnull
+    protected Logic visitLogic(@Nonnull Logic expression) {
         return new Logic(expression.operator, expression.left, expression.right);
     }
 
-    @NotNull
-    protected In visitIn(@NotNull In expression) {
+    @Nonnull
+    protected In visitIn(@Nonnull In expression) {
         return new In(expression.left, expression.right);
     }
 
-    @NotNull
-    protected DeleteProperty visitDeleteProperty(@NotNull DeleteProperty expression) {
+    @Nonnull
+    protected DeleteProperty visitDeleteProperty(@Nonnull DeleteProperty expression) {
         return new DeleteProperty(expression.object, expression.fieldExpression, expression.strict);
     }
 
-    @NotNull
-    protected Typeof visitTypeof(@NotNull Typeof expression) {
+    @Nonnull
+    protected Typeof visitTypeof(@Nonnull Typeof expression) {
         return new Typeof(expression.expression);
     }
 
-    @NotNull
-    protected BitwiseNot visitBitwiseNot(@NotNull BitwiseNot expression) {
+    @Nonnull
+    protected BitwiseNot visitBitwiseNot(@Nonnull BitwiseNot expression) {
         return new BitwiseNot(expression.expression);
     }
 
-    @NotNull
-    protected Literal visitLiteral(@NotNull Literal literal) {
+    @Nonnull
+    protected Literal visitLiteral(@Nonnull Literal literal) {
         if (literal instanceof LiteralNumber) {
             return new LiteralNumber(((LiteralNumber) literal).value);
         } else if (literal instanceof LiteralBoolean) {
@@ -297,41 +297,41 @@ public class ReconstructingReducer {
         throw new RuntimeException("Literal not implemented: " + literal.getClass().getSimpleName());
     }
 
-    @NotNull
-    protected Either<GlobalReference, LocalReference> visitReference(Either<GlobalReference, LocalReference> e) {
+    @Nonnull
+    protected Either<GlobalReference, LocalReference> visitReference(@Nonnull Either<GlobalReference, LocalReference> e) {
         return e.map(this::visitGlobalReference, this::visitLocalReference);
     }
 
-    @NotNull
-    protected GlobalReference visitGlobalReference(GlobalReference ref) {
+    @Nonnull
+    protected GlobalReference visitGlobalReference(@Nonnull GlobalReference ref) {
         return new GlobalReference(ref.name);
     }
 
-    @NotNull
-    protected LocalReference visitTemporaryReference(TemporaryReference ref) {
+    @Nonnull
+    protected LocalReference visitTemporaryReference(@Nonnull TemporaryReference ref) {
         return new TemporaryReference(ref.variable);
     }
 
-    @NotNull
-    protected LocalReference visitLocalReference(LocalReference ref) {
+    @Nonnull
+    protected LocalReference visitLocalReference(@Nonnull LocalReference ref) {
         return new LocalReference(ref.variable);
     }
 
-    @NotNull
-    protected MemberAccess visitMemberAccess(MemberAccess memberAccess) {
+    @Nonnull
+    protected MemberAccess visitMemberAccess(@Nonnull MemberAccess memberAccess) {
         return new MemberAccess(visitExpression(memberAccess.object), visitExpression(memberAccess.fieldExpression));
     }
 
-    @NotNull
-    protected MemberAssignment visitMemberAssignment(MemberAssignment memberAssignment) {
+    @Nonnull
+    protected MemberAssignment visitMemberAssignment(@Nonnull MemberAssignment memberAssignment) {
         if (memberAssignment.property instanceof MemberAssignmentProperty.StaticValue) {
             return new MemberAssignment(visitExpression(memberAssignment.object), visitExpression(memberAssignment.fieldExpression), visitExpression(((MemberAssignmentProperty.StaticValue) memberAssignment.property).value), memberAssignment.strict);
         }
         throw new RuntimeException("MemberAssignmentProperty not implemented: " + memberAssignment.property.getClass().getSimpleName());
     }
 
-    @NotNull
-    protected Node visitNode(Node node) {
+    @Nonnull
+    protected Node visitNode(@Nonnull Node node) {
         if (node instanceof Block) {
             return visitBlock((Block) node);
         } else if (node instanceof BreakTarget) {
@@ -358,48 +358,48 @@ public class ReconstructingReducer {
         throw new RuntimeException("Node not implemented: " + node.getClass().getSimpleName());
     }
 
-    @NotNull
-    protected Node visitThrow(@NotNull Throw node) {
+    @Nonnull
+    protected Node visitThrow(@Nonnull Throw node) {
         return new Throw(node.expression);
     }
 
-    @NotNull
-    protected Node visitMemberDefinition(@NotNull MemberDefinition node) {
+    @Nonnull
+    protected Node visitMemberDefinition(@Nonnull MemberDefinition node) {
         return new MemberDefinition(node.object, node.fieldExpression, node.property);
     }
 
-    @NotNull
-    protected Node visitTryCatchFinally(@NotNull TryCatchFinally node) {
+    @Nonnull
+    protected Node visitTryCatchFinally(@Nonnull TryCatchFinally node) {
         return new TryCatchFinally(node.tryBody, node.catchBody, node.finallyBody);
     }
 
-    @NotNull
-    protected Node visitSwitchStatement(@NotNull SwitchStatement node) {
+    @Nonnull
+    protected Node visitSwitchStatement(@Nonnull SwitchStatement node) {
         return new SwitchStatement(node.discriminant, node.preDefaultCases, node.defaultCase, node.postDefaultCases);
     }
 
-    @NotNull
-    protected Node visitIfElse(@NotNull IfElse ifElse) {
+    @Nonnull
+    protected Node visitIfElse(@Nonnull IfElse ifElse) {
         return new IfElse(visitExpression(ifElse.test), visitBlock(ifElse.consequent), visitBlock(ifElse.alternate));
     }
 
-    @NotNull
-    protected RelationalComparison visitRelationalComparison(RelationalComparison relationalComparison) {
+    @Nonnull
+    protected RelationalComparison visitRelationalComparison(@Nonnull RelationalComparison relationalComparison) {
         return new RelationalComparison(relationalComparison.operator, visitExpression(relationalComparison.left), visitExpression(relationalComparison.right));
     }
 
-    @NotNull
-    protected VariableAssignment visitVariableAssignment(VariableAssignment variableAssignment) {
+    @Nonnull
+    protected VariableAssignment visitVariableAssignment(@Nonnull VariableAssignment variableAssignment) {
         return new VariableAssignment(visitReference(variableAssignment.ref), visitExpression(variableAssignment.value), variableAssignment.strict);
     }
 
-    @NotNull
-    protected Void visitVoid(Void _void) {
+    @Nonnull
+    protected Void visitVoid(@Nonnull Void _void) {
         return Void.INSTANCE;
     }
 
-    @NotNull
-    public Node visit(Node node) {
+    @Nonnull
+    public Node visit(@Nonnull Node node) {
         return visitNode(node);
     }
 }

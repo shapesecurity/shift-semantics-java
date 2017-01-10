@@ -10,6 +10,8 @@ import com.shapesecurity.shift.semantics.asg.Node;
 import com.shapesecurity.shift.semantics.asg.VariableAssignment;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -41,7 +43,8 @@ public class ExplicatorTest {
 		assertEquals(0.0, ((LiteralNumber) c.arguments.maybeHead().fromJust()).value, 0.0);
 	}
 
-	public static String COVERAGE_PROGRAM =
+	@Nonnull
+    public static String COVERAGE_PROGRAM =
 		"var z; typeof a; ({ set a(b) { a = 0; }, get a(){} }).a = 0; " +
 		"(function() { 'use strict'; try { undefined = 0; } catch (e) {} })(); " +
 		"({a: 1}).a+(-1)+1-1*1/1%1|1&1^1<<1>>>1>>1; b = 1<1>1<=1>=1==1===1!=1!==!1;" +

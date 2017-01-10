@@ -16,16 +16,17 @@
 package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.data.Maybe;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Return implements Node {
-	@NotNull
+	@Nonnull
 	public final Maybe<NodeWithValue> expression;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Return)) return false;
 		Return aReturn = (Return) o;
@@ -37,11 +38,11 @@ public class Return implements Node {
 		return Objects.hash(expression);
 	}
 
-	public Return(@NotNull Maybe<NodeWithValue> expression) {
+	public Return(@Nonnull Maybe<NodeWithValue> expression) {
 		this.expression = expression;
 	}
 
-	public Return(@NotNull NodeWithValue expression) {
+	public Return(@Nonnull NodeWithValue expression) {
 		this.expression = Maybe.of(expression);
 	}
 }

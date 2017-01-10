@@ -16,21 +16,22 @@
 package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class BitwiseNot extends UnaryOperation {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue expression;
 
 	@Override
-	@NotNull
+	@Nonnull
 	public NodeWithValue expression() {
 		return expression;
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof BitwiseNot)) return false;
 		BitwiseNot that = (BitwiseNot) o;
@@ -42,7 +43,7 @@ public class BitwiseNot extends UnaryOperation {
 		return Objects.hash(expression);
 	}
 
-	public BitwiseNot(@NotNull NodeWithValue expression) {
+	public BitwiseNot(@Nonnull NodeWithValue expression) {
 		this.expression = expression;
 	}
 }

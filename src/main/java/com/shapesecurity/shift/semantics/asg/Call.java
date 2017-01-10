@@ -17,16 +17,17 @@ package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Call implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue callee;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Call)) return false;
 		Call call = (Call) o;
@@ -40,13 +41,13 @@ public class Call implements NodeWithValue {
 		return Objects.hash(callee, arguments, context);
 	}
 
-	@NotNull
+	@Nonnull
 	public final ImmutableList<NodeWithValue> arguments;
-	@NotNull
+	@Nonnull
 	public Maybe<LocalReference> context;
 
 	public Call(
-		@NotNull Maybe<LocalReference> context, @NotNull NodeWithValue callee, @NotNull ImmutableList<NodeWithValue> arguments
+		@Nonnull Maybe<LocalReference> context, @Nonnull NodeWithValue callee, @Nonnull ImmutableList<NodeWithValue> arguments
 	) {
 		this.context = context;
 		this.callee = callee;

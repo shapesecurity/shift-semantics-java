@@ -16,20 +16,21 @@
 package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Block implements Node {
-	@NotNull
+	@Nonnull
 	public final ImmutableList<Node> children;
 
-	public Block(@NotNull ImmutableList<Node> children) {
+	public Block(@Nonnull ImmutableList<Node> children) {
 		this.children = children;
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Block)) return false;
 		Block block = (Block) o;
@@ -41,7 +42,7 @@ public class Block implements Node {
 		return Objects.hash(children);
 	}
 
-	public Block(@NotNull Node child) {
+	public Block(@Nonnull Node child) {
 		this.children = ImmutableList.of(child);
 	}
 

@@ -19,16 +19,18 @@ import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.scope.Variable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class LiteralFunction implements Literal {
-	public final Maybe<Variable> name;
-	public final Maybe<Variable> arguments;
-	public final ImmutableList<Variable> parameters;
-	public final ImmutableList<Variable> locals;
+	@Nonnull public final Maybe<Variable> name;
+	@Nonnull public final Maybe<Variable> arguments;
+	@Nonnull public final ImmutableList<Variable> parameters;
+	@Nonnull public final ImmutableList<Variable> locals;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof LiteralFunction)) return false;
 		LiteralFunction that = (LiteralFunction) o;
@@ -46,13 +48,13 @@ public class LiteralFunction implements Literal {
 		return Objects.hash(name, arguments, parameters, locals, captured, body, isStrict);
 	}
 
-	public final ImmutableList<Variable> captured;
-	public final Block body;
-	public final boolean isStrict;
+	@Nonnull public final ImmutableList<Variable> captured;
+	@Nonnull public final Block body;
+	@Nonnull public final boolean isStrict;
 
 	public LiteralFunction(
-		Maybe<Variable> name, Maybe<Variable> arguments, ImmutableList<Variable> parameters, ImmutableList<Variable> locals,
-		ImmutableList<Variable> captured, Block body, boolean isStrict
+			@Nonnull Maybe<Variable> name,@Nonnull Maybe<Variable> arguments,@Nonnull ImmutableList<Variable> parameters,@Nonnull ImmutableList<Variable> locals,
+			@Nonnull ImmutableList<Variable> captured, @Nonnull Block body, boolean isStrict
 	) {
 		this.name = name;
 		this.arguments = arguments;

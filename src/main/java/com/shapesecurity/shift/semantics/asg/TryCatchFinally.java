@@ -18,18 +18,19 @@ package com.shapesecurity.shift.semantics.asg;
 import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.scope.Variable;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class TryCatchFinally implements Node {
-	@NotNull
+	@Nonnull
 	public final Block tryBody;
-	@NotNull
+	@Nonnull
 	public final Maybe<Pair<Variable, Block>> catchBody;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof TryCatchFinally)) return false;
 		TryCatchFinally that = (TryCatchFinally) o;
@@ -43,10 +44,10 @@ public class TryCatchFinally implements Node {
 		return Objects.hash(tryBody, catchBody, finallyBody);
 	}
 
-	@NotNull
+	@Nonnull
 	public final Block finallyBody;
 
-	public TryCatchFinally(@NotNull Block tryBody, @NotNull Maybe<Pair<Variable, Block>> catchBody, @NotNull Block finallyBody) {
+	public TryCatchFinally(@Nonnull Block tryBody, @Nonnull Maybe<Pair<Variable, Block>> catchBody, @Nonnull Block finallyBody) {
 		this.tryBody = tryBody;
 		this.catchBody = catchBody;
 		this.finallyBody = finallyBody;

@@ -15,13 +15,15 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class LiteralUndefined implements Literal {
-    public static final LiteralUndefined INSTANCE = new LiteralUndefined();
+    @Nonnull public static final LiteralUndefined INSTANCE = new LiteralUndefined();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o == INSTANCE;
     }
 

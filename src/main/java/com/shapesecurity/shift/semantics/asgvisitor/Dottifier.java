@@ -55,19 +55,19 @@ import com.shapesecurity.shift.semantics.asg.TypeofGlobal;
 import com.shapesecurity.shift.semantics.asg.UnaryOperation.UnaryOperation;
 import com.shapesecurity.shift.semantics.asg.VariableAssignment;
 import com.shapesecurity.shift.semantics.asg.Void;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class Dottifier {
-    private Map<Node, String> nodeNames = new IdentityHashMap<>();
-    private Map<ImmutableList<? extends Node>, String> listNames = new IdentityHashMap<>();
-    private Map<Maybe<? extends Node>, String> maybeNames = new IdentityHashMap<>();
-    private Map<Variable, Integer> variableIds = new IdentityHashMap<>();
-    private Map<Variable, String> variableNames = new IdentityHashMap<>();
-    private Map<Node, Unit> visited = new IdentityHashMap<>(); // Java lacks IdentitySet, for some reason
-    private Map<Node, Unit> declared = new IdentityHashMap<>(); // Java lacks IdentitySet, for some reason
+    @Nonnull private Map<Node, String> nodeNames = new IdentityHashMap<>();
+    @Nonnull private Map<ImmutableList<? extends Node>, String> listNames = new IdentityHashMap<>();
+    @Nonnull private Map<Maybe<? extends Node>, String> maybeNames = new IdentityHashMap<>();
+    @Nonnull private Map<Variable, Integer> variableIds = new IdentityHashMap<>();
+    @Nonnull private Map<Variable, String> variableNames = new IdentityHashMap<>();
+    @Nonnull private Map<Node, Unit> visited = new IdentityHashMap<>(); // Java lacks IdentitySet, for some reason
+    @Nonnull private Map<Node, Unit> declared = new IdentityHashMap<>(); // Java lacks IdentitySet, for some reason
     private int id = 0;
     private int varId = 0;
 
@@ -75,17 +75,17 @@ public class Dottifier {
 
     private Dottifier(){}
 
-    @NotNull
-    public static String render(@NotNull Semantics semantics) {
+    @Nonnull
+    public static String render(@Nonnull Semantics semantics) {
         return (new Dottifier()).reduce(semantics);
     }
 
-    @NotNull
-    private static String sanitize(@NotNull String string) {
+    @Nonnull
+    private static String sanitize(@Nonnull String string) {
         return string.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
     }
 
-    @NotNull
+    @Nonnull
     private String indent() {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < indentationLevel; ++i) {
@@ -94,39 +94,39 @@ public class Dottifier {
         return stringBuilder.toString();
     }
 
-    @NotNull
-    private String name(Node node) {
+    @Nonnull
+    private String name(@Nonnull Node node) {
         if (!nodeNames.containsKey(node)) {
             nodeNames.put(node, node.getClass().getSimpleName() + "_" + (id++));
         }
         return nodeNames.get(node);
     }
 
-    @NotNull
-    private String name(@NotNull ImmutableList<? extends Node> struct) {
+    @Nonnull
+    private String name(@Nonnull ImmutableList<? extends Node> struct) {
         if (!listNames.containsKey(struct)) {
             listNames.put(struct, "struct_" + (id++));
         }
         return listNames.get(struct);
     }
 
-    @NotNull
-    private String name(@NotNull Maybe<? extends Node> maybeNode) {
+    @Nonnull
+    private String name(@Nonnull Maybe<? extends Node> maybeNode) {
         if (!maybeNames.containsKey(maybeNode)) {
             maybeNames.put(maybeNode, maybeNode.map(this::name).orJust("nothing_" + (id++)));
         }
         return maybeNames.get(maybeNode);
     }
 
-    private int id(@NotNull Variable variable) {
+    private int id(@Nonnull Variable variable) {
         if (!variableIds.containsKey(variable)) {
             variableIds.put(variable, varId++);
         }
         return variableIds.get(variable);
     }
 
-    @NotNull
-    private String label(@NotNull Node node) {
+    @Nonnull
+    private String label(@Nonnull Node node) {
         if (node instanceof Equality) {
             return "Equality\\nOperator: " + sanitize(((Equality) node).operator.name);
         } else if (node instanceof FloatMath) {
@@ -166,8 +166,8 @@ public class Dottifier {
         return node.getClass().getSimpleName();
     }
 
-    @NotNull
-    private String ensureDeclared(@NotNull Node node) {
+    @Nonnull
+    private String ensureDeclared(@Nonnull Node node) {
         if (declared.containsKey(node)) {
             return indent() + "// " + name(node) + "\n";
         }
@@ -175,8 +175,8 @@ public class Dottifier {
         return indent() + name(node) + " [label=\"" + label(node) + "\"];\n";
     }
 
-    @NotNull
-    private String reduce(@NotNull Semantics semantics) {
+    @Nonnull
+    private String reduce(@Nonnull Semantics semantics) {
         StringBuilder out = new StringBuilder();
         out.append("digraph G {\n");
         ++indentationLevel;
@@ -208,8 +208,8 @@ public class Dottifier {
         return out.toString();
     }
 
-    @NotNull
-    private String reduce(@NotNull ImmutableList<? extends Node> nodes) {
+    @Nonnull
+    private String reduce(@Nonnull ImmutableList<? extends Node> nodes) {
         // TODO handle empty list better
 
         StringBuilder builder = new StringBuilder();
@@ -273,13 +273,13 @@ public class Dottifier {
         return builder.toString();
     }
 
-    @NotNull
-    private String reduce(@NotNull Maybe<? extends Node> maybeNode) {
+    @Nonnull
+    private String reduce(@Nonnull Maybe<? extends Node> maybeNode) {
         return maybeNode.map(this::reduce).orJust(indent() + name(maybeNode) + " [label=\"\"];\n");
     }
 
-    @NotNull
-    private Pair<String, String> reduceVariables(@NotNull ImmutableList<Variable> variables) {
+    @Nonnull
+    private Pair<String, String> reduceVariables(@Nonnull ImmutableList<Variable> variables) {
         // returns struct name, dot source.
         // TODO instead just return source and store the name somewhere, like we do elsewhere.
         // TODO currently requires that these be the first declarations. This isn't valid for locals or for captured.
@@ -319,7 +319,7 @@ public class Dottifier {
         return Pair.of(structName, out.toString());
     }
 
-    @NotNull
+    @Nonnull
     private String reduce(Node node) {
         if (visited.containsKey(node)) {
             return "";
@@ -414,8 +414,8 @@ public class Dottifier {
         throw new UnsupportedOperationException("Unimplemented: " + node.getClass().getSimpleName());
     }
 
-    @NotNull
-    private String reduceBinaryOperation(@NotNull BinaryOperation node) {
+    @Nonnull
+    private String reduceBinaryOperation(@Nonnull BinaryOperation node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.left());
@@ -427,8 +427,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceUnaryOperation(@NotNull UnaryOperation node) {
+    @Nonnull
+    private String reduceUnaryOperation(@Nonnull UnaryOperation node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.expression());
@@ -438,8 +438,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceBlock(@NotNull Block node) {
+    @Nonnull
+    private String reduceBlock(@Nonnull Block node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.children);
@@ -449,8 +449,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceBlockWithValue(@NotNull BlockWithValue node) {
+    @Nonnull
+    private String reduceBlockWithValue(@Nonnull BlockWithValue node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.head);
@@ -462,8 +462,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceBreak(@NotNull Break node) {
+    @Nonnull
+    private String reduceBreak(@Nonnull Break node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.target);
@@ -473,13 +473,13 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceBreakTarget(@NotNull BreakTarget node) {
+    @Nonnull
+    private String reduceBreakTarget(@Nonnull BreakTarget node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceCall(@NotNull Call node) {
+    @Nonnull
+    private String reduceCall(@Nonnull Call node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.callee);
@@ -493,13 +493,13 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceDeleteGlobalProperty(@NotNull DeleteGlobalProperty node) {
+    @Nonnull
+    private String reduceDeleteGlobalProperty(@Nonnull DeleteGlobalProperty node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceDeleteProperty(@NotNull DeleteProperty node) {
+    @Nonnull
+    private String reduceDeleteProperty(@Nonnull DeleteProperty node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.object);
@@ -511,18 +511,18 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceGlobalReference(@NotNull GlobalReference node) {
+    @Nonnull
+    private String reduceGlobalReference(@Nonnull GlobalReference node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceHalt(@NotNull Halt node) {
+    @Nonnull
+    private String reduceHalt(@Nonnull Halt node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceIfElse(@NotNull IfElse node) {
+    @Nonnull
+    private String reduceIfElse(@Nonnull IfElse node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.test);
@@ -536,8 +536,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceKeys(@NotNull Keys node) {
+    @Nonnull
+    private String reduceKeys(@Nonnull Keys node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node._object);
@@ -547,23 +547,23 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceLiteralBoolean(@NotNull LiteralBoolean node) {
+    @Nonnull
+    private String reduceLiteralBoolean(@Nonnull LiteralBoolean node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralEmptyArray(@NotNull LiteralEmptyArray node) {
+    @Nonnull
+    private String reduceLiteralEmptyArray(@Nonnull LiteralEmptyArray node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralEmptyObject(@NotNull LiteralEmptyObject node) {
+    @Nonnull
+    private String reduceLiteralEmptyObject(@Nonnull LiteralEmptyObject node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralFunction(@NotNull LiteralFunction node) {
+    @Nonnull
+    private String reduceLiteralFunction(@Nonnull LiteralFunction node) {
         StringBuilder out = new StringBuilder();
         StringBuilder after = new StringBuilder();
         out.append(ensureDeclared(node));
@@ -729,38 +729,38 @@ public class Dottifier {
         return out.append(after).toString();
     }
 
-    @NotNull
-    private String reduceLiteralInfinity(@NotNull LiteralInfinity node) {
+    @Nonnull
+    private String reduceLiteralInfinity(@Nonnull LiteralInfinity node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralNull(@NotNull LiteralNull node) {
+    @Nonnull
+    private String reduceLiteralNull(@Nonnull LiteralNull node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralNumber(@NotNull LiteralNumber node) {
+    @Nonnull
+    private String reduceLiteralNumber(@Nonnull LiteralNumber node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralRegExp(@NotNull LiteralRegExp node) {
+    @Nonnull
+    private String reduceLiteralRegExp(@Nonnull LiteralRegExp node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralString(@NotNull LiteralString node) {
+    @Nonnull
+    private String reduceLiteralString(@Nonnull LiteralString node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceLiteralUndefined(@NotNull LiteralUndefined node) {
+    @Nonnull
+    private String reduceLiteralUndefined(@Nonnull LiteralUndefined node) {
         return ensureDeclared(node);
     }
 
-//    @NotNull
-//    private String reduceTemporaryReference(@NotNull TemporaryReference node) {
+//    @Nonnull
+//    private String reduceTemporaryReference(@Nonnull TemporaryReference node) {
 //        String out = ensureDeclared(node);
 //        ++indentationLevel;
 //        // children
@@ -768,8 +768,8 @@ public class Dottifier {
 //        return out;
 //    }
 //
-    @NotNull
-    private String reduceLocalReference(@NotNull LocalReference node) {
+    @Nonnull
+    private String reduceLocalReference(@Nonnull LocalReference node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         if (variableNames.containsKey(node.variable)) {
@@ -782,8 +782,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceLoop(@NotNull Loop node) {
+    @Nonnull
+    private String reduceLoop(@Nonnull Loop node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.block);
@@ -793,8 +793,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceMemberAccess(@NotNull MemberAccess node) {
+    @Nonnull
+    private String reduceMemberAccess(@Nonnull MemberAccess node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.object);
@@ -806,8 +806,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceMemberAssignment(@NotNull MemberAssignment node) {
+    @Nonnull
+    private String reduceMemberAssignment(@Nonnull MemberAssignment node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.object);
@@ -820,8 +820,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceMemberDefinition(@NotNull MemberDefinition node) {
+    @Nonnull
+    private String reduceMemberDefinition(@Nonnull MemberDefinition node) {
         StringBuilder out = new StringBuilder();
         StringBuilder after = new StringBuilder();
         out.append(ensureDeclared(node));
@@ -860,8 +860,8 @@ public class Dottifier {
         return out.append(after).toString();
     }
 
-    @NotNull
-    private String reduceNew(@NotNull New node) {
+    @Nonnull
+    private String reduceNew(@Nonnull New node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.callee);
@@ -873,8 +873,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceRequireObjectCoercible(@NotNull RequireObjectCoercible node) {
+    @Nonnull
+    private String reduceRequireObjectCoercible(@Nonnull RequireObjectCoercible node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.expression);
@@ -884,8 +884,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceReturn(@NotNull Return node) {
+    @Nonnull
+    private String reduceReturn(@Nonnull Return node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.expression);
@@ -895,8 +895,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceSwitchStatement(@NotNull SwitchStatement node) {
+    @Nonnull
+    private String reduceSwitchStatement(@Nonnull SwitchStatement node) {
         StringBuilder out = new StringBuilder();
         StringBuilder after = new StringBuilder();
         out.append(ensureDeclared(node));
@@ -1038,13 +1038,13 @@ public class Dottifier {
         return out.append(after).toString();
     }
 
-    @NotNull
-    private String reduceThis(@NotNull This node) {
+    @Nonnull
+    private String reduceThis(@Nonnull This node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceThrow(@NotNull Throw node) {
+    @Nonnull
+    private String reduceThrow(@Nonnull Throw node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.expression);
@@ -1054,8 +1054,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceTryCatchFinally(@NotNull TryCatchFinally node) {
+    @Nonnull
+    private String reduceTryCatchFinally(@Nonnull TryCatchFinally node) {
         StringBuilder out = new StringBuilder();
         StringBuilder after = new StringBuilder();
         out.append(ensureDeclared(node));
@@ -1098,8 +1098,8 @@ public class Dottifier {
         return out.append(after).toString();
     }
 
-    @NotNull
-    private String reduceTypeCoercionNumber(@NotNull TypeCoercionNumber node) {
+    @Nonnull
+    private String reduceTypeCoercionNumber(@Nonnull TypeCoercionNumber node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.expression);
@@ -1109,8 +1109,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceTypeCoercionString(@NotNull TypeCoercionString node) {
+    @Nonnull
+    private String reduceTypeCoercionString(@Nonnull TypeCoercionString node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += reduce(node.expression);
@@ -1120,13 +1120,13 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceTypeofGlobal(@NotNull TypeofGlobal node) {
+    @Nonnull
+    private String reduceTypeofGlobal(@Nonnull TypeofGlobal node) {
         return ensureDeclared(node);
     }
 
-    @NotNull
-    private String reduceVariableAssignment(@NotNull VariableAssignment node) {
+    @Nonnull
+    private String reduceVariableAssignment(@Nonnull VariableAssignment node) {
         String out = ensureDeclared(node);
         ++indentationLevel;
         out += node.ref.either(this::reduce, this::reduce);
@@ -1138,8 +1138,8 @@ public class Dottifier {
         return out;
     }
 
-    @NotNull
-    private String reduceVoid(@NotNull Void node) {
+    @Nonnull
+    private String reduceVoid(@Nonnull Void node) {
         return ensureDeclared(node);
     }
 }

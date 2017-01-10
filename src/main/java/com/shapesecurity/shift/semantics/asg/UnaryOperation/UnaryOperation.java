@@ -16,9 +16,9 @@
 package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public abstract class UnaryOperation implements NodeWithValue {
-    @NotNull
+    @Nonnull
     public abstract NodeWithValue expression();
 }

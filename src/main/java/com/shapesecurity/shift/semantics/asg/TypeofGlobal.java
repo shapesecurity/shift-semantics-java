@@ -15,16 +15,16 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
-
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class TypeofGlobal implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public final String which;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof TypeofGlobal)) return false;
 		TypeofGlobal that = (TypeofGlobal) o;
@@ -36,7 +36,7 @@ public class TypeofGlobal implements NodeWithValue {
 		return Objects.hash(which);
 	}
 
-	public TypeofGlobal(@NotNull String which) {
+	public TypeofGlobal(@Nonnull String which) {
 		this.which = which;
 	}
 }

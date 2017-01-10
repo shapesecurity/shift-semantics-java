@@ -16,22 +16,23 @@
 package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 // Expression must not be an undefined reference.
 public class Typeof extends UnaryOperation {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue expression;
 
-	@NotNull
+	@Nonnull
 	public NodeWithValue expression() {
 		return this.expression;
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Typeof)) return false;
 		Typeof typeof = (Typeof) o;
@@ -43,7 +44,7 @@ public class Typeof extends UnaryOperation {
 		return Objects.hash(expression);
 	}
 
-	public Typeof(@NotNull NodeWithValue expression) {
+	public Typeof(@Nonnull NodeWithValue expression) {
 		this.expression = expression;
 	}
 }

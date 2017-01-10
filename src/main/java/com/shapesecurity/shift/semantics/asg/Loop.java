@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Loop implements Node {
-	@NotNull
+	@Nonnull
 	public final Block block;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Loop)) return false;
 		Loop loop = (Loop) o;
@@ -36,7 +37,7 @@ public class Loop implements Node {
 		return Objects.hash(block);
 	}
 
-	public Loop(@NotNull Block block) {
+	public Loop(@Nonnull Block block) {
 		this.block = block;
 	}
 }

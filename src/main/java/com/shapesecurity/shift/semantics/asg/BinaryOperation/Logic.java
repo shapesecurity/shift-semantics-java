@@ -16,18 +16,19 @@
 package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Logic extends BinaryOperation {
-	@NotNull
+	@Nonnull
 	public final Operator operator;
-	@NotNull
+	@Nonnull
 	public final NodeWithValue left;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Logic)) return false;
 		Logic logic = (Logic) o;
@@ -41,24 +42,24 @@ public class Logic extends BinaryOperation {
 		return Objects.hash(operator, left, right);
 	}
 
-	@NotNull
+	@Nonnull
 
 	public final NodeWithValue right;
 
-	public Logic(@NotNull Operator operator, @NotNull NodeWithValue left, @NotNull NodeWithValue right) {
+	public Logic(@Nonnull Operator operator, @Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
 		this.operator = operator;
 		this.left = left;
 		this.right = right;
 	}
 
 	@Override
-	@NotNull
+	@Nonnull
 	public NodeWithValue left() {
 		return this.left;
 	}
 
 	@Override
-	@NotNull
+	@Nonnull
 	public NodeWithValue right() {
 		return this.right;
 	}
@@ -67,10 +68,10 @@ public class Logic extends BinaryOperation {
 		And("&&"),
 		Or("||");
 
-		@NotNull
+		@Nonnull
 		public final String name;
 
-		Operator(@NotNull String name) {
+		Operator(@Nonnull String name) {
 			this.name = name;
 		}
 	}

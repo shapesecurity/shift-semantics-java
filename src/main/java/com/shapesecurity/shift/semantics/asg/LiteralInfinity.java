@@ -15,13 +15,16 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class LiteralInfinity implements Literal {
+    @Nonnull
     public static final LiteralInfinity INSTANCE = new LiteralInfinity();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o == INSTANCE;
     }
 

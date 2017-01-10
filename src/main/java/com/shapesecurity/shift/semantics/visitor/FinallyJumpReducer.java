@@ -36,20 +36,21 @@ import com.shapesecurity.shift.ast.TryFinallyStatement;
 import com.shapesecurity.shift.ast.WhileStatement;
 import com.shapesecurity.shift.visitor.Director;
 import com.shapesecurity.shift.visitor.MonoidalReducer;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 // Almost identical to JumpReducer, but also tracks the number of Finally statements that a jump exits. Try-catch statements with no syntactic finally are considered to have empty finally blocks.
 // Gives a map from break/continue statements to the statement/loop broken. For labelled statements, map goes to the body of the statement, not the LabelledStatement
 // Relies on the AST being valid: in particular, does not check that labelled continues are breaking loops rather than just statements.
 // TODO could be waaaaay more typesafe than a map from nodes to nodes.
 public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State> {
-	public static final FinallyJumpReducer INSTANCE = new FinallyJumpReducer();
+	@Nonnull public static final FinallyJumpReducer INSTANCE = new FinallyJumpReducer();
 
 	private FinallyJumpReducer() {
 		super(new StateMonoid());
 	}
 
-	public static HashTable<Node, Pair<Node, Integer>> extract(@NotNull FinallyJumpReducer.State state) {
+	@Nonnull
+	public static HashTable<Node, Pair<Node, Integer>> extract(@Nonnull FinallyJumpReducer.State state) {
 		assert state.unlabelledBreaks.length == 0;
 		assert state.labelledBreaks.length == 0;
 		assert state.unlabelledContinues.length == 0;
@@ -57,19 +58,19 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		return state.knownJumps;
 	}
 
-	@NotNull
-	public static HashTable<Node, Pair<Node, Integer>> analyze(@NotNull Script script) {
+	@Nonnull
+	public static HashTable<Node, Pair<Node, Integer>> analyze(@Nonnull Script script) {
 		return FinallyJumpReducer.extract(Director.reduceScript(INSTANCE, script));
 	}
 
-	@NotNull
-	public static HashTable<Node, Pair<Node, Integer>> analyze(@NotNull Module module) {
+	@Nonnull
+	public static HashTable<Node, Pair<Node, Integer>> analyze(@Nonnull Module module) {
 		return FinallyJumpReducer.extract(Director.reduceModule(INSTANCE, module));
 	}
 
 
-	@NotNull
-	private State loopHelper(@NotNull Node loopNode, @NotNull State body) { // no labels in loop bounds
+	@Nonnull
+	private State loopHelper(@Nonnull Node loopNode, @Nonnull State body) { // no labels in loop bounds
 		HashTable<Node, Pair<Node, Integer>> knownJumps = body.knownJumps;
 		knownJumps = body.unlabelledBreaks.foldLeft((table, kv) -> table.put(kv.left, new Pair<>(loopNode, kv.right)), knownJumps);
 		knownJumps = body.unlabelledContinues.foldLeft((table, kv) -> table.put(kv.left, new Pair<>(loopNode, kv.right)), knownJumps);
@@ -82,8 +83,8 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		);
 	}
 
-	@NotNull
-	private State switchHelper(@NotNull Node switchNode, @NotNull State body) { // no labels in discriminant
+	@Nonnull
+	private State switchHelper(@Nonnull Node switchNode, @Nonnull State body) { // no labels in discriminant
 		return new State(
 			HashTable.emptyUsingIdentity(),
 			body.labelledBreaks,
@@ -93,9 +94,9 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		);
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
-	public State reduceBreakStatement(@NotNull BreakStatement node) {
+	public State reduceBreakStatement(@Nonnull BreakStatement node) {
 		if (node.label.isJust()) {
 			String label = node.label.fromJust();
 			return new State(
@@ -119,9 +120,9 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		}
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
-	public State reduceContinueStatement(@NotNull ContinueStatement node) {
+	public State reduceContinueStatement(@Nonnull ContinueStatement node) {
 		if (node.label.isJust()) {
 			String label = node.label.fromJust();
 			return new State(
@@ -145,40 +146,40 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		}
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
-	public State reduceDoWhileStatement(@NotNull DoWhileStatement node, @NotNull State body, @NotNull State test) {
+	public State reduceDoWhileStatement(@Nonnull DoWhileStatement node, @Nonnull State body, @Nonnull State test) {
 		return loopHelper(node, super.reduceDoWhileStatement(node, body, test));
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
 	public State reduceForInStatement(
-		@NotNull ForInStatement node, @NotNull State left, @NotNull State right, @NotNull State body
+		@Nonnull ForInStatement node, @Nonnull State left, @Nonnull State right, @Nonnull State body
 	) {
 		return loopHelper(node, super.reduceForInStatement(node, left, right, body));
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
 	public State reduceForOfStatement(
-		@NotNull ForOfStatement node, @NotNull State left, @NotNull State right, @NotNull State body
+		@Nonnull ForOfStatement node, @Nonnull State left, @Nonnull State right, @Nonnull State body
 	) {
 		return loopHelper(node, super.reduceForOfStatement(node, left, right, body));
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
 	public State reduceForStatement(
-		@NotNull ForStatement node, @NotNull Maybe<State> init, @NotNull Maybe<State> test, @NotNull Maybe<State> update,
-		@NotNull State body
+		@Nonnull ForStatement node, @Nonnull Maybe<State> init, @Nonnull Maybe<State> test, @Nonnull Maybe<State> update,
+		@Nonnull State body
 	) {
 		return loopHelper(node, super.reduceForStatement(node, init, test, update, body));
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
-	public State reduceLabeledStatement(@NotNull LabeledStatement node, @NotNull State body) {
+	public State reduceLabeledStatement(@Nonnull LabeledStatement node, @Nonnull State body) {
 		ImmutableList<Pair<BreakStatement, Integer>> newBreaks = body.labelledBreaks.get(node.label).orJust(ImmutableList.empty());
 		ImmutableList<Pair<ContinueStatement, Integer>> newContinues =
 			body.labelledContinues.get(node.label).orJust(ImmutableList.empty());
@@ -200,19 +201,19 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	}
 
 
-	@NotNull
+	@Nonnull
 	@Override
 	public State reduceSwitchStatement(
-		@NotNull SwitchStatement node, @NotNull State discriminant, @NotNull ImmutableList<State> cases
+		@Nonnull SwitchStatement node, @Nonnull State discriminant, @Nonnull ImmutableList<State> cases
 	) {
 		return switchHelper(node, super.reduceSwitchStatement(node, discriminant, cases));
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
 	public State reduceSwitchStatementWithDefault(
-		@NotNull SwitchStatementWithDefault node, @NotNull State discriminant, @NotNull ImmutableList<State> preDefaultCases,
-		@NotNull State defaultCase, @NotNull ImmutableList<State> postDefaultCases
+		@Nonnull SwitchStatementWithDefault node, @Nonnull State discriminant, @Nonnull ImmutableList<State> preDefaultCases,
+		@Nonnull State defaultCase, @Nonnull ImmutableList<State> postDefaultCases
 	) {
 		return switchHelper(
 			node,
@@ -221,39 +222,39 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	}
 
 
-	@NotNull
+	@Nonnull
 	@Override
 	public State reduceTryFinallyStatement(
-		@NotNull TryFinallyStatement node, @NotNull State block, @NotNull Maybe<State> catchClause, @NotNull State finalizer
+		@Nonnull TryFinallyStatement node, @Nonnull State block, @Nonnull Maybe<State> catchClause, @Nonnull State finalizer
 	) {
 		return super.reduceTryFinallyStatement(node, block, catchClause, finalizer.incrementFinalizers());
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
-	public State reduceWhileStatement(@NotNull WhileStatement node, @NotNull State test, @NotNull State body) {
+	public State reduceWhileStatement(@Nonnull WhileStatement node, @Nonnull State test, @Nonnull State body) {
 		return loopHelper(node, super.reduceWhileStatement(node, test, body));
 	}
 
 
 	public static final class State {
-		@NotNull
+		@Nonnull
 		private final HashTable<BreakStatement, Integer> unlabelledBreaks;
-		@NotNull
+		@Nonnull
 		private final HashTable<String, ImmutableList<Pair<BreakStatement, Integer>>> labelledBreaks;
-		@NotNull
+		@Nonnull
 		private final HashTable<ContinueStatement, Integer> unlabelledContinues;
-		@NotNull
+		@Nonnull
 		private final HashTable<String, ImmutableList<Pair<ContinueStatement, Integer>>> labelledContinues;
-		@NotNull
+		@Nonnull
 		private final HashTable<Node, Pair<Node, Integer>> knownJumps;
 
 		public State(
-			@NotNull HashTable<BreakStatement, Integer> unlabelledBreaks,
-			@NotNull HashTable<String, ImmutableList<Pair<BreakStatement, Integer>>> labelledBreaks,
-			@NotNull HashTable<ContinueStatement, Integer> unlabelledContinues,
-			@NotNull HashTable<String, ImmutableList<Pair<ContinueStatement, Integer>>> labelledContinues,
-			@NotNull HashTable<Node, Pair<Node, Integer>> knownJumps
+			@Nonnull HashTable<BreakStatement, Integer> unlabelledBreaks,
+			@Nonnull HashTable<String, ImmutableList<Pair<BreakStatement, Integer>>> labelledBreaks,
+			@Nonnull HashTable<ContinueStatement, Integer> unlabelledContinues,
+			@Nonnull HashTable<String, ImmutableList<Pair<ContinueStatement, Integer>>> labelledContinues,
+			@Nonnull HashTable<Node, Pair<Node, Integer>> knownJumps
 		) {
 			this.unlabelledBreaks = unlabelledBreaks;
 			this.labelledBreaks = labelledBreaks;
@@ -270,14 +271,14 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 			this.knownJumps = HashTable.emptyUsingIdentity();
 		}
 
-		public State(@NotNull State a, @NotNull State b) {
+		public State(@Nonnull State a, @Nonnull State b) {
 			this.unlabelledBreaks = a.unlabelledBreaks.merge(b.unlabelledBreaks);
 			this.labelledBreaks = a.labelledBreaks.merge(b.labelledBreaks, ImmutableList::append);
 			this.unlabelledContinues = a.unlabelledContinues.merge(b.unlabelledContinues);
 			this.labelledContinues = a.labelledContinues.merge(b.labelledContinues, ImmutableList::append);
 			this.knownJumps = a.knownJumps.merge(b.knownJumps);
 		}
-
+        @Nonnull
 		public State incrementFinalizers() {
 			return new State(
 				this.unlabelledBreaks.map(x -> x + 1),
@@ -291,14 +292,14 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 
 	private static final class StateMonoid implements Monoid<State> {
 		@Override
-		@NotNull
+		@Nonnull
 		public State identity() {
 			return new State();
 		}
 
 		@Override
-		@NotNull
-		public State append(State a, State b) {
+		@Nonnull
+		public State append(@Nonnull State a, @Nonnull State b) {
 			if (a == b) {
 				return a;
 			}

@@ -17,18 +17,19 @@ package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.ImmutableList;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class SwitchStatement implements Node {
-	@NotNull
+	@Nonnull
 	public final LocalReference discriminant;
-	@NotNull
+	@Nonnull
 	public final ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof SwitchStatement)) return false;
 		SwitchStatement that = (SwitchStatement) o;
@@ -43,15 +44,15 @@ public class SwitchStatement implements Node {
 		return Objects.hash(discriminant, preDefaultCases, defaultCase, postDefaultCases);
 	}
 
-	@NotNull
+	@Nonnull
 
 	public final Block defaultCase;
-	@NotNull
+	@Nonnull
 	public final ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases;
 
 	public SwitchStatement(
-		@NotNull LocalReference discriminant, @NotNull ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases,
-		@NotNull Block defaultCase, @NotNull ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases
+		@Nonnull LocalReference discriminant, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases,
+		@Nonnull Block defaultCase, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases
 	) {
 		this.discriminant = discriminant;
 		this.preDefaultCases = preDefaultCases;

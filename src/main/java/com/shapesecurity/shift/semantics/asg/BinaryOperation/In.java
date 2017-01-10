@@ -16,16 +16,17 @@
 package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class In extends BinaryOperation {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue left;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof In)) return false;
 		In in = (In) o;
@@ -38,23 +39,23 @@ public class In extends BinaryOperation {
 		return Objects.hash(left, right);
 	}
 
-	@NotNull
+	@Nonnull
 
 	public final NodeWithValue right;
 
 	@Override
-	@NotNull
+	@Nonnull
 	public NodeWithValue left() {
 		return this.left;
 	}
 
 	@Override
-	@NotNull
+	@Nonnull
 	public NodeWithValue right() {
 		return this.right;
 	}
 
-	public In(@NotNull NodeWithValue left, @NotNull NodeWithValue right) {
+	public In(@Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
 		this.left = left;
 		this.right = right;
 	}

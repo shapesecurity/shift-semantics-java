@@ -16,20 +16,21 @@
 package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Equality extends BinaryOperation {
-	@NotNull
+	@Nonnull
 	public final Operator operator;
-	@NotNull
+	@Nonnull
 	public final NodeWithValue left;
-	@NotNull
+	@Nonnull
 	public final NodeWithValue right;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Equality)) return false;
 		Equality equality = (Equality) o;
@@ -43,20 +44,20 @@ public class Equality extends BinaryOperation {
 		return Objects.hash(operator, left, right);
 	}
 
-	public Equality(@NotNull Operator operator, @NotNull NodeWithValue left, @NotNull NodeWithValue right) {
+	public Equality(@Nonnull Operator operator, @Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
 		this.operator = operator;
 		this.left = left;
 		this.right = right;
 	}
 
 	@Override
-	@NotNull
+	@Nonnull
 	public NodeWithValue left() {
 		return this.left;
 	}
 
 	@Override
-	@NotNull
+	@Nonnull
 	public NodeWithValue right() {
 		return this.right;
 	}
@@ -67,10 +68,10 @@ public class Equality extends BinaryOperation {
 		StrictEq("==="),
 		StrictNeq("!==");
 
-		@NotNull
+		@Nonnull
 		public final String name;
 
-		Operator(@NotNull String name) {
+		Operator(@Nonnull String name) {
 			this.name = name;
 		}
 	}

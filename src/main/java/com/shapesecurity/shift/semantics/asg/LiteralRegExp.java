@@ -15,18 +15,19 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class LiteralRegExp implements Literal {
-	@NotNull
+	@Nonnull
 	public final String pattern;
-	@NotNull
+	@Nonnull
 	public final String flags;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof LiteralRegExp)) return false;
 		LiteralRegExp that = (LiteralRegExp) o;
@@ -39,7 +40,7 @@ public class LiteralRegExp implements Literal {
 		return Objects.hash(pattern, flags);
 	}
 
-	public LiteralRegExp(@NotNull String pattern, @NotNull String flags) {
+	public LiteralRegExp(@Nonnull String pattern, @Nonnull String flags) {
 		this.pattern = pattern;
 		this.flags = flags;
 	}

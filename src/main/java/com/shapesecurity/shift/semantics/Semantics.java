@@ -18,17 +18,17 @@ package com.shapesecurity.shift.semantics;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.shift.scope.Variable;
 import com.shapesecurity.shift.semantics.asg.Node;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public class Semantics {
-	@NotNull
+	@Nonnull
 	public final Node node;
-	@NotNull
+	@Nonnull
 	public final ImmutableList<Variable> locals;
-	@NotNull
+	@Nonnull
 	public final ImmutableList<String> scriptVarDecls;
 
-	public Semantics(@NotNull Node node, @NotNull ImmutableList<Variable> locals, @NotNull ImmutableList<String> scriptVarDecls) {
+	public Semantics(@Nonnull Node node, @Nonnull ImmutableList<Variable> locals, @Nonnull ImmutableList<String> scriptVarDecls) {
 		this.node = node;
 		this.locals = locals;
 		this.scriptVarDecls = scriptVarDecls;

@@ -16,10 +16,11 @@
 package com.shapesecurity.shift.semantics.asg.BinaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public abstract class BinaryOperation implements NodeWithValue {
-	public static BinaryOperation fromOperator(BinaryOperator operator, NodeWithValue left, NodeWithValue right) {
+	@Nonnull
+	public static BinaryOperation fromOperator(@Nonnull BinaryOperator operator, @Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
 		if (operator instanceof FloatMath.Operator) {
 			return new FloatMath((FloatMath.Operator) operator, left, right);
 		} else if (operator instanceof IntMath.Operator) {
@@ -35,9 +36,9 @@ public abstract class BinaryOperation implements NodeWithValue {
 		}
 	}
 
-	@NotNull
+	@Nonnull
 	public abstract NodeWithValue left();
 
-	@NotNull
+	@Nonnull
 	public abstract NodeWithValue right();
 }

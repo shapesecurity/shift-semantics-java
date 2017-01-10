@@ -15,13 +15,14 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class GlobalReference implements NodeWithValue {
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof GlobalReference)) return false;
 		GlobalReference that = (GlobalReference) o;
@@ -33,9 +34,9 @@ public class GlobalReference implements NodeWithValue {
 		return Objects.hash(name);
 	}
 
-	public final String name;
+	@Nonnull public final String name;
 
-	public GlobalReference(@NotNull String name) {
+	public GlobalReference(@Nonnull String name) {
 		this.name = name;
 	}
 }

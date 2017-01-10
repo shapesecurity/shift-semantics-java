@@ -16,13 +16,14 @@
 package com.shapesecurity.shift.semantics.asg.UnaryOperation;
 
 import com.shapesecurity.shift.semantics.asg.NodeWithValue;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class Negation extends UnaryOperation {
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Negation)) return false;
 		Negation negation = (Negation) o;
@@ -34,15 +35,15 @@ public class Negation extends UnaryOperation {
 		return Objects.hash(expression);
 	}
 
-	@NotNull
+	@Nonnull
 	public final NodeWithValue expression;
 
-	@NotNull
+	@Nonnull
 	public NodeWithValue expression() {
 		return this.expression;
 	}
 
-	public Negation(@NotNull NodeWithValue expression) {
+	public Negation(@Nonnull NodeWithValue expression) {
 		this.expression = expression;
 	}
 }

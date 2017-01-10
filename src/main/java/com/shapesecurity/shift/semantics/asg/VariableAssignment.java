@@ -16,13 +16,14 @@
 package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.data.Either;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class VariableAssignment implements NodeWithValue {
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof VariableAssignment)) return false;
 		VariableAssignment that = (VariableAssignment) o;
@@ -36,27 +37,27 @@ public class VariableAssignment implements NodeWithValue {
 		return Objects.hash(ref, value, strict);
 	}
 
-	@NotNull
+	@Nonnull
 	public final Either<GlobalReference, LocalReference> ref;
-	@NotNull
+	@Nonnull
 	public final NodeWithValue value;
 	public final boolean strict;
 
 	public VariableAssignment(
-		@NotNull Either<GlobalReference, LocalReference> ref, @NotNull NodeWithValue value, boolean strict
+		@Nonnull Either<GlobalReference, LocalReference> ref, @Nonnull NodeWithValue value, boolean strict
 	) {
 		this.ref = ref;
 		this.value = value;
 		this.strict = strict;
 	}
 
-	public VariableAssignment(@NotNull GlobalReference ref, @NotNull NodeWithValue value, boolean strict) {
+	public VariableAssignment(@Nonnull GlobalReference ref, @Nonnull NodeWithValue value, boolean strict) {
 		this.ref = Either.left(ref);
 		this.value = value;
 		this.strict = strict;
 	}
 
-	public VariableAssignment(@NotNull LocalReference ref, @NotNull NodeWithValue value, boolean strict) {
+	public VariableAssignment(@Nonnull LocalReference ref, @Nonnull NodeWithValue value, boolean strict) {
 		this.ref = Either.right(ref);
 		this.value = value;
 		this.strict = strict;

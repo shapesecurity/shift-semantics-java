@@ -16,18 +16,19 @@
 package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class New implements NodeWithValue {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue callee;
-	@NotNull
+	@Nonnull
 	public final ImmutableList<NodeWithValue> arguments;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof New)) return false;
 		New aNew = (New) o;
@@ -40,7 +41,7 @@ public class New implements NodeWithValue {
 		return Objects.hash(callee, arguments);
 	}
 
-	public New(@NotNull NodeWithValue callee, @NotNull ImmutableList<NodeWithValue> arguments) {
+	public New(@Nonnull NodeWithValue callee, @Nonnull ImmutableList<NodeWithValue> arguments) {
 		this.callee = callee;
 		this.arguments = arguments;
 	}

@@ -15,13 +15,14 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Keys implements NodeWithValue {
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Keys)) return false;
 		Keys keys = (Keys) o;
@@ -33,10 +34,10 @@ public class Keys implements NodeWithValue {
 		return Objects.hash(_object);
 	}
 
-	@NotNull
+	@Nonnull
 	public final NodeWithValue _object;
 
-	public Keys(@NotNull NodeWithValue object) {
+	public Keys(@Nonnull NodeWithValue object) {
 		_object = object;
 	}
 }

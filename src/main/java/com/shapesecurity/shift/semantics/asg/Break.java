@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class Break implements Node {
-	@NotNull
+	@Nonnull
 	public final BreakTarget target;
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Break)) return false;
 		Break aBreak = (Break) o;
@@ -39,7 +40,7 @@ public class Break implements Node {
 
 	public final int finalliesBroken;
 
-	public Break(@NotNull BreakTarget target, int finalliesBroken) {
+	public Break(@Nonnull BreakTarget target, int finalliesBroken) {
 		this.target = target;
 		this.finalliesBroken = finalliesBroken;
 	}

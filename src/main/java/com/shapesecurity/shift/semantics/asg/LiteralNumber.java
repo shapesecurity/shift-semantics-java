@@ -15,11 +15,12 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class LiteralNumber implements Node, Literal {
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof LiteralNumber)) return false;
 		LiteralNumber that = (LiteralNumber) o;

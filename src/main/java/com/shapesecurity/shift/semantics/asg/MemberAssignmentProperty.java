@@ -15,17 +15,18 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public interface MemberAssignmentProperty {
 	class StaticValue implements MemberAssignmentProperty {
-		@NotNull
+		@Nonnull
 		public final NodeWithValue value;
 
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(@Nullable Object o) {
 			if (this == o) return true;
 			if (!(o instanceof StaticValue)) return false;
 			StaticValue that = (StaticValue) o;
@@ -37,21 +38,21 @@ public interface MemberAssignmentProperty {
 			return Objects.hash(value);
 		}
 
-		public StaticValue(@NotNull NodeWithValue value) {
+		public StaticValue(@Nonnull NodeWithValue value) {
 			this.value = value;
 		}
 	}
 
 	class Getter implements MemberAssignmentProperty {
-		@NotNull
+		@Nonnull
 		public final LiteralFunction value;
 
-		public Getter(@NotNull LiteralFunction value) {
+		public Getter(@Nonnull LiteralFunction value) {
 			this.value = value;
 		}
 
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(@Nullable Object o) {
 			if (this == o) return true;
 			if (!(o instanceof Getter)) return false;
 			Getter getter = (Getter) o;
@@ -65,10 +66,10 @@ public interface MemberAssignmentProperty {
 	}
 
 	class Setter implements MemberAssignmentProperty {
-		@NotNull
+		@Nonnull
 		public final LiteralFunction value;
 
-		public Setter(@NotNull LiteralFunction value) {
+		public Setter(@Nonnull LiteralFunction value) {
 			this.value = value;
 		}
 	}

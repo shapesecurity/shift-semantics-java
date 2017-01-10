@@ -15,16 +15,17 @@
  */
 package com.shapesecurity.shift.semantics.asg;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Objects;
 
 public class IfElse implements Node {
-	@NotNull
+	@Nonnull
 	public final NodeWithValue test; // TODO could be a type coercion node
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof IfElse)) return false;
 		IfElse ifElse = (IfElse) o;
@@ -38,12 +39,12 @@ public class IfElse implements Node {
 		return Objects.hash(test, consequent, alternate);
 	}
 
-	@NotNull
+	@Nonnull
 	public final Block consequent;
-	@NotNull
+	@Nonnull
 	public final Block alternate;
 
-	public IfElse(@NotNull NodeWithValue test, @NotNull Block consequent, @NotNull Block alternate) {
+	public IfElse(@Nonnull NodeWithValue test, @Nonnull Block consequent, @Nonnull Block alternate) {
 		this.test = test;
 		this.consequent = consequent;
 		this.alternate = alternate;
