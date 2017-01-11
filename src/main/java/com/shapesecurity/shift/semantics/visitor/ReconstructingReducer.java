@@ -84,7 +84,7 @@ public class ReconstructingReducer {
 
     @Nonnull
     protected BreakTarget visitBreakTarget(@Nonnull BreakTarget breakTarget) {
-        return breakTarget; // TODO is not in fact cloning targets
+        return breakTarget;
     }
 
     @Nonnull

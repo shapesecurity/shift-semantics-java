@@ -372,8 +372,8 @@ public class Explicator {
 			return Void.INSTANCE;
 		} else if (statement instanceof DoWhileStatement) { // exactly the same as WhileStatement, except that the test is last instead of first
 			DoWhileStatement doWhileStatement = (DoWhileStatement) statement;
-			BreakTarget outerTarget = BreakTarget.INSTANCE;
-			BreakTarget innerTarget = BreakTarget.INSTANCE;
+			BreakTarget outerTarget = new BreakTarget();
+			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 			Block body = new Block(ImmutableList.<Node>of(
@@ -412,8 +412,8 @@ public class Explicator {
             }
              */
 			ForInStatement forInStatement = (ForInStatement) statement;
-			BreakTarget outerTarget = BreakTarget.INSTANCE;
-			BreakTarget innerTarget = BreakTarget.INSTANCE;
+			BreakTarget outerTarget = new BreakTarget();
+			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
@@ -472,8 +472,8 @@ public class Explicator {
 			})));
 		} else if (statement instanceof ForStatement) {
 			ForStatement forStatement = (ForStatement) statement;
-			BreakTarget outerTarget = BreakTarget.INSTANCE;
-			BreakTarget innerTarget = BreakTarget.INSTANCE;
+			BreakTarget outerTarget = new BreakTarget();
+			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
@@ -518,7 +518,7 @@ public class Explicator {
 			return new IfElse(test, new Block(consequent), new Block(alternate));
 		} else if (statement instanceof LabeledStatement) {
 			LabeledStatement labeledStatement = (LabeledStatement) statement;
-			BreakTarget target = BreakTarget.INSTANCE;
+			BreakTarget target = new BreakTarget();
 			targets = targets.put(labeledStatement.body, new Pair<>(target, Maybe.empty()));
 			return new Block(ImmutableList.of(explicateStatement(labeledStatement.body, strict), target));
 		} else if (statement instanceof ReturnStatement) {
@@ -529,7 +529,7 @@ public class Explicator {
 		} else if (statement instanceof com.shapesecurity.shift.ast.SwitchStatement) {
 			// TODO hoist function declarations. This will require modifying asg SwitchStatements to have a Declarations block of statements, horrifyingly enough. probably also need to fix scope analysis.
 			com.shapesecurity.shift.ast.SwitchStatement switchStatement = (com.shapesecurity.shift.ast.SwitchStatement) statement;
-			BreakTarget target = BreakTarget.INSTANCE;
+			BreakTarget target = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(target, Maybe.empty()));
 
 			return new Block(ImmutableList.of(
@@ -547,7 +547,7 @@ public class Explicator {
 		} else if (statement instanceof SwitchStatementWithDefault) {
 			// TODO hoist function declarations. This will require modifying asg SwitchStatements to have a Declarations block of statements, horrifyingly enough. probably also need to fix scope analysis.
 			SwitchStatementWithDefault switchStatement = (SwitchStatementWithDefault) statement;
-			BreakTarget target = BreakTarget.INSTANCE;
+			BreakTarget target = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(target, Maybe.empty()));
 
 			return new Block(ImmutableList.of(
@@ -594,8 +594,8 @@ public class Explicator {
 			return explicateVariableDeclaration(variableDeclarationStatement.declaration, strict);
 		} else if (statement instanceof WhileStatement) {
 			WhileStatement whileStatement = (WhileStatement) statement;
-			BreakTarget outerTarget = BreakTarget.INSTANCE;
-			BreakTarget innerTarget = BreakTarget.INSTANCE;
+			BreakTarget outerTarget = new BreakTarget();
+			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 			Block body = new Block(ImmutableList.<Node>of(
