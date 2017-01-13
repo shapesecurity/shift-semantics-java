@@ -78,7 +78,7 @@ public class ReconstructingReducer {
     }
 
     @Nonnull
-    protected Break visitBreak(@Nonnull Break _break) {
+    protected Node visitBreak(@Nonnull Break _break) {
         return new Break(_break.target, _break.finalliesBroken); // TODO is not in fact cloning targets
     }
 
@@ -88,7 +88,7 @@ public class ReconstructingReducer {
     }
 
     @Nonnull
-    protected Call visitCall(@Nonnull Call call) {
+    protected NodeWithValue visitCall(@Nonnull Call call) {
         return new Call(
                 call.context.map(this::visitLocalReference),
                 visitExpression(call.callee),
@@ -173,102 +173,102 @@ public class ReconstructingReducer {
     }
 
     @Nonnull
-    protected FloatMath visitFloatMath(@Nonnull FloatMath floatMath) {
+    protected NodeWithValue visitFloatMath(@Nonnull FloatMath floatMath) {
         return new FloatMath(floatMath.operator, visitExpression(floatMath.left), visitExpression(floatMath.right));
     }
 
     @Nonnull
-    protected IntMath visitIntMath(@Nonnull IntMath intMath) {
+    protected NodeWithValue visitIntMath(@Nonnull IntMath intMath) {
         return new IntMath(intMath.operator, visitExpression(intMath.left), visitExpression(intMath.right));
     }
 
     @Nonnull
-    protected InstanceOf visitInstanceOf(@Nonnull InstanceOf instanceOf) {
+    protected NodeWithValue visitInstanceOf(@Nonnull InstanceOf instanceOf) {
         return new InstanceOf(instanceOf.left, instanceOf.right);
     }
 
     @Nonnull
-    protected Negation visitNegation(@Nonnull Negation negation) {
+    protected NodeWithValue visitNegation(@Nonnull Negation negation) {
         return new Negation(negation.expression);
     }
 
     @Nonnull
-    protected Equality visitEquality(@Nonnull Equality equality) {
+    protected NodeWithValue visitEquality(@Nonnull Equality equality) {
         return new Equality(equality.operator, equality.left, equality.right);
     }
 
     @Nonnull
-    protected New visitNew(@Nonnull New expression) {
+    protected NodeWithValue visitNew(@Nonnull New expression) {
         return new New(expression.callee, expression.arguments);
     }
 
     @Nonnull
-    protected This visitThis(@Nonnull This expression) {
+    protected NodeWithValue visitThis(@Nonnull This expression) {
         return new This(expression.strict);
     }
 
     @Nonnull
-    protected RequireObjectCoercible visitRequireObjectCoercible(@Nonnull RequireObjectCoercible requireObjectCoercible) {
+    protected NodeWithValue visitRequireObjectCoercible(@Nonnull RequireObjectCoercible requireObjectCoercible) {
         return new RequireObjectCoercible(requireObjectCoercible.expression);
     }
 
     @Nonnull
-    protected TypeCoercionString visitTypeCoercionString(@Nonnull TypeCoercionString typeCoercionString) {
+    protected NodeWithValue visitTypeCoercionString(@Nonnull TypeCoercionString typeCoercionString) {
         return new TypeCoercionString(typeCoercionString.expression);
     }
 
     @Nonnull
-    protected TypeCoercionNumber visitTypeCoercionNumber(@Nonnull TypeCoercionNumber typeCoercionNumber) {
+    protected NodeWithValue visitTypeCoercionNumber(@Nonnull TypeCoercionNumber typeCoercionNumber) {
         return new TypeCoercionNumber(typeCoercionNumber.expression);
     }
 
     @Nonnull
-    protected Keys visitKeys(@Nonnull Keys keys) {
+    protected NodeWithValue visitKeys(@Nonnull Keys keys) {
         return new Keys(keys._object);
     }
 
     @Nonnull
-    protected TypeofGlobal visitTypeofGlobal(@Nonnull TypeofGlobal typeofGlobal) {
+    protected NodeWithValue visitTypeofGlobal(@Nonnull TypeofGlobal typeofGlobal) {
         return new TypeofGlobal(typeofGlobal.which);
     }
 
     @Nonnull
-    protected VoidOp visitVoidOp(@Nonnull VoidOp voidOp) {
+    protected NodeWithValue visitVoidOp(@Nonnull VoidOp voidOp) {
         return new VoidOp(voidOp.expression);
     }
 
     @Nonnull
-    protected DeleteGlobalProperty visitDeleteGlobalProperty(@Nonnull DeleteGlobalProperty expression) {
+    protected NodeWithValue visitDeleteGlobalProperty(@Nonnull DeleteGlobalProperty expression) {
         return new DeleteGlobalProperty(expression.which);
     }
 
     @Nonnull
-    protected Logic visitLogic(@Nonnull Logic expression) {
+    protected NodeWithValue visitLogic(@Nonnull Logic expression) {
         return new Logic(expression.operator, expression.left, expression.right);
     }
 
     @Nonnull
-    protected In visitIn(@Nonnull In expression) {
+    protected NodeWithValue visitIn(@Nonnull In expression) {
         return new In(expression.left, expression.right);
     }
 
     @Nonnull
-    protected DeleteProperty visitDeleteProperty(@Nonnull DeleteProperty expression) {
+    protected NodeWithValue visitDeleteProperty(@Nonnull DeleteProperty expression) {
         return new DeleteProperty(expression.object, expression.fieldExpression, expression.strict);
     }
 
     @Nonnull
-    protected Typeof visitTypeof(@Nonnull Typeof expression) {
+    protected NodeWithValue visitTypeof(@Nonnull Typeof expression) {
         return new Typeof(expression.expression);
     }
 
     @Nonnull
-    protected BitwiseNot visitBitwiseNot(@Nonnull BitwiseNot expression) {
+    protected NodeWithValue visitBitwiseNot(@Nonnull BitwiseNot expression) {
         return new BitwiseNot(expression.expression);
     }
 
     @Nonnull
-    protected Literal visitLiteral(@Nonnull Literal literal) {
+    private NodeWithValue visitLiteral(@Nonnull Literal literal) {
         if (literal instanceof LiteralNumber) {
             return new LiteralNumber(((LiteralNumber) literal).value);
         } else if (literal instanceof LiteralBoolean) {
@@ -318,12 +318,12 @@ public class ReconstructingReducer {
     }
 
     @Nonnull
-    protected MemberAccess visitMemberAccess(@Nonnull MemberAccess memberAccess) {
+    protected NodeWithValue visitMemberAccess(@Nonnull MemberAccess memberAccess) {
         return new MemberAccess(visitExpression(memberAccess.object), visitExpression(memberAccess.fieldExpression));
     }
 
     @Nonnull
-    protected MemberAssignment visitMemberAssignment(@Nonnull MemberAssignment memberAssignment) {
+    protected NodeWithValue visitMemberAssignment(@Nonnull MemberAssignment memberAssignment) {
         if (memberAssignment.property instanceof MemberAssignmentProperty.StaticValue) {
             return new MemberAssignment(visitExpression(memberAssignment.object), visitExpression(memberAssignment.fieldExpression), visitExpression(((MemberAssignmentProperty.StaticValue) memberAssignment.property).value), memberAssignment.strict);
         }
@@ -384,17 +384,17 @@ public class ReconstructingReducer {
     }
 
     @Nonnull
-    protected RelationalComparison visitRelationalComparison(@Nonnull RelationalComparison relationalComparison) {
+    protected NodeWithValue visitRelationalComparison(@Nonnull RelationalComparison relationalComparison) {
         return new RelationalComparison(relationalComparison.operator, visitExpression(relationalComparison.left), visitExpression(relationalComparison.right));
     }
 
     @Nonnull
-    protected VariableAssignment visitVariableAssignment(@Nonnull VariableAssignment variableAssignment) {
+    protected NodeWithValue visitVariableAssignment(@Nonnull VariableAssignment variableAssignment) {
         return new VariableAssignment(visitReference(variableAssignment.ref), visitExpression(variableAssignment.value), variableAssignment.strict);
     }
 
     @Nonnull
-    protected Void visitVoid(@Nonnull Void _void) {
+    protected Node visitVoid(@Nonnull Void _void) {
         return Void.INSTANCE;
     }
 
