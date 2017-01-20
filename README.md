@@ -6,8 +6,8 @@ This project derives a representation of an ECMAScript program's semantics from 
 ## Usage example
 
 ```java
-import com.shapesecurity.shift.parser.Parser;
-import com.shapesecurity.shift.semantics.Explicator;
+import com.shapesecurity.shift.es2016.parser.Parser;
+import com.shapesecurity.shift.es2016.semantics.Explicator;
 
 Script program = Parser.parseScript(programText);
 Semantics semantics = Explicator.deriveSemantics(program);
@@ -19,8 +19,8 @@ In `pom.xml`, under `project.dependencies`, add this dependency.
 
 ```xml
 <dependency>
-  <groupId>com.shapesecurity</groupId>
-  <artifactId>shift-semantics</artifactId>
+  <groupId>com.shapesecurity.shift.es2016</groupId>
+  <artifactId>semantics</artifactId>
   <version>1.0.0</version>
 </dependency>
 ```
