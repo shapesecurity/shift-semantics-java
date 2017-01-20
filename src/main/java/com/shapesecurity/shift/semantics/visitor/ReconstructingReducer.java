@@ -290,7 +290,8 @@ public class ReconstructingReducer {
         } else if (literal instanceof LiteralEmptyArray) {
             return LiteralEmptyArray.INSTANCE;
         } else if (literal instanceof LiteralRegExp) {
-            return new LiteralRegExp(((LiteralRegExp) literal).pattern, ((LiteralRegExp) literal).flags);
+            LiteralRegExp regex = (LiteralRegExp) literal;
+            return new LiteralRegExp(regex.pattern, regex.global, regex.ignoreCase, regex.multiline, regex.sticky, regex.multiline);
         } else if (literal instanceof LiteralInfinity) {
             return LiteralInfinity.INSTANCE;
         }

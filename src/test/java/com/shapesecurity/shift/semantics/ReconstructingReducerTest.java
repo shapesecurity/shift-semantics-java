@@ -1,6 +1,6 @@
 package com.shapesecurity.shift.semantics;
 
-import com.shapesecurity.shift.parser.Parser;
+import com.shapesecurity.shift.es2016.parser.Parser;
 import com.shapesecurity.shift.semantics.visitor.ReconstructingReducer;
 import org.junit.Test;
 

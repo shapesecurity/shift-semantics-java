@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,77 +21,80 @@ import com.shapesecurity.functional.data.Either;
 import com.shapesecurity.functional.data.HashTable;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
-import com.shapesecurity.shift.ast.ArrayExpression;
-import com.shapesecurity.shift.ast.AssignmentExpression;
-import com.shapesecurity.shift.ast.BinaryExpression;
-import com.shapesecurity.shift.ast.Binding;
-import com.shapesecurity.shift.ast.BindingIdentifier;
-import com.shapesecurity.shift.ast.BlockStatement;
-import com.shapesecurity.shift.ast.BreakStatement;
-import com.shapesecurity.shift.ast.CallExpression;
-import com.shapesecurity.shift.ast.CompoundAssignmentExpression;
-import com.shapesecurity.shift.ast.ComputedMemberExpression;
-import com.shapesecurity.shift.ast.ComputedPropertyName;
-import com.shapesecurity.shift.ast.ConditionalExpression;
-import com.shapesecurity.shift.ast.ContinueStatement;
-import com.shapesecurity.shift.ast.DataProperty;
-import com.shapesecurity.shift.ast.DebuggerStatement;
-import com.shapesecurity.shift.ast.Directive;
-import com.shapesecurity.shift.ast.DoWhileStatement;
-import com.shapesecurity.shift.ast.EmptyStatement;
-import com.shapesecurity.shift.ast.Expression;
-import com.shapesecurity.shift.ast.ExpressionStatement;
-import com.shapesecurity.shift.ast.ExpressionSuper;
-import com.shapesecurity.shift.ast.ForInStatement;
-import com.shapesecurity.shift.ast.ForStatement;
-import com.shapesecurity.shift.ast.FormalParameters;
-import com.shapesecurity.shift.ast.FunctionBody;
-import com.shapesecurity.shift.ast.FunctionDeclaration;
-import com.shapesecurity.shift.ast.FunctionExpression;
-import com.shapesecurity.shift.ast.Getter;
-import com.shapesecurity.shift.ast.IdentifierExpression;
-import com.shapesecurity.shift.ast.IfStatement;
-import com.shapesecurity.shift.ast.LabeledStatement;
-import com.shapesecurity.shift.ast.LiteralBooleanExpression;
-import com.shapesecurity.shift.ast.LiteralInfinityExpression;
-import com.shapesecurity.shift.ast.LiteralNullExpression;
-import com.shapesecurity.shift.ast.LiteralNumericExpression;
-import com.shapesecurity.shift.ast.LiteralRegExpExpression;
-import com.shapesecurity.shift.ast.LiteralStringExpression;
-import com.shapesecurity.shift.ast.MemberExpression;
-import com.shapesecurity.shift.ast.Module;
-import com.shapesecurity.shift.ast.NewExpression;
-import com.shapesecurity.shift.ast.ObjectExpression;
-import com.shapesecurity.shift.ast.ObjectProperty;
-import com.shapesecurity.shift.ast.PropertyName;
-import com.shapesecurity.shift.ast.ReturnStatement;
-import com.shapesecurity.shift.ast.Script;
-import com.shapesecurity.shift.ast.Setter;
-import com.shapesecurity.shift.ast.SpreadElementExpression;
-import com.shapesecurity.shift.ast.Statement;
-import com.shapesecurity.shift.ast.StaticMemberExpression;
-import com.shapesecurity.shift.ast.StaticPropertyName;
-import com.shapesecurity.shift.ast.Super;
-import com.shapesecurity.shift.ast.SwitchCase;
-import com.shapesecurity.shift.ast.SwitchStatementWithDefault;
-import com.shapesecurity.shift.ast.ThisExpression;
-import com.shapesecurity.shift.ast.ThrowStatement;
-import com.shapesecurity.shift.ast.TryCatchStatement;
-import com.shapesecurity.shift.ast.TryFinallyStatement;
-import com.shapesecurity.shift.ast.UnaryExpression;
-import com.shapesecurity.shift.ast.UpdateExpression;
-import com.shapesecurity.shift.ast.VariableDeclaration;
-import com.shapesecurity.shift.ast.VariableDeclarationExpression;
-import com.shapesecurity.shift.ast.VariableDeclarationStatement;
-import com.shapesecurity.shift.ast.WhileStatement;
-import com.shapesecurity.shift.ast.WithStatement;
-import com.shapesecurity.shift.ast.operators.UpdateOperator;
-import com.shapesecurity.shift.scope.Declaration;
-import com.shapesecurity.shift.scope.GlobalScope;
-import com.shapesecurity.shift.scope.Scope;
-import com.shapesecurity.shift.scope.ScopeAnalyzer;
-import com.shapesecurity.shift.scope.ScopeLookup;
-import com.shapesecurity.shift.scope.Variable;
+import com.shapesecurity.shift.es2016.ast.ArrayExpression;
+import com.shapesecurity.shift.es2016.ast.AssignmentExpression;
+import com.shapesecurity.shift.es2016.ast.AssignmentTarget;
+import com.shapesecurity.shift.es2016.ast.AssignmentTargetIdentifier;
+import com.shapesecurity.shift.es2016.ast.BinaryExpression;
+import com.shapesecurity.shift.es2016.ast.BindingIdentifier;
+import com.shapesecurity.shift.es2016.ast.BlockStatement;
+import com.shapesecurity.shift.es2016.ast.BreakStatement;
+import com.shapesecurity.shift.es2016.ast.CallExpression;
+import com.shapesecurity.shift.es2016.ast.CompoundAssignmentExpression;
+import com.shapesecurity.shift.es2016.ast.ComputedMemberAssignmentTarget;
+import com.shapesecurity.shift.es2016.ast.ComputedMemberExpression;
+import com.shapesecurity.shift.es2016.ast.ComputedPropertyName;
+import com.shapesecurity.shift.es2016.ast.ConditionalExpression;
+import com.shapesecurity.shift.es2016.ast.ContinueStatement;
+import com.shapesecurity.shift.es2016.ast.DataProperty;
+import com.shapesecurity.shift.es2016.ast.DebuggerStatement;
+import com.shapesecurity.shift.es2016.ast.Directive;
+import com.shapesecurity.shift.es2016.ast.DoWhileStatement;
+import com.shapesecurity.shift.es2016.ast.EmptyStatement;
+import com.shapesecurity.shift.es2016.ast.Expression;
+import com.shapesecurity.shift.es2016.ast.ExpressionStatement;
+import com.shapesecurity.shift.es2016.ast.ExpressionSuper;
+import com.shapesecurity.shift.es2016.ast.ForInStatement;
+import com.shapesecurity.shift.es2016.ast.ForStatement;
+import com.shapesecurity.shift.es2016.ast.FormalParameters;
+import com.shapesecurity.shift.es2016.ast.FunctionBody;
+import com.shapesecurity.shift.es2016.ast.FunctionDeclaration;
+import com.shapesecurity.shift.es2016.ast.FunctionExpression;
+import com.shapesecurity.shift.es2016.ast.Getter;
+import com.shapesecurity.shift.es2016.ast.IdentifierExpression;
+import com.shapesecurity.shift.es2016.ast.IfStatement;
+import com.shapesecurity.shift.es2016.ast.LabeledStatement;
+import com.shapesecurity.shift.es2016.ast.LiteralBooleanExpression;
+import com.shapesecurity.shift.es2016.ast.LiteralInfinityExpression;
+import com.shapesecurity.shift.es2016.ast.LiteralNullExpression;
+import com.shapesecurity.shift.es2016.ast.LiteralNumericExpression;
+import com.shapesecurity.shift.es2016.ast.LiteralRegExpExpression;
+import com.shapesecurity.shift.es2016.ast.LiteralStringExpression;
+import com.shapesecurity.shift.es2016.ast.MemberExpression;
+import com.shapesecurity.shift.es2016.ast.Module;
+import com.shapesecurity.shift.es2016.ast.NewExpression;
+import com.shapesecurity.shift.es2016.ast.ObjectExpression;
+import com.shapesecurity.shift.es2016.ast.ObjectProperty;
+import com.shapesecurity.shift.es2016.ast.PropertyName;
+import com.shapesecurity.shift.es2016.ast.ReturnStatement;
+import com.shapesecurity.shift.es2016.ast.Script;
+import com.shapesecurity.shift.es2016.ast.Setter;
+import com.shapesecurity.shift.es2016.ast.SpreadElementExpression;
+import com.shapesecurity.shift.es2016.ast.Statement;
+import com.shapesecurity.shift.es2016.ast.StaticMemberAssignmentTarget;
+import com.shapesecurity.shift.es2016.ast.StaticMemberExpression;
+import com.shapesecurity.shift.es2016.ast.StaticPropertyName;
+import com.shapesecurity.shift.es2016.ast.Super;
+import com.shapesecurity.shift.es2016.ast.SwitchCase;
+import com.shapesecurity.shift.es2016.ast.SwitchStatementWithDefault;
+import com.shapesecurity.shift.es2016.ast.ThisExpression;
+import com.shapesecurity.shift.es2016.ast.ThrowStatement;
+import com.shapesecurity.shift.es2016.ast.TryCatchStatement;
+import com.shapesecurity.shift.es2016.ast.TryFinallyStatement;
+import com.shapesecurity.shift.es2016.ast.UnaryExpression;
+import com.shapesecurity.shift.es2016.ast.UpdateExpression;
+import com.shapesecurity.shift.es2016.ast.VariableDeclaration;
+import com.shapesecurity.shift.es2016.ast.VariableDeclarationExpression;
+import com.shapesecurity.shift.es2016.ast.VariableDeclarationStatement;
+import com.shapesecurity.shift.es2016.ast.WhileStatement;
+import com.shapesecurity.shift.es2016.ast.WithStatement;
+import com.shapesecurity.shift.es2016.ast.operators.UpdateOperator;
+import com.shapesecurity.shift.es2016.scope.Declaration;
+import com.shapesecurity.shift.es2016.scope.GlobalScope;
+import com.shapesecurity.shift.es2016.scope.Scope;
+import com.shapesecurity.shift.es2016.scope.ScopeAnalyzer;
+import com.shapesecurity.shift.es2016.scope.ScopeLookup;
+import com.shapesecurity.shift.es2016.scope.Variable;
 import com.shapesecurity.shift.semantics.asg.BinaryOperation.BinaryOperation;
 import com.shapesecurity.shift.semantics.asg.BinaryOperation.BinaryOperator;
 import com.shapesecurity.shift.semantics.asg.BinaryOperation.Equality;
@@ -149,7 +152,6 @@ import com.shapesecurity.shift.semantics.asg.UnaryOperation.VoidOp;
 import com.shapesecurity.shift.semantics.asg.VariableAssignment;
 import com.shapesecurity.shift.semantics.asg.Void;
 import com.shapesecurity.shift.semantics.visitor.FinallyJumpReducer;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
@@ -161,11 +163,11 @@ public class Explicator {
 	@Nonnull
 	private final Either<Script, Module> program;
 	@Nonnull
-	private final HashTable<com.shapesecurity.shift.ast.Node, Pair<com.shapesecurity.shift.ast.Node, Integer>> jumpMap;
+	private final HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<com.shapesecurity.shift.es2016.ast.Node, Integer>> jumpMap;
 	@Nonnull
 	private final ScopeLookup scopeLookup;
 	@Nonnull
-	private HashTable<com.shapesecurity.shift.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingEquality();
+	private HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingEquality();
 	// map from AST loops and labelled statement to their corresponding Target nodes. Loops have an outer and an inner, for break and continue respectively.
 	@Nonnull
 	private ImmutableList<ImmutableList<Variable>> temporaries = ImmutableList.of(ImmutableList.empty());
@@ -227,7 +229,7 @@ public class Explicator {
 		return directives.find(d -> d.rawValue.equals("use strict")).isJust();
 	}
 
-	@NotNull
+	@Nonnull
 	private NodeWithValue variableAssignmentHelper(
 		@Nonnull Either<GlobalReference, LocalReference> ref, @Nonnull NodeWithValue rhs, boolean strict
 	) { // handles const-ness correctly. not to be used with variable or function declarations.
@@ -257,8 +259,9 @@ public class Explicator {
 
 	// given a FunctionDeclaration or FunctionExpression, find all the variables created in it or its children not crossing function boundaries
 	// which is to say, all variables which calling this function recursively might shadow
-	private ImmutableList<Variable> functionVariablesHelper(@Nonnull com.shapesecurity.shift.ast.Node node) {
-		return scopeLookup.findScopeFor(node).<ImmutableList<Variable>>maybe(ImmutableList.<Variable>empty(), this::functionVariablesHelper);
+
+	private ImmutableList<Variable> functionVariablesHelper(@Nonnull com.shapesecurity.shift.es2016.ast.Node node) {
+		return scopeLookup.findScopeFor(node).maybe(ImmutableList.empty(), this::functionVariablesHelper);
 	}
 
 	// helper for the above. find variables in the given scope and its descendants, up to function boundaries
@@ -279,7 +282,15 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Either<GlobalReference, LocalReference> refHelper(@Nonnull BindingIdentifier bindingIdentifier) {
+	private Either<GlobalReference, LocalReference> refHelper(AssignmentTargetIdentifier assignmentTargetIdentifier) {
+		Variable variable = scopeLookup.findVariableReferencedBy(assignmentTargetIdentifier);
+		return scopeLookup.isGlobal(variable) ?
+				Either.left(new GlobalReference(assignmentTargetIdentifier.name)) :
+				Either.right(new LocalReference(variable));
+	}
+
+	@Nonnull
+	private Either<GlobalReference, LocalReference> refHelper(BindingIdentifier bindingIdentifier) {
 		Variable variable = scopeLookup.findVariableReferencedBy(bindingIdentifier).fromJust();
 		return scopeLookup.isGlobal(variable) ?
 			Either.left(new GlobalReference(bindingIdentifier.name)) :
@@ -350,10 +361,15 @@ public class Explicator {
 		ImmutableList<Variable> locals = fnTemporaries.append(functionVariablesHelper(scope)); // todo concatlists, I guess
 		// TODO capture may have duplicate entries: `function g(x){function h(){x+x}}`
 		ImmutableList<Variable> captured = scope.through.entries()
-			.flatMap(p -> p.right.map(r -> r.node.<Variable>either(
-				bi -> scopeLookup.findVariableReferencedBy(bi).fromJust(),
-				scopeLookup::findVariableReferencedBy
-			)))
+			.flatMap(p -> p.right.map(r -> {
+				if (r.node instanceof BindingIdentifier) {
+					return scopeLookup.findVariableReferencedBy((BindingIdentifier) r.node).fromJust();
+				} else if (r.node instanceof AssignmentTargetIdentifier) {
+					return scopeLookup.findVariableReferencedBy((AssignmentTargetIdentifier) r.node);
+				} else {
+					return scopeLookup.findVariableReferencedBy((IdentifierExpression) r.node);
+				}
+			}))
 			.filter(v -> !scopeLookup.isGlobal(v)); // everything needing capture
 		return new LiteralFunction(name, arguments, parameters, locals, captured, body, strict);
 	}
@@ -363,10 +379,10 @@ public class Explicator {
 		if (statement instanceof BlockStatement) {
 			return explicateBody(((BlockStatement) statement).block.statements, strict);
 		} else if (statement instanceof BreakStatement) {
-			Pair<com.shapesecurity.shift.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
+			Pair<com.shapesecurity.shift.es2016.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
 			return new Break(targets.get(_break.left).fromJust().left, _break.right);
 		} else if (statement instanceof ContinueStatement) {
-			Pair<com.shapesecurity.shift.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
+			Pair<com.shapesecurity.shift.es2016.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
 			return new Break(targets.get(_break.left).fromJust().right.fromJust(), _break.right);
 		} else if (statement instanceof DebuggerStatement) {
 			return Void.INSTANCE;
@@ -394,39 +410,39 @@ public class Explicator {
 		} else if (statement instanceof ForInStatement) {
 			/*
 			Desugaring:
-            for(x in o) {
-                ...
-            }
+			for(x in o) {
+				...
+			}
 
-            becomes
+			becomes
 
-            __o = o;
-            __t = keys(__o);
-            __i = 0;
-            while(__i < __t.length) {
-                if(__t[__i] in __o) {
-                    x = __t[__i];
-                    ...
-                }
-                __i = __i + 1;
-            }
-             */
+			__o = o;
+			__t = keys(__o);
+			__i = 0;
+			while(__i < __t.length) {
+				if(__t[__i] in __o) {
+					x = __t[__i];
+					...
+				}
+				__i = __i + 1;
+			}
+			 */
 			ForInStatement forInStatement = (ForInStatement) statement;
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
-			BindingIdentifier binding;
+			Either<GlobalReference, LocalReference> reference;
 			boolean isDeclaration;
 			if (forInStatement.left instanceof VariableDeclaration) {
 				VariableDeclaration variableDeclaration = (VariableDeclaration) forInStatement.left;
 				assert variableDeclaration.declarators.length == 1; // TODO maybe remove this
 				// assumes ES5
-				binding = (BindingIdentifier) variableDeclaration.declarators.maybeHead().fromJust().binding;
+				reference = refHelper((BindingIdentifier) variableDeclaration.declarators.maybeHead().fromJust().binding);
 				isDeclaration = true;
-			} else if (forInStatement.left instanceof BindingIdentifier) {
-				binding = (BindingIdentifier) forInStatement.left;
+			} else if (forInStatement.left instanceof AssignmentTargetIdentifier) {
+				reference = refHelper((AssignmentTargetIdentifier) forInStatement.left);
 				isDeclaration = false;
 			} else {
 				throw new UnsupportedOperationException("ES6 not supported: " + forInStatement.left.getClass().getSimpleName());
@@ -448,8 +464,8 @@ public class Explicator {
 							new In(new MemberAccess(keys, counter), object),
 							new Block(ImmutableList.of(
 								isDeclaration ?
-									new VariableAssignment(refHelper(binding), new MemberAccess(keys, counter), strict) :
-									variableAssignmentHelper(refHelper(binding), new MemberAccess(keys, counter), strict),
+									new VariableAssignment(reference, new MemberAccess(keys, counter), strict) :
+									variableAssignmentHelper(reference, new MemberAccess(keys, counter), strict),
 								explicateStatement(forInStatement.body, strict)
 							)),
 							new Block(Void.INSTANCE)
@@ -526,9 +542,9 @@ public class Explicator {
 			return new Return(
 				returnStatement.expression.map(e -> explicateExpressionReturningValue(e, strict))
 			);
-		} else if (statement instanceof com.shapesecurity.shift.ast.SwitchStatement) {
+		} else if (statement instanceof com.shapesecurity.shift.es2016.ast.SwitchStatement) {
 			// TODO hoist function declarations. This will require modifying asg SwitchStatements to have a Declarations block of statements, horrifyingly enough. probably also need to fix scope analysis.
-			com.shapesecurity.shift.ast.SwitchStatement switchStatement = (com.shapesecurity.shift.ast.SwitchStatement) statement;
+			com.shapesecurity.shift.es2016.ast.SwitchStatement switchStatement = (com.shapesecurity.shift.es2016.ast.SwitchStatement) statement;
 			BreakTarget target = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(target, Maybe.empty()));
 
@@ -664,22 +680,22 @@ public class Explicator {
 			);
 		} else if (expression instanceof AssignmentExpression) {
 			AssignmentExpression assignmentExpression = (AssignmentExpression) expression;
-			Binding binding = assignmentExpression.binding;
-			if (binding instanceof StaticMemberExpression) {
-				StaticMemberExpression staticMemberExpression = (StaticMemberExpression) binding;
+			AssignmentTarget binding = assignmentExpression.binding;
+			if (binding instanceof StaticMemberAssignmentTarget) {
+				StaticMemberAssignmentTarget staticMemberAssignmentTarget = (StaticMemberAssignmentTarget) binding;
 				return new MemberAssignment(
-					explicateExpressionSuper(staticMemberExpression._object, strict),
-					new LiteralString(staticMemberExpression.property),
+					explicateExpressionSuper(staticMemberAssignmentTarget.object, strict),
+					new LiteralString(staticMemberAssignmentTarget.property),
 					explicateExpressionReturningValue(assignmentExpression.expression, strict),
 					strict
 				);
-			} else if (binding instanceof ComputedMemberExpression) {
-				ComputedMemberExpression computedMemberExpression = (ComputedMemberExpression) binding;
+			} else if (binding instanceof ComputedMemberAssignmentTarget) {
+				ComputedMemberAssignmentTarget computedMemberAssignmentTarget = (ComputedMemberAssignmentTarget) binding;
 				return letWithValue(
 					// semantics: evaluate obj, evaluate prop, coerce obj to object, coerce prop to string. in that order. TODO find a better way of doing this.
-					explicateExpressionSuper(computedMemberExpression._object, strict),
+					explicateExpressionSuper(computedMemberAssignmentTarget.object, strict),
 					objectRef -> letWithValue(
-						explicateExpressionReturningValue(computedMemberExpression.expression, strict),
+						explicateExpressionReturningValue(computedMemberAssignmentTarget.expression, strict),
 						fieldRef -> new BlockWithValue(
 							ImmutableList.of(new RequireObjectCoercible(objectRef)),
 							letWithValue(
@@ -694,9 +710,9 @@ public class Explicator {
 						)
 					)
 				);
-			} else if (binding instanceof BindingIdentifier) {
-				BindingIdentifier bindingIdentifier = (BindingIdentifier) binding;
-				Either<GlobalReference, LocalReference> ref = refHelper(bindingIdentifier);
+			} else if (binding instanceof AssignmentTargetIdentifier) {
+				AssignmentTargetIdentifier assignmentTargetIdentifier = (AssignmentTargetIdentifier) binding;
+				Either<GlobalReference, LocalReference> ref = refHelper(assignmentTargetIdentifier);
 				NodeWithValue rhs = explicateExpressionReturningValue(assignmentExpression.expression, strict);
 				return variableAssignmentHelper(
 					ref,
@@ -718,9 +734,9 @@ public class Explicator {
 				c.arguments.map(a -> explicateExpressionReturningValue((Expression) a, strict));
 			if (c.callee instanceof MemberExpression) {
 				MemberExpression memberExpression = (MemberExpression) c.callee;
-				// TODO: if memberExpression._object is a Super, we need to actually call it as super.<...>
+				// TODO: if memberExpression.object is a Super, we need to actually call it as super.<...>
 				return letWithValue(
-					explicateExpressionSuper(memberExpression._object, strict),
+					explicateExpressionSuper(memberExpression.object, strict),
 					contextRef -> new Call(
 						Maybe.of(contextRef),
 						memberExpression instanceof StaticMemberExpression
@@ -746,7 +762,7 @@ public class Explicator {
 		} else if (expression instanceof ComputedMemberExpression) {
 			ComputedMemberExpression computedMemberExpression = (ComputedMemberExpression) expression;
 			return new MemberAccess(
-				explicateExpressionSuper(computedMemberExpression._object, strict),
+				explicateExpressionSuper(computedMemberExpression.object, strict),
 				explicateExpressionReturningValue(computedMemberExpression.expression, strict)
 			);
 		} else if (expression instanceof ConditionalExpression) {
@@ -783,7 +799,7 @@ public class Explicator {
 		} else if (expression instanceof StaticMemberExpression) {
 			StaticMemberExpression staticMemberExpression = (StaticMemberExpression) expression;
 			return new MemberAccess(
-				explicateExpressionSuper(staticMemberExpression._object, strict),
+				explicateExpressionSuper(staticMemberExpression.object, strict),
 				new LiteralString(staticMemberExpression.property)
 			);
 		} else if (expression instanceof IdentifierExpression) {
@@ -799,7 +815,7 @@ public class Explicator {
 			return LiteralNull.INSTANCE;
 		} else if (expression instanceof LiteralRegExpExpression) {
 			LiteralRegExpExpression literalRegExpExpression = (LiteralRegExpExpression) expression;
-			return new LiteralRegExp(literalRegExpExpression.pattern, literalRegExpExpression.flags);
+			return new LiteralRegExp(literalRegExpExpression.pattern, literalRegExpExpression.global, literalRegExpExpression.ignoreCase, literalRegExpExpression.multiLine, literalRegExpExpression.sticky, literalRegExpExpression.unicode);
 		} else if (expression instanceof LiteralStringExpression) {
 			return new LiteralString(((LiteralStringExpression) expression).value);
 		} else if (expression instanceof ObjectExpression) { // TODO this would be faster/better as Object.defineProperties (all at once, instead of one at a time), probably
@@ -826,8 +842,8 @@ public class Explicator {
 			return explicateUnaryExpression((UnaryExpression) expression, strict);
 		} else if (expression instanceof UpdateExpression) {
 			UpdateExpression updateExpression = (UpdateExpression) expression;
-			if (updateExpression.operand instanceof BindingIdentifier) {
-				Either<GlobalReference, LocalReference> binding = refHelper((BindingIdentifier) updateExpression.operand);
+			if (updateExpression.operand instanceof AssignmentTargetIdentifier) {
+				Either<GlobalReference, LocalReference> binding = refHelper((AssignmentTargetIdentifier) updateExpression.operand);
 				NodeWithValue valExpr = new TypeCoercionNumber(Either.extract(binding));
 				if (keepValue && !updateExpression.isPrefix) {
 					return letWithValue(
@@ -857,23 +873,23 @@ public class Explicator {
 					);
 				}
 			} else {
-				NodeWithValue _object;
+				NodeWithValue object;
 				NodeWithValue field;
-				if (updateExpression.operand instanceof ComputedMemberExpression) {
-					ComputedMemberExpression computedMemberExpression = (ComputedMemberExpression) updateExpression.operand;
-					_object = explicateExpressionSuper(computedMemberExpression._object, strict);
-					field = explicateExpressionReturningValue(computedMemberExpression.expression, strict);
-				} else if (updateExpression.operand instanceof StaticMemberExpression) {
-					StaticMemberExpression staticMemberExpression = (StaticMemberExpression) updateExpression.operand;
-					_object = explicateExpressionSuper(staticMemberExpression._object, strict);
-					field = new LiteralString(staticMemberExpression.property);
+				if (updateExpression.operand instanceof ComputedMemberAssignmentTarget) {
+					ComputedMemberAssignmentTarget computedMemberAssignmentTarget = (ComputedMemberAssignmentTarget) updateExpression.operand;
+					object = explicateExpressionSuper(computedMemberAssignmentTarget.object, strict);
+					field = explicateExpressionReturningValue(computedMemberAssignmentTarget.expression, strict);
+				} else if (updateExpression.operand instanceof StaticMemberAssignmentTarget) {
+					StaticMemberAssignmentTarget staticMemberAssignmentTarget = (StaticMemberAssignmentTarget) updateExpression.operand;
+					object = explicateExpressionSuper(staticMemberAssignmentTarget.object, strict);
+					field = new LiteralString(staticMemberAssignmentTarget.property);
 				} else {
-					throw new RuntimeException("Not reached");
+					throw new RuntimeException("Not reached:" + updateExpression.operand.getClass().getSimpleName());
 				}
 
 				return letWithValue(
 					// semantics: evaluate obj, evaluate prop, ensure obj is object, coerce prop to string, coerce obj[prop] to number. in that order. TODO find a better way of doing this.
-					_object,
+					object,
 					objectRef -> letWithValue(
 						field,
 						fieldRef -> new BlockWithValue(
@@ -977,14 +993,14 @@ public class Explicator {
 				} else if (unaryExpression.operand instanceof ComputedMemberExpression) {
 					ComputedMemberExpression computedMemberExpression = (ComputedMemberExpression) unaryExpression.operand;
 					return new DeleteProperty(
-						explicateExpressionSuper(computedMemberExpression._object, strict),
+						explicateExpressionSuper(computedMemberExpression.object, strict),
 						explicateExpressionReturningValue(computedMemberExpression.expression, strict),
 						strict
 					);
 				} else if (unaryExpression.operand instanceof StaticMemberExpression) {
 					StaticMemberExpression staticMemberExpression = (StaticMemberExpression) unaryExpression.operand;
 					return new DeleteProperty(
-						explicateExpressionSuper(staticMemberExpression._object, strict),
+						explicateExpressionSuper(staticMemberExpression.object, strict),
 						new LiteralString(staticMemberExpression.property),
 						strict
 					);
@@ -1015,7 +1031,7 @@ public class Explicator {
 	private NodeWithValue explicateBinaryExpression(@Nonnull BinaryExpression binaryExpression, boolean strict) {
 		NodeWithValue right = explicateExpressionReturningValue(binaryExpression.right, strict);
 
-		if (binaryExpression.operator == com.shapesecurity.shift.ast.operators.BinaryOperator.Sequence) { // unlike all other cases, we do not need the RHS.
+		if (binaryExpression.operator == com.shapesecurity.shift.es2016.ast.operators.BinaryOperator.Sequence) { // unlike all other cases, we do not need the RHS.
 			return new BlockWithValue(
 				ImmutableList.of(explicateExpressionDiscardingValue(binaryExpression.left, strict)),
 				right
@@ -1208,8 +1224,8 @@ public class Explicator {
 			default:
 				throw new RuntimeException("Not reached");
 		}
-		if (compoundAssignmentExpression.binding instanceof BindingIdentifier) {
-			Either<GlobalReference, LocalReference> binding = refHelper((BindingIdentifier) compoundAssignmentExpression.binding);
+		if (compoundAssignmentExpression.binding instanceof AssignmentTargetIdentifier) {
+			Either<GlobalReference, LocalReference> binding = refHelper((AssignmentTargetIdentifier) compoundAssignmentExpression.binding);
 			NodeWithValue reference = Either.extract(binding);
 			return variableAssignmentHelper(
 				binding,
@@ -1221,26 +1237,26 @@ public class Explicator {
 				strict
 			);
 		} else {
-			NodeWithValue _object;
+			NodeWithValue object;
 			NodeWithValue field;
 			NodeWithValue value;
-			if (compoundAssignmentExpression.binding instanceof ComputedMemberExpression) {
-				ComputedMemberExpression computedMemberExpression =
-					(ComputedMemberExpression) compoundAssignmentExpression.binding;
-				_object = explicateExpressionSuper(computedMemberExpression._object, strict);
-				field = explicateExpressionReturningValue(computedMemberExpression.expression, strict);
+			if (compoundAssignmentExpression.binding instanceof ComputedMemberAssignmentTarget) {
+				ComputedMemberAssignmentTarget computedMemberAssignmentTarget =
+					(ComputedMemberAssignmentTarget) compoundAssignmentExpression.binding;
+				object = explicateExpressionSuper(computedMemberAssignmentTarget.object, strict);
+				field = explicateExpressionReturningValue(computedMemberAssignmentTarget.expression, strict);
 				value = explicateExpressionReturningValue(compoundAssignmentExpression.expression, strict);
-			} else if (compoundAssignmentExpression.binding instanceof StaticMemberExpression) {
-				StaticMemberExpression staticMemberExpression = (StaticMemberExpression) compoundAssignmentExpression.binding;
-				_object = explicateExpressionSuper(staticMemberExpression._object, strict);
-				field = new LiteralString(staticMemberExpression.property);
+			} else if (compoundAssignmentExpression.binding instanceof StaticMemberAssignmentTarget) {
+				StaticMemberAssignmentTarget staticMemberAssignmentTarget = (StaticMemberAssignmentTarget) compoundAssignmentExpression.binding;
+				object = explicateExpressionSuper(staticMemberAssignmentTarget.object, strict);
+				field = new LiteralString(staticMemberAssignmentTarget.property);
 				value = explicateExpressionReturningValue(compoundAssignmentExpression.expression, strict);
 			} else {
-				throw new RuntimeException("Not reached");
+				throw new RuntimeException("Not reached: " + compoundAssignmentExpression.binding.getClass().getSimpleName());
 			}
 			return letWithValue(
 				// semantics: evaluate obj, evaluate prop, coerce obj to object, coerce prop to string. in that order. TODO find a better way of doing this.
-				_object,
+				object,
 				objectRef -> letWithValue(
 					field,
 					fieldRef -> new BlockWithValue(
@@ -1357,7 +1373,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue letWithValue(@Nonnull NodeWithValue value, @NotNull F<LocalReference, NodeWithValue> function) {
+	private NodeWithValue letWithValue(@Nonnull NodeWithValue value, @Nonnull F<LocalReference, NodeWithValue> function) {
 		F<LocalReference, NodeWithValue> wrapped =
 			ref ->
 				new BlockWithValue(new Block(new VariableAssignment(ref, value, false)), function.apply(ref));
@@ -1365,7 +1381,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Node let(@Nonnull NodeWithValue value, @NotNull F<LocalReference, Node> function) {
+	private Node let(@Nonnull NodeWithValue value, @Nonnull F<LocalReference, Node> function) {
 		return makeUnvaluedTemporary(ref ->
 			new Block(ImmutableList.of(
 				new VariableAssignment(ref, value, false),

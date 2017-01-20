@@ -4,7 +4,7 @@ import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.Unit;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
-import com.shapesecurity.shift.scope.Variable;
+import com.shapesecurity.shift.es2016.scope.Variable;
 import com.shapesecurity.shift.semantics.Semantics;
 import com.shapesecurity.shift.semantics.asg.BinaryOperation.BinaryOperation;
 import com.shapesecurity.shift.semantics.asg.BinaryOperation.Equality;
@@ -153,7 +153,7 @@ public class Dottifier {
             return "LiteralString\\nValue: " + sanitize(((LiteralString) node).value);
         } else if (node instanceof LiteralRegExp) {
             LiteralRegExp literalRegExp = (LiteralRegExp) node;
-            return "LiteralRegExp\\nPattern: " + sanitize(literalRegExp.pattern) + "\\nFlags: " + literalRegExp.flags;
+            return "LiteralRegExp\\nPattern: " + sanitize(literalRegExp.pattern) + "\\nFlags: " + (literalRegExp.global ? "g" : "") + (literalRegExp.ignoreCase ? "i" : "") + (literalRegExp.multiline ? "m" : "") + (literalRegExp.unicode ? "u" : "") + (literalRegExp.sticky ? "y" : "");
         } else if (node instanceof MemberAssignment) {
             return "MemberAssignment\\nStrict: " + ((MemberAssignment) node).strict;
         } else if (node instanceof This) {

@@ -16,32 +16,22 @@
 package com.shapesecurity.shift.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class LiteralRegExp implements Literal {
 	@Nonnull
 	public final String pattern;
-	@Nonnull
-	public final String flags;
+	public final boolean global;
+	public final boolean ignoreCase;
+	public final boolean multiline;
+	public final boolean sticky;
+	public final boolean unicode;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof LiteralRegExp)) return false;
-		LiteralRegExp that = (LiteralRegExp) o;
-		return Objects.equals(pattern, that.pattern) &&
-				Objects.equals(flags, that.flags);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(pattern, flags);
-	}
-
-	public LiteralRegExp(@Nonnull String pattern, @Nonnull String flags) {
+	public LiteralRegExp(@Nonnull String pattern, boolean global, boolean ignoreCase, boolean multiline, boolean sticky, boolean unicode) {
 		this.pattern = pattern;
-		this.flags = flags;
+		this.global = global;
+		this.ignoreCase = ignoreCase;
+		this.multiline = multiline;
+		this.sticky = sticky;
+		this.unicode = unicode;
 	}
 }

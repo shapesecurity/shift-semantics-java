@@ -1,7 +1,7 @@
 package com.shapesecurity.shift.semantics;
 
 import com.shapesecurity.functional.data.NonEmptyImmutableList;
-import com.shapesecurity.shift.parser.Parser;
+import com.shapesecurity.shift.es2016.parser.Parser;
 import com.shapesecurity.shift.semantics.asg.Block;
 import com.shapesecurity.shift.semantics.asg.Call;
 import com.shapesecurity.shift.semantics.asg.GlobalReference;

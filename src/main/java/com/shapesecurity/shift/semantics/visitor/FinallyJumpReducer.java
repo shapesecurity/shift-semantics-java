@@ -20,22 +20,23 @@ import com.shapesecurity.functional.data.HashTable;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.functional.data.Monoid;
-import com.shapesecurity.shift.ast.BreakStatement;
-import com.shapesecurity.shift.ast.ContinueStatement;
-import com.shapesecurity.shift.ast.DoWhileStatement;
-import com.shapesecurity.shift.ast.ForInStatement;
-import com.shapesecurity.shift.ast.ForOfStatement;
-import com.shapesecurity.shift.ast.ForStatement;
-import com.shapesecurity.shift.ast.LabeledStatement;
-import com.shapesecurity.shift.ast.Module;
-import com.shapesecurity.shift.ast.Node;
-import com.shapesecurity.shift.ast.Script;
-import com.shapesecurity.shift.ast.SwitchStatement;
-import com.shapesecurity.shift.ast.SwitchStatementWithDefault;
-import com.shapesecurity.shift.ast.TryFinallyStatement;
-import com.shapesecurity.shift.ast.WhileStatement;
-import com.shapesecurity.shift.visitor.Director;
-import com.shapesecurity.shift.visitor.MonoidalReducer;
+import com.shapesecurity.shift.es2016.ast.BreakStatement;
+import com.shapesecurity.shift.es2016.ast.ContinueStatement;
+import com.shapesecurity.shift.es2016.ast.DoWhileStatement;
+import com.shapesecurity.shift.es2016.ast.ForInStatement;
+import com.shapesecurity.shift.es2016.ast.ForOfStatement;
+import com.shapesecurity.shift.es2016.ast.ForStatement;
+import com.shapesecurity.shift.es2016.ast.LabeledStatement;
+import com.shapesecurity.shift.es2016.ast.Module;
+import com.shapesecurity.shift.es2016.ast.Node;
+import com.shapesecurity.shift.es2016.ast.Script;
+import com.shapesecurity.shift.es2016.ast.SwitchStatement;
+import com.shapesecurity.shift.es2016.ast.SwitchStatementWithDefault;
+import com.shapesecurity.shift.es2016.ast.TryFinallyStatement;
+import com.shapesecurity.shift.es2016.ast.WhileStatement;
+import com.shapesecurity.shift.es2016.reducer.Director;
+import com.shapesecurity.shift.es2016.reducer.MonoidalReducer;
+
 import javax.annotation.Nonnull;
 
 // Almost identical to JumpReducer, but also tracks the number of Finally statements that a jump exits. Try-catch statements with no syntactic finally are considered to have empty finally blocks.
@@ -43,7 +44,8 @@ import javax.annotation.Nonnull;
 // Relies on the AST being valid: in particular, does not check that labelled continues are breaking loops rather than just statements.
 // TODO could be waaaaay more typesafe than a map from nodes to nodes.
 public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State> {
-	@Nonnull public static final FinallyJumpReducer INSTANCE = new FinallyJumpReducer();
+	@Nonnull
+	public static final FinallyJumpReducer INSTANCE = new FinallyJumpReducer();
 
 	private FinallyJumpReducer() {
 		super(new StateMonoid());

@@ -17,7 +17,7 @@ package com.shapesecurity.shift.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
-import com.shapesecurity.shift.scope.Variable;
+import com.shapesecurity.shift.es2016.scope.Variable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
