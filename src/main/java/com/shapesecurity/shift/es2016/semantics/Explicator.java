@@ -261,7 +261,7 @@ public class Explicator {
 	// which is to say, all variables which calling this function recursively might shadow
 
 	private ImmutableList<Variable> functionVariablesHelper(@Nonnull com.shapesecurity.shift.es2016.ast.Node node) {
-		return scopeLookup.findScopeFor(node).maybe(ImmutableList.empty(), this::functionVariablesHelper);
+		return scopeLookup.findScopeFor(node).maybe(ImmutableList.<Variable>empty(), this::functionVariablesHelper);
 	}
 
 	// helper for the above. find variables in the given scope and its descendants, up to function boundaries
