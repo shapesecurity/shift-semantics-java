@@ -154,7 +154,7 @@ public class Dottifier {
             return "LiteralString\\nValue: " + sanitize(((LiteralString) node).value);
         } else if (node instanceof LiteralRegExp) {
             LiteralRegExp literalRegExp = (LiteralRegExp) node;
-            return "LiteralRegExp\\nPattern: " + sanitize(literalRegExp.pattern) + "\\nFlags: " + (literalRegExp.global ? "g" : "") + (literalRegExp.ignoreCase ? "i" : "") + (literalRegExp.multiline ? "m" : "") + (literalRegExp.unicode ? "u" : "") + (literalRegExp.sticky ? "y" : "");
+            return "LiteralRegExp\\nPattern: " + sanitize(literalRegExp.pattern) + "\\nFlags: " + (literalRegExp.global ? "g" : "") + (literalRegExp.ignoreCase ? "i" : "") + (literalRegExp.multiLine ? "m" : "") + (literalRegExp.unicode ? "u" : "") + (literalRegExp.sticky ? "y" : "");
         } else if (node instanceof MemberAssignment) {
             return "MemberAssignment\\nStrict: " + ((MemberAssignment) node).strict;
         } else if (node instanceof This) {

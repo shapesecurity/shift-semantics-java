@@ -24,7 +24,7 @@ public class LiteralRegExp implements Literal {
 	public final String pattern;
 	public final boolean global;
 	public final boolean ignoreCase;
-	public final boolean multiline;
+	public final boolean multiLine;
 	public final boolean sticky;
 	public final boolean unicode;
 
@@ -36,22 +36,22 @@ public class LiteralRegExp implements Literal {
 		return Objects.equals(pattern, that.pattern) &&
 				global == that.global &&
 				ignoreCase == that.ignoreCase &&
-				multiline == that.multiline &&
+				multiLine == that.multiLine &&
 				sticky == that.sticky &&
 				unicode == that.unicode;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(pattern, global, ignoreCase, multiline, sticky, unicode);
+		return Objects.hash(pattern, global, ignoreCase, multiLine, sticky, unicode);
 	}
 
 
-	public LiteralRegExp(@Nonnull String pattern, boolean global, boolean ignoreCase, boolean multiline, boolean sticky, boolean unicode) {
+	public LiteralRegExp(@Nonnull String pattern, boolean global, boolean ignoreCase, boolean multiLine, boolean sticky, boolean unicode) {
 		this.pattern = pattern;
 		this.global = global;
 		this.ignoreCase = ignoreCase;
-		this.multiline = multiline;
+		this.multiLine = multiLine;
 		this.sticky = sticky;
 		this.unicode = unicode;
 	}
