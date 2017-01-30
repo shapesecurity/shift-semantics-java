@@ -16,22 +16,13 @@
 package com.shapesecurity.shift.es2016.semantics.visitor;
 
 import com.shapesecurity.functional.data.Either;
+import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Equality;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.FloatMath;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.In;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.InstanceOf;
-import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.RelationalComparison;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralEmptyObject;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralFunction;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralRegExp;
-import com.shapesecurity.shift.es2016.semantics.asg.Node;
-import com.shapesecurity.shift.es2016.semantics.asg.TemporaryReference;
-import com.shapesecurity.shift.es2016.semantics.asg.This;
-import com.shapesecurity.shift.es2016.semantics.asg.TryCatchFinally;
-import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Negation;
-import com.shapesecurity.shift.es2016.semantics.asg.Void;
-import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Equality;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.IntMath;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Logic;
+import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.RelationalComparison;
 import com.shapesecurity.shift.es2016.semantics.asg.Block;
 import com.shapesecurity.shift.es2016.semantics.asg.BlockWithValue;
 import com.shapesecurity.shift.es2016.semantics.asg.Break;
@@ -40,15 +31,19 @@ import com.shapesecurity.shift.es2016.semantics.asg.Call;
 import com.shapesecurity.shift.es2016.semantics.asg.DeleteGlobalProperty;
 import com.shapesecurity.shift.es2016.semantics.asg.DeleteProperty;
 import com.shapesecurity.shift.es2016.semantics.asg.GlobalReference;
+import com.shapesecurity.shift.es2016.semantics.asg.Halt;
 import com.shapesecurity.shift.es2016.semantics.asg.IfElse;
 import com.shapesecurity.shift.es2016.semantics.asg.Keys;
-import com.shapesecurity.shift.es2016.semantics.asg.Literal;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralBoolean;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralEmptyArray;
+import com.shapesecurity.shift.es2016.semantics.asg.LiteralEmptyObject;
+import com.shapesecurity.shift.es2016.semantics.asg.LiteralFunction;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralInfinity;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralNull;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralNumber;
+import com.shapesecurity.shift.es2016.semantics.asg.LiteralRegExp;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralString;
+import com.shapesecurity.shift.es2016.semantics.asg.LiteralUndefined;
 import com.shapesecurity.shift.es2016.semantics.asg.LocalReference;
 import com.shapesecurity.shift.es2016.semantics.asg.Loop;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAccess;
@@ -56,22 +51,29 @@ import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignment;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignmentProperty;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberDefinition;
 import com.shapesecurity.shift.es2016.semantics.asg.New;
+import com.shapesecurity.shift.es2016.semantics.asg.Node;
 import com.shapesecurity.shift.es2016.semantics.asg.NodeWithValue;
 import com.shapesecurity.shift.es2016.semantics.asg.RequireObjectCoercible;
 import com.shapesecurity.shift.es2016.semantics.asg.SwitchStatement;
+import com.shapesecurity.shift.es2016.semantics.asg.TemporaryReference;
+import com.shapesecurity.shift.es2016.semantics.asg.This;
 import com.shapesecurity.shift.es2016.semantics.asg.Throw;
+import com.shapesecurity.shift.es2016.semantics.asg.TryCatchFinally;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionNumber;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionString;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeofGlobal;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.BitwiseNot;
+import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Negation;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Not;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Typeof;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.VoidOp;
 import com.shapesecurity.shift.es2016.semantics.asg.VariableAssignment;
+import com.shapesecurity.shift.es2016.semantics.asg.Void;
+import com.shapesecurity.shift.es2016.semantics.asg.LiteralSymbol;
 
 import javax.annotation.Nonnull;
 
-public class ReconstructingReducer {
+public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValue> {
     @Nonnull
     protected Block visitBlock(@Nonnull Block block) {
         return new Block(block.children.map(this::visitNode));
@@ -91,25 +93,45 @@ public class ReconstructingReducer {
     protected NodeWithValue visitCall(@Nonnull Call call) {
         return new Call(
                 call.context.map(this::visitLocalReference),
-                visitExpression(call.callee),
-                call.arguments.map(this::visitExpression)
+                visitNodeWithValue(call.callee),
+                call.arguments.map(this::visitNodeWithValue)
         );
     }
 
     @Nonnull
-    protected NodeWithValue visitExpression(@Nonnull NodeWithValue expression) {
+    protected NodeWithValue visitNodeWithValue(@Nonnull NodeWithValue expression) {
         if (expression instanceof Call) {
             return visitCall((Call) expression);
         } else if (expression instanceof BlockWithValue) {
-            return visitExpressionBlock((BlockWithValue) expression);
+            return visitBlockWithValue((BlockWithValue) expression);
         } else if (expression instanceof FloatMath) {
             return visitFloatMath((FloatMath) expression);
         } else if (expression instanceof IntMath) {
             return visitIntMath((IntMath) expression);
         } else if (expression instanceof GlobalReference) {
             return visitGlobalReference((GlobalReference) expression);
-        } else if (expression instanceof Literal) {
-            return visitLiteral((Literal) expression);
+        } else if (expression instanceof LiteralNumber) {
+            return visitLiteralNumber((LiteralNumber) expression);
+        } else if (expression instanceof LiteralBoolean) {
+            return visitLiteralBoolean((LiteralBoolean) expression);
+        } else if (expression instanceof LiteralString) {
+            return visitLiteralString((LiteralString) expression);
+        } else if (expression instanceof LiteralNull) {
+            return visitLiteralNull((LiteralNull) expression);
+        } else if (expression instanceof LiteralFunction) {
+            return visitLiteralFunction((LiteralFunction) expression);
+        } else if (expression instanceof LiteralEmptyObject) {
+            return visitLiteralEmptyObject((LiteralEmptyObject) expression);
+        } else if (expression instanceof LiteralEmptyArray) {
+            return visitLiteralEmptyArray((LiteralEmptyArray) expression);
+        } else if (expression instanceof LiteralRegExp) {
+            return visitLiteralRegExp((LiteralRegExp) expression);
+        } else if (expression instanceof LiteralInfinity) {
+            return visitLiteralInfinity((LiteralInfinity) expression);
+        } else if (expression instanceof LiteralSymbol) {
+            return visitLiteralSymbol((LiteralSymbol) expression);
+        } else if (expression instanceof LiteralUndefined) {
+            return visitLiteralUndefined((LiteralUndefined) expression);
         } else if (expression instanceof TemporaryReference) {
             return visitTemporaryReference((TemporaryReference) expression);
         } else if (expression instanceof LocalReference) {
@@ -134,6 +156,8 @@ public class ReconstructingReducer {
             return visitNew((New) expression);
         } else if (expression instanceof This) {
             return visitThis((This) expression);
+        } else if (expression instanceof Halt) {
+            return visitHalt((Halt) expression);
         } else if (expression instanceof RequireObjectCoercible) {
             return visitRequireObjectCoercible((RequireObjectCoercible) expression);
         } else if (expression instanceof TypeCoercionString) {
@@ -162,24 +186,76 @@ public class ReconstructingReducer {
         throw new RuntimeException("Expression not implemented: " + expression.getClass().getSimpleName());
     }
 
-    @Nonnull
-    protected NodeWithValue visitNot(@Nonnull Not not) {
-        return new Not(visitExpression(not.expression));
+    private NodeWithValue visitLiteralUndefined(LiteralUndefined literalUndefined) {
+        return LiteralUndefined.INSTANCE;
+    }
+
+    private NodeWithValue visitLiteralSymbol(LiteralSymbol literalSymbol) {
+        return literalSymbol;
+    }
+
+    private NodeWithValue visitLiteralInfinity(LiteralInfinity literalInfinity) {
+        return LiteralInfinity.INSTANCE;
+    }
+
+    private NodeWithValue visitLiteralRegExp(LiteralRegExp literalRegExp) {
+        return new LiteralRegExp(literalRegExp.pattern, literalRegExp.global, literalRegExp.ignoreCase, literalRegExp.multiLine, literalRegExp.sticky, literalRegExp.unicode);
+    }
+
+    private NodeWithValue visitLiteralEmptyArray(LiteralEmptyArray literalEmptyArray) {
+        return LiteralEmptyArray.INSTANCE;
+    }
+
+    private NodeWithValue visitLiteralEmptyObject(LiteralEmptyObject literalEmptyObject) {
+        return LiteralEmptyObject.INSTANCE;
+    }
+
+    private NodeWithValue visitLiteralFunction(LiteralFunction literalFunction) {
+        return new LiteralFunction(
+            literalFunction.name,
+            literalFunction.arguments,
+            literalFunction.parameters,
+            literalFunction.locals,
+            literalFunction.captured,
+            literalFunction.body,
+            literalFunction.isStrict
+        );
+    }
+
+    private NodeWithValue visitLiteralNull(LiteralNull literalNull) {
+        return LiteralNull.INSTANCE;
+    }
+
+    private NodeWithValue visitLiteralString(LiteralString literalString) {
+        return literalString;
+    }
+
+    private NodeWithValue visitLiteralNumber(LiteralNumber literalNumber) {
+        return literalNumber;
+    }
+
+    private NodeWithValue visitLiteralBoolean(LiteralBoolean literalBoolean) {
+        return literalBoolean;
     }
 
     @Nonnull
-    protected BlockWithValue visitExpressionBlock(@Nonnull BlockWithValue blockWithValue) {
-        return new BlockWithValue(visitBlock(blockWithValue.head), visitExpression(blockWithValue.result));
+    protected NodeWithValue visitNot(@Nonnull Not not) {
+        return new Not(visitNodeWithValue(not.expression));
+    }
+
+    @Nonnull
+    protected NodeWithValue visitBlockWithValue(@Nonnull BlockWithValue blockWithValue) {
+        return new BlockWithValue(visitBlock(blockWithValue.head), visitNodeWithValue(blockWithValue.result));
     }
 
     @Nonnull
     protected NodeWithValue visitFloatMath(@Nonnull FloatMath floatMath) {
-        return new FloatMath(floatMath.operator, visitExpression(floatMath.left), visitExpression(floatMath.right));
+        return new FloatMath(floatMath.operator, visitNodeWithValue(floatMath.left), visitNodeWithValue(floatMath.right));
     }
 
     @Nonnull
     protected NodeWithValue visitIntMath(@Nonnull IntMath intMath) {
-        return new IntMath(intMath.operator, visitExpression(intMath.left), visitExpression(intMath.right));
+        return new IntMath(intMath.operator, visitNodeWithValue(intMath.left), visitNodeWithValue(intMath.right));
     }
 
     @Nonnull
@@ -248,6 +324,11 @@ public class ReconstructingReducer {
     }
 
     @Nonnull
+    protected NodeWithValue visitHalt(@Nonnull Halt halt) {
+        return Halt.INSTANCE;
+    }
+
+    @Nonnull
     protected NodeWithValue visitIn(@Nonnull In expression) {
         return new In(expression.left, expression.right);
     }
@@ -265,37 +346,6 @@ public class ReconstructingReducer {
     @Nonnull
     protected NodeWithValue visitBitwiseNot(@Nonnull BitwiseNot expression) {
         return new BitwiseNot(expression.expression);
-    }
-
-    @Nonnull
-    private NodeWithValue visitLiteral(@Nonnull Literal literal) {
-        if (literal instanceof LiteralNumber) {
-            return new LiteralNumber(((LiteralNumber) literal).value);
-        } else if (literal instanceof LiteralBoolean) {
-            return new LiteralBoolean(((LiteralBoolean) literal).value);
-        } else if (literal instanceof LiteralString) {
-            return new LiteralString(((LiteralString) literal).value);
-        } else if (literal instanceof LiteralNull) {
-            return LiteralNull.INSTANCE;
-        } else if (literal instanceof LiteralFunction) {
-            return new LiteralFunction(((LiteralFunction) literal).name,
-                    ((LiteralFunction) literal).arguments,
-                    ((LiteralFunction) literal).parameters,
-                    ((LiteralFunction) literal).locals,
-                    ((LiteralFunction) literal).captured,
-                    ((LiteralFunction) literal).body,
-                    ((LiteralFunction) literal).isStrict);
-        } else if (literal instanceof LiteralEmptyObject) {
-            return LiteralEmptyObject.INSTANCE;
-        } else if (literal instanceof LiteralEmptyArray) {
-            return LiteralEmptyArray.INSTANCE;
-        } else if (literal instanceof LiteralRegExp) {
-            LiteralRegExp regex = (LiteralRegExp) literal;
-            return new LiteralRegExp(regex.pattern, regex.global, regex.ignoreCase, regex.multiLine, regex.sticky, regex.multiLine);
-        } else if (literal instanceof LiteralInfinity) {
-            return LiteralInfinity.INSTANCE;
-        }
-        throw new RuntimeException("Literal not implemented: " + literal.getClass().getSimpleName());
     }
 
     @Nonnull
@@ -320,27 +370,27 @@ public class ReconstructingReducer {
 
     @Nonnull
     protected NodeWithValue visitMemberAccess(@Nonnull MemberAccess memberAccess) {
-        return new MemberAccess(visitExpression(memberAccess.object), visitExpression(memberAccess.fieldExpression));
+        return new MemberAccess(visitNodeWithValue(memberAccess.object), visitNodeWithValue(memberAccess.fieldExpression));
     }
 
     @Nonnull
     protected NodeWithValue visitMemberAssignment(@Nonnull MemberAssignment memberAssignment) {
         if (memberAssignment.property instanceof MemberAssignmentProperty.StaticValue) {
-            return new MemberAssignment(visitExpression(memberAssignment.object), visitExpression(memberAssignment.fieldExpression), visitExpression(((MemberAssignmentProperty.StaticValue) memberAssignment.property).value), memberAssignment.strict);
+            return new MemberAssignment(visitNodeWithValue(memberAssignment.object), visitNodeWithValue(memberAssignment.fieldExpression), visitNodeWithValue(((MemberAssignmentProperty.StaticValue) memberAssignment.property).value), memberAssignment.strict);
         }
         throw new RuntimeException("MemberAssignmentProperty not implemented: " + memberAssignment.property.getClass().getSimpleName());
     }
 
     @Nonnull
     protected Node visitNode(@Nonnull Node node) {
-        if (node instanceof Block) {
+        if (node instanceof NodeWithValue) {
+            return visitNodeWithValue((NodeWithValue) node);
+        } else if (node instanceof Block) {
             return visitBlock((Block) node);
         } else if (node instanceof BreakTarget) {
             return visitBreakTarget((BreakTarget) node);
         } else if (node instanceof Break) {
             return visitBreak((Break) node);
-        } else if (node instanceof NodeWithValue) {
-            return visitExpression((NodeWithValue) node);
         } else if (node instanceof IfElse) {
             return visitIfElse((IfElse) node);
         } else if (node instanceof Loop) {
@@ -381,17 +431,17 @@ public class ReconstructingReducer {
 
     @Nonnull
     protected Node visitIfElse(@Nonnull IfElse ifElse) {
-        return new IfElse(visitExpression(ifElse.test), visitBlock(ifElse.consequent), visitBlock(ifElse.alternate));
+        return new IfElse(visitNodeWithValue(ifElse.test), visitBlock(ifElse.consequent), visitBlock(ifElse.alternate));
     }
 
     @Nonnull
     protected NodeWithValue visitRelationalComparison(@Nonnull RelationalComparison relationalComparison) {
-        return new RelationalComparison(relationalComparison.operator, visitExpression(relationalComparison.left), visitExpression(relationalComparison.right));
+        return new RelationalComparison(relationalComparison.operator, visitNodeWithValue(relationalComparison.left), visitNodeWithValue(relationalComparison.right));
     }
 
     @Nonnull
     protected NodeWithValue visitVariableAssignment(@Nonnull VariableAssignment variableAssignment) {
-        return new VariableAssignment(visitReference(variableAssignment.ref), visitExpression(variableAssignment.value), variableAssignment.strict);
+        return new VariableAssignment(visitReference(variableAssignment.ref), visitNodeWithValue(variableAssignment.value), variableAssignment.strict);
     }
 
     @Nonnull
@@ -402,5 +452,252 @@ public class ReconstructingReducer {
     @Nonnull
     public Node visit(@Nonnull Node node) {
         return visitNode(node);
+    }
+
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(BlockWithValue blockWithValue) {
+        return visitBlockWithValue(blockWithValue);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Call call) {
+        return visitCall(call);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(DeleteGlobalProperty deleteGlobalProperty) {
+        return visitDeleteGlobalProperty(deleteGlobalProperty);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(DeleteProperty deleteProperty) {
+        return visitDeleteProperty(deleteProperty);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(GlobalReference globalReference) {
+        return visitGlobalReference(globalReference);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Halt halt) {
+        return visitHalt(halt);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Keys keys) {
+        return visitKeys(keys);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralBoolean literalBoolean) {
+        return visitLiteralBoolean(literalBoolean);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralEmptyArray literalEmptyArray) {
+        return visitLiteralEmptyArray(literalEmptyArray);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralEmptyObject literalEmptyObject) {
+        return visitLiteralEmptyObject(literalEmptyObject);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralFunction literalFunction) {
+        return visitLiteralFunction(literalFunction);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralInfinity literalInfinity) {
+        return visitLiteralInfinity(literalInfinity);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralNull literalNull) {
+        return visitLiteralNull(literalNull);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralNumber literalNumber) {
+        return visitLiteralNumber(literalNumber);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralRegExp literalRegExp) {
+        return visitLiteralRegExp(literalRegExp);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralString literalString) {
+        return visitLiteralString(literalString);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralSymbol literalSymbol) {
+        return visitLiteralSymbol(literalSymbol);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LiteralUndefined literalUndefined) {
+        return visitLiteralUndefined(literalUndefined);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(MemberAccess memberAccess) {
+        return visitMemberAccess(memberAccess);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(MemberAssignment memberAssignment) {
+        return visitMemberAssignment(memberAssignment);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(New new_) {
+        return visitNew(new_);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(RequireObjectCoercible requireObjectCoercible) {
+        return visitRequireObjectCoercible(requireObjectCoercible);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(LocalReference localReference) {
+        return visitLocalReference(localReference);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(TemporaryReference temporaryReference) {
+        return visitTemporaryReference(temporaryReference);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(This this_) {
+        return visitThis(this_);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(TypeCoercionNumber typeCoercionNumber) {
+        return visitTypeCoercionNumber(typeCoercionNumber);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(TypeCoercionString typeCoercionString) {
+        return visitTypeCoercionString(typeCoercionString);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(TypeofGlobal typeofGlobal) {
+        return visitTypeofGlobal(typeofGlobal);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(VariableAssignment variableAssignment) {
+        return visitVariableAssignment(variableAssignment);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Equality equality) {
+        return visitEquality(equality);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(FloatMath floatMath) {
+        return visitFloatMath(floatMath);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(In in_) {
+        return visitIn(in_);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(InstanceOf instanceOf) {
+        return visitInstanceOf(instanceOf);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(IntMath intMath) {
+        return visitIntMath(intMath);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Logic logic) {
+        return visitLogic(logic);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(RelationalComparison relationalComparison) {
+        return visitRelationalComparison(relationalComparison);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(BitwiseNot bitwiseNot) {
+        return visitBitwiseNot(bitwiseNot);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Negation negation) {
+        return visitNegation(negation);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Not not) {
+        return visitNot(not);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(Typeof typeof) {
+        return visitTypeof(typeof);
+    }
+
+    @Nonnull
+    @Override
+    public NodeWithValue apply(VoidOp voidOp) {
+        return visitVoidOp(voidOp);
     }
 }
