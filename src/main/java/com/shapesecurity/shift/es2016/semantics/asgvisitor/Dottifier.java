@@ -216,8 +216,6 @@ public class Dottifier {
         StringBuilder builder = new StringBuilder();
         StringBuilder after = new StringBuilder();
         String structName = name(nodes);
-        assert !listNames.containsKey(nodes);
-        listNames.put(nodes, structName);
 
         builder.append(indent())
                 .append(structName)
@@ -250,11 +248,9 @@ public class Dottifier {
                 nodeName = indirectionName;
                 nodeLabel = "";
             } else {
-                assert !nodeNames.containsKey(node);
-                assert !declared.containsKey(node); // TODO consider combining declared and nodeNames
                 nodeNames.put(node, structName + ':' + nodeName);
                 nodeLabel = label(node);
-                declared.put(node, Unit.unit);
+                declared.put(node, Unit.unit); // TODO consider combining declared and nodeNames
             }
             
             builder.append('<')
@@ -692,7 +688,7 @@ public class Dottifier {
                         .append(placeholderId)
                         .append(" -> ")
                         .append(variableNames.get(variable))
-                        .append('\n');
+                        .append(";\n");
             } else {
                 int varId = id(variable);
                 String name = "variable_" + varId;

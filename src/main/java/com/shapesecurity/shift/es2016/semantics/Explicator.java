@@ -159,29 +159,29 @@ import java.util.ArrayList;
 
 public class Explicator {
 	@Nonnull
-	private final GlobalScope scope;
+	final GlobalScope scope;
 	@Nonnull
-	private final Either<Script, Module> program;
+	final Either<Script, Module> program;
 	@Nonnull
-	private final HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<com.shapesecurity.shift.es2016.ast.Node, Integer>> jumpMap;
+	final HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<com.shapesecurity.shift.es2016.ast.Node, Integer>> jumpMap;
 	@Nonnull
-	private final ScopeLookup scopeLookup;
+	final ScopeLookup scopeLookup;
 	@Nonnull
-	private HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingEquality();
+	HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingEquality();
 	// map from AST loops and labelled statement to their corresponding Target nodes. Loops have an outer and an inner, for break and continue respectively.
 	@Nonnull
-	private ImmutableList<ImmutableList<Variable>> temporaries = ImmutableList.of(ImmutableList.empty());
+	ImmutableList<ImmutableList<Variable>> temporaries = ImmutableList.of(ImmutableList.empty());
 	// Stack of function-local temporaries. Whenever you begin explicating a function, push a new empty list; when you finish, pop it. TODO this is a somewhat hacky way of accomplishing this. It would be better to be intraproceedural or something.
 
 	// todo runtime errors for with, direct eval
-	private Explicator(@Nonnull Script script) {
+	Explicator(@Nonnull Script script) {
 		this.program = Either.left(script);
 		this.scope = ScopeAnalyzer.analyze(script);
 		this.jumpMap = FinallyJumpReducer.analyze(script);
 		this.scopeLookup = new ScopeLookup(this.scope);
 	}
 
-	private Explicator(@Nonnull Module module) {
+	Explicator(@Nonnull Module module) {
 		this.program = Either.right(module);
 		this.scope = ScopeAnalyzer.analyze(module);
 		this.jumpMap = FinallyJumpReducer.analyze(module);
@@ -211,26 +211,26 @@ public class Explicator {
 		return new Semantics(result, scriptLocals, ImmutableList.empty());
 	}
 
-	private Node explicate() {
+	Node explicate() {
 		return this.program.either(
 			script -> explicateBody(script.statements, isStrict(script.directives)),
 			module -> explicateBody(module.items.map(i -> (Statement) i), true)
 		);
 	}
 
-	private ImmutableList<Variable> simpleParamsHelper(@Nonnull FormalParameters params) {
+	ImmutableList<Variable> simpleParamsHelper(@Nonnull FormalParameters params) {
 		assert params.rest.isNothing();
 		return params.items.map(
 			b -> scopeLookup.findVariableDeclaredBy((BindingIdentifier) b).fromJust()
 		);
 	}
 
-	private boolean isStrict(@Nonnull ImmutableList<Directive> directives) {
+	boolean isStrict(@Nonnull ImmutableList<Directive> directives) {
 		return directives.find(d -> d.rawValue.equals("use strict")).isJust();
 	}
 
 	@Nonnull
-	private NodeWithValue variableAssignmentHelper(
+	NodeWithValue variableAssignmentHelper(
 			@Nonnull Either<GlobalReference, LocalReference> ref, @Nonnull NodeWithValue rhs, boolean strict
 	) { // handles const-ness correctly. not to be used with variable or function declarations.
 		if (ref.isRight()) {
@@ -260,13 +260,13 @@ public class Explicator {
 	// given a FunctionDeclaration or FunctionExpression, find all the variables created in it or its children not crossing function boundaries
 	// which is to say, all variables which calling this function recursively might shadow
 
-	private ImmutableList<Variable> functionVariablesHelper(@Nonnull com.shapesecurity.shift.es2016.ast.Node node) {
+	ImmutableList<Variable> functionVariablesHelper(@Nonnull com.shapesecurity.shift.es2016.ast.Node node) {
 		return scopeLookup.findScopeFor(node).maybe(ImmutableList.<Variable>empty(), this::functionVariablesHelper);
 	}
 
 	// helper for the above. find variables in the given scope and its descendants, up to function boundaries
 	// TODO should maybe be a Scope or ScopeLookup method (but probably not)
-	private ImmutableList<Variable> functionVariablesHelper(@Nonnull Scope scope) {
+	ImmutableList<Variable> functionVariablesHelper(@Nonnull Scope scope) {
 		ImmutableList<Variable> initial = ImmutableList.from(new ArrayList<>(scope.variables()));
 		if (scope.type == Scope.Type.FunctionName) {
 			assert scope.children.length == 1; // in ES5, anyway...
@@ -282,7 +282,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Either<GlobalReference, LocalReference> refHelper(AssignmentTargetIdentifier assignmentTargetIdentifier) {
+	Either<GlobalReference, LocalReference> refHelper(AssignmentTargetIdentifier assignmentTargetIdentifier) {
 		Variable variable = scopeLookup.findVariableReferencedBy(assignmentTargetIdentifier);
 		return scopeLookup.isGlobal(variable) ?
 				Either.left(new GlobalReference(assignmentTargetIdentifier.name)) :
@@ -290,7 +290,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Either<GlobalReference, LocalReference> refHelper(BindingIdentifier bindingIdentifier) {
+	Either<GlobalReference, LocalReference> refHelper(BindingIdentifier bindingIdentifier) {
 		Variable variable = scopeLookup.findVariableReferencedBy(bindingIdentifier).fromJust();
 		return scopeLookup.isGlobal(variable) ?
 			Either.left(new GlobalReference(bindingIdentifier.name)) :
@@ -298,14 +298,14 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Either<GlobalReference, LocalReference> refHelper(@Nonnull IdentifierExpression identifierExpression) {
+	Either<GlobalReference, LocalReference> refHelper(@Nonnull IdentifierExpression identifierExpression) {
 		return scopeLookup.isGlobal(scopeLookup.findVariableReferencedBy(identifierExpression)) ?
 			Either.left(new GlobalReference(identifierExpression.name)) :
 			Either.right(new LocalReference(scopeLookup.findVariableReferencedBy(identifierExpression)));
 	}
 
 	@Nonnull
-	private Either<GlobalReference, LocalReference> refHelper(@Nonnull Variable variable) {
+	Either<GlobalReference, LocalReference> refHelper(@Nonnull Variable variable) {
 		return scopeLookup.isGlobal(variable) ?
 			Either.left(new GlobalReference(variable.name)) :
 			Either.right(new LocalReference(variable));
@@ -314,7 +314,7 @@ public class Explicator {
 	// for function, block, caseblock, and script bodies, not arbitrary lists of statements. Performs hoisting.
 	// TODO ensure that function declarations in switch statements get hoisted to the top of the switch, per 13.12.6 (I think)
 	@Nonnull
-	private Block explicateBody(@Nonnull ImmutableList<Statement> statements, boolean strict) {
+	Block explicateBody(@Nonnull ImmutableList<Statement> statements, boolean strict) {
 		ImmutableList<Node> res = ImmutableList.empty();
 		// hoist functions
 		for (Statement s : statements) {
@@ -339,7 +339,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private LiteralFunction explicateGeneralFunction(
+	LiteralFunction explicateGeneralFunction(
 		@Nonnull Maybe<Variable> name, @Nonnull Scope scope, @Nonnull ImmutableList<Variable> parameters,
 		@Nonnull FunctionBody functionBody, boolean strict
 	) {
@@ -375,7 +375,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Node explicateStatement(@Nonnull Statement statement, boolean strict) {
+	Node explicateStatement(@Nonnull Statement statement, boolean strict) {
 		if (statement instanceof BlockStatement) {
 			return explicateBody(((BlockStatement) statement).block.statements, strict);
 		} else if (statement instanceof BreakStatement) {
@@ -632,18 +632,18 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue explicateExpressionReturningValue(Expression expression, boolean strict) {
+	NodeWithValue explicateExpressionReturningValue(Expression expression, boolean strict) {
 		return explicateExpression(expression, true, strict);
 	}
 
 	@Nonnull
-	private NodeWithValue explicateExpressionDiscardingValue(Expression expression, boolean strict) {
+	NodeWithValue explicateExpressionDiscardingValue(Expression expression, boolean strict) {
 		return explicateExpression(expression, false, strict);
 	}
 
 	// Here, keepValue is just used for statements like i++, to avoid creating unnecessary temporaries.
 	@Nonnull
-	private NodeWithValue explicateExpression(Expression expression, boolean keepValue, boolean strict) {
+	NodeWithValue explicateExpression(Expression expression, boolean keepValue, boolean strict) {
 		if (expression instanceof ArrayExpression) {
 			ArrayExpression arrayExpression = (ArrayExpression) expression;
 			if (arrayExpression.elements.exists(Maybe::isNothing)) { // ie, contains hole
@@ -934,7 +934,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Pair<NodeWithValue, Block> explicateSwitchCase(@Nonnull SwitchCase switchCase, boolean strict) {
+	Pair<NodeWithValue, Block> explicateSwitchCase(@Nonnull SwitchCase switchCase, boolean strict) {
 		return new Pair<>(
 			explicateExpressionReturningValue(switchCase.test, strict),
 			new Block(switchCase.consequent.map(s -> explicateStatement(s, strict)))
@@ -942,7 +942,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Node explicateVariableDeclarationExpression(
+	Node explicateVariableDeclarationExpression(
 		@Nonnull VariableDeclarationExpression variableDeclarationExpression, boolean strict
 	) {
 		if (variableDeclarationExpression instanceof VariableDeclaration) {
@@ -955,7 +955,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Node explicateVariableDeclaration(@Nonnull VariableDeclaration variableDeclaration, boolean strict) {
+	Node explicateVariableDeclaration(@Nonnull VariableDeclaration variableDeclaration, boolean strict) {
 		return new Block(
 			Maybe.catMaybes(variableDeclaration.declarators.map(d -> d.init.isNothing() ? Maybe.empty() :
 				Maybe.of(new VariableAssignment(
@@ -968,7 +968,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue explicateUnaryExpression(@Nonnull UnaryExpression unaryExpression, boolean strict) {
+	NodeWithValue explicateUnaryExpression(@Nonnull UnaryExpression unaryExpression, boolean strict) {
 		switch (unaryExpression.operator) {
 			case Plus:
 				return new TypeCoercionNumber(explicateExpressionReturningValue(unaryExpression.operand, strict));
@@ -1028,7 +1028,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue explicateBinaryExpression(@Nonnull BinaryExpression binaryExpression, boolean strict) {
+	NodeWithValue explicateBinaryExpression(@Nonnull BinaryExpression binaryExpression, boolean strict) {
 		NodeWithValue right = explicateExpressionReturningValue(binaryExpression.right, strict);
 
 		if (binaryExpression.operator == com.shapesecurity.shift.es2016.ast.operators.BinaryOperator.Sequence) { // unlike all other cases, we do not need the RHS.
@@ -1183,7 +1183,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue explicateCompoundAssignmentExpression(
+	NodeWithValue explicateCompoundAssignmentExpression(
 		@Nonnull CompoundAssignmentExpression compoundAssignmentExpression, boolean strict
 	) {
 		BinaryOperator operator;
@@ -1281,19 +1281,19 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue explicateExpressionSuper(@Nonnull ExpressionSuper node, boolean strict) {
+	NodeWithValue explicateExpressionSuper(@Nonnull ExpressionSuper node, boolean strict) {
 		return node instanceof Super
 			? explicateSuper((Super) node)
 			: explicateExpressionReturningValue((Expression) node, strict);
 	}
 
 	@Nonnull
-	private NodeWithValue explicateSuper(@Nonnull Super node) {
+	NodeWithValue explicateSuper(@Nonnull Super node) {
 		throw new UnsupportedOperationException("ES6 not supported: Super");
 	}
 
 	@Nonnull
-	private Node explicateObjectProperty(@Nonnull LocalReference ref, @Nonnull ObjectProperty objectProperty, boolean strict) {
+	Node explicateObjectProperty(@Nonnull LocalReference ref, @Nonnull ObjectProperty objectProperty, boolean strict) {
 		if (objectProperty instanceof DataProperty) {
 			DataProperty dataProperty = (DataProperty) objectProperty;
 			return new MemberDefinition(
@@ -1332,7 +1332,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue explicatePropertyName(@Nonnull PropertyName propertyName, boolean strict) {
+	NodeWithValue explicatePropertyName(@Nonnull PropertyName propertyName, boolean strict) {
 		if (propertyName instanceof ComputedPropertyName) {
 			// TODO not a part of ES5
 			return explicateExpressionReturningValue(((ComputedPropertyName) propertyName).expression, strict);
@@ -1343,7 +1343,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Node explicateSpreadElementExpression(
+	Node explicateSpreadElementExpression(
 		@Nonnull LocalReference arr, int index, @Nonnull SpreadElementExpression spreadElementExpression, boolean strict
 	) { // TODO assigning every individual element of the array is extremely inefficient
 		if (spreadElementExpression instanceof Expression) {
@@ -1357,7 +1357,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue makeTemporary(@Nonnull F<LocalReference, NodeWithValue> withTemporary) {
+	NodeWithValue makeTemporary(@Nonnull F<LocalReference, NodeWithValue> withTemporary) {
 		LocalReference ref = new TemporaryReference();
 		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().fromJust().cons(ref.variable);
 		this.temporaries = this.temporaries.maybeTail().fromJust().cons(curTemps);
@@ -1365,7 +1365,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Node makeUnvaluedTemporary(@Nonnull F<LocalReference, Node> withTemporary) { // TODO would be nice to join this with the above
+	Node makeUnvaluedTemporary(@Nonnull F<LocalReference, Node> withTemporary) { // TODO would be nice to join this with the above
 		LocalReference ref = new TemporaryReference();
 		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().fromJust().cons(ref.variable);
 		this.temporaries = this.temporaries.maybeTail().fromJust().cons(curTemps);
@@ -1373,7 +1373,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private NodeWithValue letWithValue(@Nonnull NodeWithValue value, @Nonnull F<LocalReference, NodeWithValue> function) {
+	NodeWithValue letWithValue(@Nonnull NodeWithValue value, @Nonnull F<LocalReference, NodeWithValue> function) {
 		F<LocalReference, NodeWithValue> wrapped =
 			ref ->
 				new BlockWithValue(new Block(new VariableAssignment(ref, value, false)), function.apply(ref));
@@ -1381,7 +1381,7 @@ public class Explicator {
 	}
 
 	@Nonnull
-	private Node let(@Nonnull NodeWithValue value, @Nonnull F<LocalReference, Node> function) {
+	Node let(@Nonnull NodeWithValue value, @Nonnull F<LocalReference, Node> function) {
 		return makeUnvaluedTemporary(ref ->
 			new Block(ImmutableList.of(
 				new VariableAssignment(ref, value, false),
