@@ -49,6 +49,7 @@ import com.shapesecurity.shift.es2016.semantics.asg.Loop;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAccess;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignment;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignmentProperty;
+import com.shapesecurity.shift.es2016.semantics.asg.MemberCall;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberDefinition;
 import com.shapesecurity.shift.es2016.semantics.asg.New;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
@@ -144,6 +145,8 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
             return visitRelationalComparison((RelationalComparison) expression);
         } else if (expression instanceof VariableAssignment) {
             return visitVariableAssignment((VariableAssignment) expression);
+        } else if (expression instanceof MemberCall) {
+            return visitMemberCall((MemberCall) expression);
         } else if (expression instanceof Not) {
             return visitNot((Not) expression);
         } else if (expression instanceof InstanceOf) {
@@ -236,6 +239,15 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
 
     private NodeWithValue visitLiteralBoolean(LiteralBoolean literalBoolean) {
         return literalBoolean;
+    }
+
+    @Nonnull
+    protected NodeWithValue visitMemberCall(@Nonnull MemberCall memberCall) {
+        return new MemberCall(
+                visitNodeWithValue(memberCall.object),
+                visitNodeWithValue(memberCall.fieldExpression),
+                memberCall.arguments.map(this::visitNodeWithValue)
+        );
     }
 
     @Nonnull

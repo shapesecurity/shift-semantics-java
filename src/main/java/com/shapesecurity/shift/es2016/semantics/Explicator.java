@@ -121,6 +121,7 @@ import com.shapesecurity.shift.es2016.semantics.asg.LocalReference;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAccess;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignment;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignmentProperty;
+import com.shapesecurity.shift.es2016.semantics.asg.MemberCall;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberDefinition;
 import com.shapesecurity.shift.es2016.semantics.asg.New;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
@@ -734,26 +735,13 @@ public class Explicator {
 				c.arguments.map(a -> explicateExpressionReturningValue((Expression) a, strict));
 			if (c.callee instanceof MemberExpression) {
 				MemberExpression memberExpression = (MemberExpression) c.callee;
-				// TODO: if memberExpression.object is a Super, we need to actually call it as super.<...>
-				return letWithValue(
-					explicateExpressionSuper(memberExpression.object, strict),
-					contextRef -> new Call(
-						Maybe.of(contextRef),
-						memberExpression instanceof StaticMemberExpression
-							? new MemberAccess(
-							contextRef,
-							new LiteralString(((StaticMemberExpression) memberExpression).property)
-						)
-							: new MemberAccess(
-								contextRef,
-								explicateExpressionReturningValue(
-									((ComputedMemberExpression) memberExpression).expression,
-									strict
-								)
-							),
-						arguments
-					)
-				);
+				NodeWithValue field = memberExpression instanceof StaticMemberExpression
+						? new LiteralString(((StaticMemberExpression) memberExpression).property)
+						: explicateExpressionReturningValue(
+							((ComputedMemberExpression) memberExpression).expression,
+							strict
+						);
+				return new MemberCall(explicateExpressionSuper(memberExpression.object, strict), field, arguments);
 			}
 			NodeWithValue callee = explicateExpressionSuper(c.callee, strict);
 			return new Call(Maybe.empty(), callee, arguments);

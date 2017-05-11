@@ -25,6 +25,7 @@ import com.shapesecurity.shift.es2016.semantics.asg.LiteralString;
 import com.shapesecurity.shift.es2016.semantics.asg.LocalReference;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAccess;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignmentProperty;
+import com.shapesecurity.shift.es2016.semantics.asg.MemberCall;
 import com.shapesecurity.shift.es2016.semantics.asg.MemberDefinition;
 import com.shapesecurity.shift.es2016.semantics.asg.New;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
@@ -381,6 +382,8 @@ public class Dottifier {
             return reduceMemberAccess((MemberAccess) node);
         } else if (node instanceof MemberAssignment) {
             return reduceMemberAssignment((MemberAssignment) node);
+        } else if (node instanceof MemberCall) {
+            return reduceMemberCall((MemberCall) node);
         } else if (node instanceof MemberDefinition) {
             return reduceMemberDefinition((MemberDefinition) node);
         } else if (node instanceof New) {
@@ -486,6 +489,21 @@ public class Dottifier {
         out += lhs + name(node.callee) + " [label=\"callee\"];\n";
         out += lhs + name(node.arguments) + " [label=\"arguments\"];\n";
         out += lhs + name(node.context) + " [label=\"context\"];\n";
+        --indentationLevel;
+        return out;
+    }
+
+    @Nonnull
+    private String reduceMemberCall(@Nonnull MemberCall node) {
+        String out = ensureDeclared(node);
+        ++indentationLevel;
+        out += reduce(node.object);
+        out += reduce(node.fieldExpression);
+        out += reduce(node.arguments);
+        String lhs = indent() + name(node) + " -> ";
+        out += lhs + name(node.object) + " [label=\"object\"];\n";
+        out += lhs + name(node.fieldExpression) + " [label=\"fieldExpression\"];\n";
+        out += lhs + name(node.arguments) + " [label=\"arguments\"];\n";
         --indentationLevel;
         return out;
     }
