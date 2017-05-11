@@ -93,7 +93,6 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
     @Nonnull
     protected NodeWithValue visitCall(@Nonnull Call call) {
         return new Call(
-                call.context.map(this::visitLocalReference),
                 visitNodeWithValue(call.callee),
                 call.arguments.map(this::visitNodeWithValue)
         );

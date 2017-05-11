@@ -744,7 +744,7 @@ public class Explicator {
 				return new MemberCall(explicateExpressionSuper(memberExpression.object, strict), field, arguments);
 			}
 			NodeWithValue callee = explicateExpressionSuper(c.callee, strict);
-			return new Call(Maybe.empty(), callee, arguments);
+			return new Call(callee, arguments);
 		} else if (expression instanceof CompoundAssignmentExpression) {
 			return explicateCompoundAssignmentExpression((CompoundAssignmentExpression) expression, strict);
 		} else if (expression instanceof ComputedMemberExpression) {

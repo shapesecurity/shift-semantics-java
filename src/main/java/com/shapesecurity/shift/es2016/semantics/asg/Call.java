@@ -32,24 +32,18 @@ public class Call implements NodeWithValue {
 		if (!(o instanceof Call)) return false;
 		Call call = (Call) o;
 		return Objects.equals(callee, call.callee) &&
-				Objects.equals(arguments, call.arguments) &&
-				Objects.equals(context, call.context);
+				Objects.equals(arguments, call.arguments);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(callee, arguments, context);
+		return Objects.hash(callee, arguments);
 	}
 
 	@Nonnull
 	public final ImmutableList<NodeWithValue> arguments;
-	@Nonnull
-	public Maybe<LocalReference> context;
 
-	public Call(
-		@Nonnull Maybe<LocalReference> context, @Nonnull NodeWithValue callee, @Nonnull ImmutableList<NodeWithValue> arguments
-	) {
-		this.context = context;
+	public Call(@Nonnull NodeWithValue callee, @Nonnull ImmutableList<NodeWithValue> arguments) {
 		this.callee = callee;
 		this.arguments = arguments;
 	}

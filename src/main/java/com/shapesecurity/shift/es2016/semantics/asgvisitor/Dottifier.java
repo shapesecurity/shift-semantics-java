@@ -484,11 +484,9 @@ public class Dottifier {
         ++indentationLevel;
         out += reduce(node.callee);
         out += reduce(node.arguments);
-        out += reduce(node.context);
         String lhs = indent() + name(node) + " -> ";
         out += lhs + name(node.callee) + " [label=\"callee\"];\n";
         out += lhs + name(node.arguments) + " [label=\"arguments\"];\n";
-        out += lhs + name(node.context) + " [label=\"context\"];\n";
         --indentationLevel;
         return out;
     }
