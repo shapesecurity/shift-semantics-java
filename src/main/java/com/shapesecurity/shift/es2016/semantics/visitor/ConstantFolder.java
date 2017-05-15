@@ -34,7 +34,7 @@ public class ConstantFolder extends ReconstructingReducer {
 
     @Nonnull
     public static Semantics reduce(Semantics input) {
-        return new Semantics(new ConstantFolder(input).go(), input.locals, input.scriptVarDecls);
+        return new Semantics(new ConstantFolder(input).go(), input.locals, input.scriptVarDecls, input.scopeLookup, input.functionScopes);
     }
 
     @Nonnull

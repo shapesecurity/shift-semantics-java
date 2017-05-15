@@ -157,6 +157,7 @@ import com.shapesecurity.shift.es2016.semantics.visitor.FinallyJumpReducer;
 import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 
 public class Explicator {
 	@Nonnull
@@ -173,6 +174,8 @@ public class Explicator {
 	@Nonnull
 	ImmutableList<ImmutableList<Variable>> temporaries = ImmutableList.of(ImmutableList.empty());
 	// Stack of function-local temporaries. Whenever you begin explicating a function, push a new empty list; when you finish, pop it. TODO this is a somewhat hacky way of accomplishing this. It would be better to be intraproceedural or something.
+	@Nonnull
+	final IdentityHashMap<LiteralFunction, Scope> functionScopes;
 
 	// todo runtime errors for with, direct eval
 	Explicator(@Nonnull Script script) {
@@ -180,6 +183,7 @@ public class Explicator {
 		this.scope = ScopeAnalyzer.analyze(script);
 		this.jumpMap = FinallyJumpReducer.analyze(script);
 		this.scopeLookup = new ScopeLookup(this.scope);
+		this.functionScopes = new IdentityHashMap<>();
 	}
 
 	Explicator(@Nonnull Module module) {
@@ -187,6 +191,7 @@ public class Explicator {
 		this.scope = ScopeAnalyzer.analyze(module);
 		this.jumpMap = FinallyJumpReducer.analyze(module);
 		this.scopeLookup = new ScopeLookup(this.scope);
+		this.functionScopes = new IdentityHashMap<>();
 	}
 
 	@Nonnull
@@ -198,7 +203,7 @@ public class Explicator {
 			maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.temporaries.maybeHead().fromJust());
 		ImmutableList<String> scriptVarDecls =
 			maybeGlobals.filter(x -> exp.scopeLookup.isGlobal(x) && x.declarations.isNotEmpty()).map(x -> x.name);
-		return new Semantics(result, scriptLocals, scriptVarDecls);
+		return new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes);
 	}
 
 	@Nonnull
@@ -209,7 +214,7 @@ public class Explicator {
 			exp.functionVariablesHelper(module)
 				.filter(x -> !exp.scopeLookup.isGlobal(x))
 				.append(exp.temporaries.maybeHead().fromJust());
-		return new Semantics(result, scriptLocals, ImmutableList.empty());
+		return new Semantics(result, scriptLocals, ImmutableList.empty(), exp.scopeLookup, exp.functionScopes);
 	}
 
 	Node explicate() {
@@ -372,7 +377,9 @@ public class Explicator {
 				}
 			}))
 			.filter(v -> !scopeLookup.isGlobal(v)); // everything needing capture
-		return new LiteralFunction(name, arguments, parameters, locals, captured, body, strict);
+		LiteralFunction out = new LiteralFunction(name, arguments, parameters, locals, captured, body, strict);
+		this.functionScopes.put(out, scope);
+		return out;
 	}
 
 	@Nonnull

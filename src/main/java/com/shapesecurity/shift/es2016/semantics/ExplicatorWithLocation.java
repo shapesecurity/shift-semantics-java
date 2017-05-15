@@ -4,7 +4,6 @@ import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.es2016.ast.FunctionBody;
-import com.shapesecurity.shift.es2016.ast.Module;
 import com.shapesecurity.shift.es2016.ast.Script;
 import com.shapesecurity.shift.es2016.scope.Scope;
 import com.shapesecurity.shift.es2016.scope.Variable;
@@ -45,6 +44,6 @@ public class ExplicatorWithLocation {
 				maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.temporaries.maybeHead().fromJust());
 		ImmutableList<String> scriptVarDecls =
 				maybeGlobals.filter(x -> exp.scopeLookup.isGlobal(x) && x.declarations.isNotEmpty()).map(x -> x.name);
-		return Pair.of(new Semantics(result, scriptLocals, scriptVarDecls), exp.locations);
+		return Pair.of(new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes), exp.locations);
 	}
 }

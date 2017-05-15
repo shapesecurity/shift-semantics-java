@@ -16,10 +16,14 @@
 package com.shapesecurity.shift.es2016.semantics;
 
 import com.shapesecurity.functional.data.ImmutableList;
+import com.shapesecurity.shift.es2016.scope.Scope;
+import com.shapesecurity.shift.es2016.scope.ScopeLookup;
 import com.shapesecurity.shift.es2016.scope.Variable;
+import com.shapesecurity.shift.es2016.semantics.asg.LiteralFunction;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
 
 import javax.annotation.Nonnull;
+import java.util.IdentityHashMap;
 
 public class Semantics {
 	@Nonnull
@@ -28,10 +32,16 @@ public class Semantics {
 	public final ImmutableList<Variable> locals;
 	@Nonnull
 	public final ImmutableList<String> scriptVarDecls;
+	@Nonnull
+	public final ScopeLookup scopeLookup;
+	@Nonnull
+	public final IdentityHashMap<LiteralFunction, Scope> functionScopes;
 
-	public Semantics(@Nonnull Node node, @Nonnull ImmutableList<Variable> locals, @Nonnull ImmutableList<String> scriptVarDecls) {
+	public Semantics(@Nonnull Node node, @Nonnull ImmutableList<Variable> locals, @Nonnull ImmutableList<String> scriptVarDecls, @Nonnull ScopeLookup scopeLookup, @Nonnull IdentityHashMap<LiteralFunction, Scope> functionScopes) {
 		this.node = node;
 		this.locals = locals;
 		this.scriptVarDecls = scriptVarDecls;
+		this.scopeLookup = scopeLookup;
+		this.functionScopes = functionScopes;
 	}
 }

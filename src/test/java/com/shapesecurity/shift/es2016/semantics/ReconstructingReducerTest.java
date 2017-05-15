@@ -28,7 +28,7 @@ public class ReconstructingReducerTest {
                 "})();";
 
         Semantics asg = Explicator.deriveSemantics(Parser.parseScript(programText));
-        Semantics reconstructedAsg = new Semantics(new ReconstructingReducer().visit(asg.node), asg.locals, asg.scriptVarDecls);
+        Semantics reconstructedAsg = new Semantics(new ReconstructingReducer().visit(asg.node), asg.locals, asg.scriptVarDecls, asg.scopeLookup, asg.functionScopes);
         assertTrue(asg.node.equals(reconstructedAsg.node));
     }
 }

@@ -3,6 +3,7 @@ package com.shapesecurity.shift.es2016.semantics;
 import com.shapesecurity.functional.data.NonEmptyImmutableList;
 import com.shapesecurity.shift.es2016.parser.Parser;
 import com.shapesecurity.shift.es2016.semantics.asg.GlobalReference;
+import com.shapesecurity.shift.es2016.semantics.asg.LiteralFunction;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralNumber;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
 import com.shapesecurity.shift.es2016.semantics.asg.Block;
@@ -41,6 +42,14 @@ public class ExplicatorTest {
 		assertEquals(1, c.arguments.length);
 		assertTrue(c.arguments.maybeHead().fromJust() instanceof LiteralNumber);
 		assertEquals(0.0, ((LiteralNumber) c.arguments.maybeHead().fromJust()).value, 0.0);
+	}
+
+	@Test
+	public void testScope() throws Exception {
+		Semantics s = Explicator.deriveSemantics(Parser.parseModule("(function(){})"));
+		Block b = (Block) s.node;
+		LiteralFunction f = (LiteralFunction) b.children.maybeHead().fromJust();
+		assertTrue(s.functionScopes.containsKey(f));
 	}
 
 	@Nonnull
