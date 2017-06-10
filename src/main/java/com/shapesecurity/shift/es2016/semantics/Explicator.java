@@ -84,6 +84,7 @@ import com.shapesecurity.shift.es2016.ast.TryFinallyStatement;
 import com.shapesecurity.shift.es2016.ast.UnaryExpression;
 import com.shapesecurity.shift.es2016.ast.UpdateExpression;
 import com.shapesecurity.shift.es2016.ast.VariableDeclaration;
+import com.shapesecurity.shift.es2016.ast.VariableDeclarationAssignmentTarget;
 import com.shapesecurity.shift.es2016.ast.VariableDeclarationExpression;
 import com.shapesecurity.shift.es2016.ast.VariableDeclarationStatement;
 import com.shapesecurity.shift.es2016.ast.WhileStatement;
@@ -383,6 +384,21 @@ public class Explicator {
 	}
 
 	@Nonnull
+	private  Node makeForInUpdate(@Nonnull VariableDeclarationAssignmentTarget lhs, LocalReference keys, LocalReference counter, boolean strict) {
+		NodeWithValue rhs = new MemberAccess(keys, counter);
+		if (lhs instanceof VariableDeclaration) {
+			VariableDeclaration variableDeclaration = (VariableDeclaration) lhs;
+			assert variableDeclaration.declarators.length == 1;
+			assert variableDeclaration.declarators.maybeHead().fromJust().init.isNothing(); // TODO this was true in ES5 but not in practice, and is no longer true in ES2017
+			Either<GlobalReference, LocalReference> reference = refHelper((BindingIdentifier) variableDeclaration.declarators.maybeHead().fromJust().binding);
+			return new VariableAssignment(reference, rhs, strict);
+		} else {
+			AssignmentTarget lhsAsTarget = (AssignmentTarget) lhs;
+			return explicateAssignment(lhsAsTarget, rhs, strict);
+		}
+	}
+
+	@Nonnull
 	Node explicateStatement(@Nonnull Statement statement, boolean strict) {
 		if (statement instanceof BlockStatement) {
 			return explicateBody(((BlockStatement) statement).block.statements, strict);
@@ -441,21 +457,6 @@ public class Explicator {
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, 0);
 
-			Either<GlobalReference, LocalReference> reference;
-			boolean isDeclaration;
-			if (forInStatement.left instanceof VariableDeclaration) {
-				VariableDeclaration variableDeclaration = (VariableDeclaration) forInStatement.left;
-				assert variableDeclaration.declarators.length == 1; // TODO maybe remove this
-				// assumes ES5
-				reference = refHelper((BindingIdentifier) variableDeclaration.declarators.maybeHead().fromJust().binding);
-				isDeclaration = true;
-			} else if (forInStatement.left instanceof AssignmentTargetIdentifier) {
-				reference = refHelper((AssignmentTargetIdentifier) forInStatement.left);
-				isDeclaration = false;
-			} else {
-				throw new UnsupportedOperationException("ES6 not supported: " + forInStatement.left.getClass().getSimpleName());
-			}
-
 			return makeUnvaluedTemporary(object -> makeUnvaluedTemporary(counter -> makeUnvaluedTemporary(keys -> {
 				Block body = new Block(ImmutableList.<Node>of(
 					new IfElse(
@@ -471,9 +472,7 @@ public class Explicator {
 						new IfElse(
 							new In(new MemberAccess(keys, counter), object),
 							new Block(ImmutableList.of(
-								isDeclaration ?
-									new VariableAssignment(reference, new MemberAccess(keys, counter), strict) :
-									variableAssignmentHelper(reference, new MemberAccess(keys, counter), strict),
+								makeForInUpdate(forInStatement.left, keys, counter, strict),
 								explicateStatement(forInStatement.body, strict)
 							)),
 							new Block(Void.INSTANCE)
@@ -649,6 +648,50 @@ public class Explicator {
 		return explicateExpression(expression, false, strict);
 	}
 
+	@Nonnull
+	NodeWithValue explicateAssignment(AssignmentTarget lhs, NodeWithValue rhs, boolean strict) {
+		if (lhs instanceof StaticMemberAssignmentTarget) {
+			StaticMemberAssignmentTarget staticMemberAssignmentTarget = (StaticMemberAssignmentTarget) lhs;
+			return new MemberAssignment(
+					explicateExpressionSuper(staticMemberAssignmentTarget.object, strict),
+					new LiteralString(staticMemberAssignmentTarget.property),
+					rhs,
+					strict
+			);
+		} else if (lhs instanceof ComputedMemberAssignmentTarget) {
+			ComputedMemberAssignmentTarget computedMemberAssignmentTarget = (ComputedMemberAssignmentTarget) lhs;
+			return letWithValue(
+					// semantics: evaluate obj, evaluate prop, coerce obj to object, coerce prop to string. in that order. TODO find a better way of doing this.
+					explicateExpressionSuper(computedMemberAssignmentTarget.object, strict),
+					objectRef -> letWithValue(
+							explicateExpressionReturningValue(computedMemberAssignmentTarget.expression, strict),
+							fieldRef -> new BlockWithValue(
+									ImmutableList.of(new RequireObjectCoercible(objectRef)),
+									letWithValue(
+											new TypeCoercionString(fieldRef),
+											prop -> new MemberAssignment(
+													objectRef,
+													prop,
+													rhs,
+													strict
+											)
+									)
+							)
+					)
+			);
+		} else if (lhs instanceof AssignmentTargetIdentifier) {
+			AssignmentTargetIdentifier assignmentTargetIdentifier = (AssignmentTargetIdentifier) lhs;
+			Either<GlobalReference, LocalReference> ref = refHelper(assignmentTargetIdentifier);
+			return variableAssignmentHelper(
+					ref,
+					rhs,
+					strict
+			);
+		} else {
+			throw new UnsupportedOperationException("ES6 not supported: " + lhs.getClass().getSimpleName());
+		}
+	}
+
 	// Here, keepValue is just used for statements like i++, to avoid creating unnecessary temporaries.
 	@Nonnull
 	NodeWithValue explicateExpression(Expression expression, boolean keepValue, boolean strict) {
@@ -689,47 +732,7 @@ public class Explicator {
 		} else if (expression instanceof AssignmentExpression) {
 			AssignmentExpression assignmentExpression = (AssignmentExpression) expression;
 			AssignmentTarget binding = assignmentExpression.binding;
-			if (binding instanceof StaticMemberAssignmentTarget) {
-				StaticMemberAssignmentTarget staticMemberAssignmentTarget = (StaticMemberAssignmentTarget) binding;
-				return new MemberAssignment(
-					explicateExpressionSuper(staticMemberAssignmentTarget.object, strict),
-					new LiteralString(staticMemberAssignmentTarget.property),
-					explicateExpressionReturningValue(assignmentExpression.expression, strict),
-					strict
-				);
-			} else if (binding instanceof ComputedMemberAssignmentTarget) {
-				ComputedMemberAssignmentTarget computedMemberAssignmentTarget = (ComputedMemberAssignmentTarget) binding;
-				return letWithValue(
-					// semantics: evaluate obj, evaluate prop, coerce obj to object, coerce prop to string. in that order. TODO find a better way of doing this.
-					explicateExpressionSuper(computedMemberAssignmentTarget.object, strict),
-					objectRef -> letWithValue(
-						explicateExpressionReturningValue(computedMemberAssignmentTarget.expression, strict),
-						fieldRef -> new BlockWithValue(
-							ImmutableList.of(new RequireObjectCoercible(objectRef)),
-							letWithValue(
-								new TypeCoercionString(fieldRef),
-								prop -> new MemberAssignment(
-									objectRef,
-									prop,
-									explicateExpressionReturningValue(assignmentExpression.expression, strict),
-									strict
-								)
-							)
-						)
-					)
-				);
-			} else if (binding instanceof AssignmentTargetIdentifier) {
-				AssignmentTargetIdentifier assignmentTargetIdentifier = (AssignmentTargetIdentifier) binding;
-				Either<GlobalReference, LocalReference> ref = refHelper(assignmentTargetIdentifier);
-				NodeWithValue rhs = explicateExpressionReturningValue(assignmentExpression.expression, strict);
-				return variableAssignmentHelper(
-					ref,
-					rhs,
-					strict
-				);
-			} else {
-				throw new UnsupportedOperationException("ES6 not supported: " + binding.getClass().getSimpleName());
-			}
+			return explicateAssignment(binding, explicateExpressionReturningValue(assignmentExpression.expression, strict), strict);
 		} else if (expression instanceof BinaryExpression) {
 			return explicateBinaryExpression((BinaryExpression) expression, strict);
 		} else if (expression instanceof CallExpression) {
