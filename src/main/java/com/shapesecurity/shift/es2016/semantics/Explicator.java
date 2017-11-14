@@ -30,6 +30,7 @@ import com.shapesecurity.shift.es2016.ast.BindingIdentifier;
 import com.shapesecurity.shift.es2016.ast.BlockStatement;
 import com.shapesecurity.shift.es2016.ast.BreakStatement;
 import com.shapesecurity.shift.es2016.ast.CallExpression;
+import com.shapesecurity.shift.es2016.ast.CatchClause;
 import com.shapesecurity.shift.es2016.ast.CompoundAssignmentExpression;
 import com.shapesecurity.shift.es2016.ast.ComputedMemberAssignmentTarget;
 import com.shapesecurity.shift.es2016.ast.ComputedMemberExpression;
@@ -132,7 +133,8 @@ import com.shapesecurity.shift.es2016.semantics.asg.SwitchStatement;
 import com.shapesecurity.shift.es2016.semantics.asg.TemporaryReference;
 import com.shapesecurity.shift.es2016.semantics.asg.This;
 import com.shapesecurity.shift.es2016.semantics.asg.Throw;
-import com.shapesecurity.shift.es2016.semantics.asg.TryCatchFinally;
+import com.shapesecurity.shift.es2016.semantics.asg.TryCatch;
+import com.shapesecurity.shift.es2016.semantics.asg.TryFinally;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionNumber;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionString;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeofGlobal;
@@ -594,22 +596,32 @@ public class Explicator {
 			TryCatchStatement tryCatchStatement = (TryCatchStatement) statement;
 			Variable catchVariable =
 				scopeLookup.findVariableDeclaredBy((BindingIdentifier) tryCatchStatement.catchClause.binding).fromJust();
-			return new TryCatchFinally(
+			return new TryCatch(
 				explicateBody(tryCatchStatement.body.statements, strict),
-				Maybe.of(new Pair<>(catchVariable, explicateBody(tryCatchStatement.catchClause.body.statements, strict))),
-				new Block(ImmutableList.empty())
+				new Pair<>(catchVariable, explicateBody(tryCatchStatement.catchClause.body.statements, strict))
 			);
 		} else if (statement instanceof TryFinallyStatement) {
 			TryFinallyStatement tryFinallyStatement = (TryFinallyStatement) statement;
-			Maybe<Pair<Variable, Block>> catchBody = tryFinallyStatement.catchClause.map(c ->
-				new Pair<>(
-					scopeLookup.findVariableDeclaredBy((BindingIdentifier) c.binding).fromJust(),
-					explicateBody(c.body.statements, strict)
-				)
-			);
-			return new TryCatchFinally(
-				explicateBody(tryFinallyStatement.body.statements, strict),
-				catchBody,
+
+			Block tryBody = explicateBody(tryFinallyStatement.body.statements, strict);
+
+			if (tryFinallyStatement.catchClause.isJust()) {
+				// Rewrite
+				// try { A } catch (e) { B } finally { C }
+				// as
+				// try { try { A } catch (e) { B } } finally { C }
+				CatchClause clause = tryFinallyStatement.catchClause.fromJust();
+				Pair<Variable, Block> catchBody = new Pair<>(
+						scopeLookup.findVariableDeclaredBy((BindingIdentifier) clause.binding).fromJust(),
+						explicateBody(clause.body.statements, strict)
+				);
+
+				TryCatch tryCatch = new TryCatch(tryBody, catchBody);
+				tryBody = new Block(tryCatch);
+			}
+
+			return new TryFinally(
+				tryBody,
 				explicateBody(tryFinallyStatement.finalizer.statements, strict)
 			);
 		} else if (statement instanceof VariableDeclarationStatement) {

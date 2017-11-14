@@ -8,6 +8,8 @@ import com.shapesecurity.shift.es2016.semantics.asg.LiteralNumber;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
 import com.shapesecurity.shift.es2016.semantics.asg.Block;
 import com.shapesecurity.shift.es2016.semantics.asg.Call;
+import com.shapesecurity.shift.es2016.semantics.asg.TryCatch;
+import com.shapesecurity.shift.es2016.semantics.asg.TryFinally;
 import com.shapesecurity.shift.es2016.semantics.asg.VariableAssignment;
 import org.junit.Test;
 
@@ -42,6 +44,33 @@ public class ExplicatorTest {
 		assertEquals(1, c.arguments.length);
 		assertTrue(c.arguments.maybeHead().fromJust() instanceof LiteralNumber);
 		assertEquals(0.0, ((LiteralNumber) c.arguments.maybeHead().fromJust()).value, 0.0);
+	}
+
+	@Test
+	public void testTryCatchFinally() throws Exception {
+		Semantics s = Explicator.deriveSemantics(Parser.parseModule("try { a; } catch (e) { b; } finally { c; }"));
+
+		assertTrue(s.node instanceof Block);
+		assertEquals(1, ((Block) s.node).children.length);
+		assertTrue(((NonEmptyImmutableList<Node>) ((Block) s.node).children).head instanceof TryFinally);
+
+		TryFinally tf = (TryFinally) ((NonEmptyImmutableList<Node>) ((Block) s.node).children).head;
+
+		assertEquals(1, tf.tryBody.children.length);
+		assertTrue(tf.tryBody.children.maybeHead().fromJust() instanceof TryCatch);
+		TryCatch tc = (TryCatch) tf.tryBody.children.maybeHead().fromJust();
+
+		assertEquals(1, tc.tryBody.children.length);
+		assertTrue(tc.tryBody.children.maybeHead().fromJust() instanceof GlobalReference);
+		assertEquals("a", ((GlobalReference) tc.tryBody.children.maybeHead().fromJust()).name);
+
+		assertEquals(1, tc.catchBody.right.children.length);
+		assertTrue(tc.catchBody.right.children.maybeHead().fromJust() instanceof GlobalReference);
+		assertEquals("b", ((GlobalReference) tc.catchBody.right.children.maybeHead().fromJust()).name);
+
+		assertEquals(1, tf.finallyBody.children.length);
+		assertTrue(tf.finallyBody.children.maybeHead().fromJust() instanceof GlobalReference);
+		assertEquals("c", ((GlobalReference) tf.finallyBody.children.maybeHead().fromJust()).name);
 	}
 
 	@Test

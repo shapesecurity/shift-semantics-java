@@ -23,33 +23,28 @@ import javax.annotation.Nullable;
 
 import java.util.Objects;
 
-public class TryCatchFinally implements Node {
+public class TryCatch implements Node {
 	@Nonnull
 	public final Block tryBody;
 	@Nonnull
-	public final Maybe<Pair<Variable, Block>> catchBody;
+	public final Pair<Variable, Block> catchBody;
 
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
-		if (!(o instanceof TryCatchFinally)) return false;
-		TryCatchFinally that = (TryCatchFinally) o;
+		if (!(o instanceof TryCatch)) return false;
+		TryCatch that = (TryCatch) o;
 		return Objects.equals(tryBody, that.tryBody) &&
-				Objects.equals(catchBody, that.catchBody) &&
-				Objects.equals(finallyBody, that.finallyBody);
+				Objects.equals(catchBody, that.catchBody);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(tryBody, catchBody, finallyBody);
+		return Objects.hash(tryBody, catchBody);
 	}
 
-	@Nonnull
-	public final Block finallyBody;
-
-	public TryCatchFinally(@Nonnull Block tryBody, @Nonnull Maybe<Pair<Variable, Block>> catchBody, @Nonnull Block finallyBody) {
+	public TryCatch(@Nonnull Block tryBody, @Nonnull Pair<Variable, Block> catchBody) {
 		this.tryBody = tryBody;
 		this.catchBody = catchBody;
-		this.finallyBody = finallyBody;
 	}
 }

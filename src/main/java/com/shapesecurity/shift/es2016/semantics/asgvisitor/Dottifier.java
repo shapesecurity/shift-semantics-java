@@ -33,7 +33,8 @@ import com.shapesecurity.shift.es2016.semantics.asg.Return;
 import com.shapesecurity.shift.es2016.semantics.asg.SwitchStatement;
 import com.shapesecurity.shift.es2016.semantics.asg.This;
 import com.shapesecurity.shift.es2016.semantics.asg.Throw;
-import com.shapesecurity.shift.es2016.semantics.asg.TryCatchFinally;
+import com.shapesecurity.shift.es2016.semantics.asg.TryCatch;
+import com.shapesecurity.shift.es2016.semantics.asg.TryFinally;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionString;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeofGlobal;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.UnaryOperation;
@@ -398,8 +399,10 @@ public class Dottifier {
             return reduceThis((This) node);
         } else if (node instanceof Throw) {
             return reduceThrow((Throw) node);
-        } else if (node instanceof TryCatchFinally) {
-            return reduceTryCatchFinally((TryCatchFinally) node);
+        } else if (node instanceof TryCatch) {
+            return reduceTryCatch((TryCatch) node);
+        } else if (node instanceof TryFinally) {
+            return reduceTryFinally((TryFinally) node);
         } else if (node instanceof TypeCoercionNumber) {
             return reduceTypeCoercionNumber((TypeCoercionNumber) node);
         } else if (node instanceof TypeCoercionString) {
@@ -1068,7 +1071,7 @@ public class Dottifier {
     }
 
     @Nonnull
-    private String reduceTryCatchFinally(@Nonnull TryCatchFinally node) {
+    private String reduceTryCatch(@Nonnull TryCatch node) {
         StringBuilder out = new StringBuilder();
         StringBuilder after = new StringBuilder();
         out.append(ensureDeclared(node));
@@ -1080,28 +1083,34 @@ public class Dottifier {
                 .append(name(node.tryBody))
                 .append(" [label=\"tryBody\"];\n");
 
-        if (node.catchBody.isJust()) {
-            Pair<Variable, Block> pair = node.catchBody.fromJust();
-            if (variableNames.containsKey(pair.left())) {
-                out.append(reduce(pair.right()));
-                after.append(lhs)
-                        .append(variableNames.get(pair.left()))
-                        .append(" [label=\"catchVariable\"];\n")
-                        .append(lhs)
-                        .append(name(pair.right()))
-                        .append(" [label=\"catchBody\"];\n");
-            } else {
-                throw new RuntimeException("Undeclared reference!");
-            }
-        } else {
-            String nothing = "nothing_" + id++;
-            out.append(indent())
-                    .append(nothing)
-                    .append(" [label=\"\"];\n");
+        Pair<Variable, Block> pair = node.catchBody;
+        if (variableNames.containsKey(pair.left())) {
+            out.append(reduce(pair.right()));
             after.append(lhs)
-                    .append(nothing)
-                    .append(" [label=\"name\"];\n");
+                    .append(variableNames.get(pair.left()))
+                    .append(" [label=\"catchVariable\"];\n")
+                    .append(lhs)
+                    .append(name(pair.right()))
+                    .append(" [label=\"catchBody\"];\n");
+        } else {
+            throw new RuntimeException("Undeclared reference!");
         }
+
+        return out.append(after).toString();
+    }
+
+    @Nonnull
+    private String reduceTryFinally(@Nonnull TryFinally node) {
+        StringBuilder out = new StringBuilder();
+        StringBuilder after = new StringBuilder();
+        out.append(ensureDeclared(node));
+        ++indentationLevel;
+        String lhs = indent() + name(node) + " -> ";
+
+        out.append(reduce(node.tryBody));
+        after.append(lhs)
+                .append(name(node.tryBody))
+                .append(" [label=\"tryBody\"];\n");
 
         out.append(reduce(node.finallyBody));
         after.append(lhs)

@@ -59,7 +59,8 @@ import com.shapesecurity.shift.es2016.semantics.asg.SwitchStatement;
 import com.shapesecurity.shift.es2016.semantics.asg.TemporaryReference;
 import com.shapesecurity.shift.es2016.semantics.asg.This;
 import com.shapesecurity.shift.es2016.semantics.asg.Throw;
-import com.shapesecurity.shift.es2016.semantics.asg.TryCatchFinally;
+import com.shapesecurity.shift.es2016.semantics.asg.TryCatch;
+import com.shapesecurity.shift.es2016.semantics.asg.TryFinally;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionNumber;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionString;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeofGlobal;
@@ -412,8 +413,10 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
             return visitThrow((Throw) node);
         } else if (node instanceof MemberDefinition) {
             return visitMemberDefinition((MemberDefinition) node);
-        } else if (node instanceof TryCatchFinally) {
-            return visitTryCatchFinally((TryCatchFinally) node);
+        } else if (node instanceof TryCatch) {
+            return visitTryCatch((TryCatch) node);
+        } else if (node instanceof TryFinally) {
+            return visitTryFinally((TryFinally) node);
         } else if (node instanceof SwitchStatement) {
             return visitSwitchStatement((SwitchStatement) node);
         }
@@ -431,8 +434,13 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
     }
 
     @Nonnull
-    protected Node visitTryCatchFinally(@Nonnull TryCatchFinally node) {
-        return new TryCatchFinally(node.tryBody, node.catchBody, node.finallyBody);
+    protected Node visitTryCatch(@Nonnull TryCatch node) {
+        return new TryCatch(node.tryBody, node.catchBody);
+    }
+
+    @Nonnull
+    protected Node visitTryFinally(@Nonnull TryFinally node) {
+        return new TryFinally(node.tryBody, node.finallyBody);
     }
 
     @Nonnull
