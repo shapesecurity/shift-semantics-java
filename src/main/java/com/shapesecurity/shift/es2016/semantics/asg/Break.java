@@ -15,6 +15,9 @@
  */
 package com.shapesecurity.shift.es2016.semantics.asg;
 
+import com.shapesecurity.functional.data.ImmutableList;
+import com.shapesecurity.shift.es2016.semantics.BrokenThrough;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -24,24 +27,25 @@ public class Break implements Node {
 	@Nonnull
 	public final BreakTarget target;
 
+	@Nonnull
+	public final ImmutableList<BrokenThrough> broken;
+
 	@Override
 	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Break)) return false;
 		Break aBreak = (Break) o;
-		return finalliesBroken == aBreak.finalliesBroken &&
-				Objects.equals(target, aBreak.target);
+		return Objects.equals(target, aBreak.target) &&
+				Objects.equals(broken, aBreak.broken);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(target, finalliesBroken);
+		return Objects.hash(target, broken);
 	}
 
-	public final int finalliesBroken;
-
-	public Break(@Nonnull BreakTarget target, int finalliesBroken) {
+	public Break(@Nonnull BreakTarget target, @Nonnull ImmutableList<BrokenThrough> broken) {
 		this.target = target;
-		this.finalliesBroken = finalliesBroken;
+		this.broken = broken;
 	}
 }

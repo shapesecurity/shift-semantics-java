@@ -129,6 +129,7 @@ import com.shapesecurity.shift.es2016.semantics.asg.New;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
 import com.shapesecurity.shift.es2016.semantics.asg.NodeWithValue;
 import com.shapesecurity.shift.es2016.semantics.asg.Return;
+import com.shapesecurity.shift.es2016.semantics.asg.ReturnAfterFinallies;
 import com.shapesecurity.shift.es2016.semantics.asg.SwitchStatement;
 import com.shapesecurity.shift.es2016.semantics.asg.TemporaryReference;
 import com.shapesecurity.shift.es2016.semantics.asg.This;
@@ -168,7 +169,7 @@ public class Explicator {
 	@Nonnull
 	final Either<Script, Module> program;
 	@Nonnull
-	final HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<com.shapesecurity.shift.es2016.ast.Node, Integer>> jumpMap;
+	final HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<com.shapesecurity.shift.es2016.ast.Node, ImmutableList<BrokenThrough>>> jumpMap;
 	@Nonnull
 	final ScopeLookup scopeLookup;
 	@Nonnull
@@ -405,11 +406,11 @@ public class Explicator {
 		if (statement instanceof BlockStatement) {
 			return explicateBody(((BlockStatement) statement).block.statements, strict);
 		} else if (statement instanceof BreakStatement) {
-			Pair<com.shapesecurity.shift.es2016.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
-			return new Break(targets.get(_break.left).fromJust().left, _break.right);
+			Pair<com.shapesecurity.shift.es2016.ast.Node, ImmutableList<BrokenThrough>> _break = jumpMap.get(statement).fromJust();
+			return new Break(targets.get(_break.left).fromJust().left, _break.right.reverse()); // Reverse so that the list is innermost-to-outermost
 		} else if (statement instanceof ContinueStatement) {
-			Pair<com.shapesecurity.shift.es2016.ast.Node, Integer> _break = jumpMap.get(statement).fromJust();
-			return new Break(targets.get(_break.left).fromJust().right.fromJust(), _break.right);
+			Pair<com.shapesecurity.shift.es2016.ast.Node, ImmutableList<BrokenThrough>> _break = jumpMap.get(statement).fromJust();
+			return new Break(targets.get(_break.left).fromJust().right.fromJust(), _break.right.reverse()); // Reverse so that the list is innermost-to-outermost
 		} else if (statement instanceof DebuggerStatement) {
 			return Void.INSTANCE;
 		} else if (statement instanceof DoWhileStatement) { // exactly the same as WhileStatement, except that the test is last instead of first
@@ -417,7 +418,7 @@ public class Explicator {
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
-			Break breakNode = new Break(outerTarget, 0);
+			Break breakNode = new Break(outerTarget,  ImmutableList.empty());
 			Block body = new Block(ImmutableList.<Node>of(
 				explicateStatement(doWhileStatement.body, strict),
 				innerTarget,
@@ -457,7 +458,7 @@ public class Explicator {
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
-			Break breakNode = new Break(outerTarget, 0);
+			Break breakNode = new Break(outerTarget, ImmutableList.empty());
 
 			return makeUnvaluedTemporary(object -> makeUnvaluedTemporary(counter -> makeUnvaluedTemporary(keys -> {
 				Block body = new Block(ImmutableList.<Node>of(
@@ -500,7 +501,7 @@ public class Explicator {
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
-			Break breakNode = new Break(outerTarget, 0);
+			Break breakNode = new Break(outerTarget, ImmutableList.empty());
 
 			Block body = new Block(forStatement.test.map(t -> ((ImmutableList<Node>) ImmutableList.<Node>of(
 				new IfElse(
@@ -548,6 +549,14 @@ public class Explicator {
 			return new Block(ImmutableList.of(explicateStatement(labeledStatement.body, strict), target));
 		} else if (statement instanceof ReturnStatement) {
 			ReturnStatement returnStatement = (ReturnStatement) statement;
+			ImmutableList<BrokenThrough> breakables = jumpMap.get(statement).fromJust().right;
+
+			if (breakables.exists(BrokenThrough.TRY_WITH_FINALLY::equals)) {
+				// These need special handling, so they get their own node type.
+				return returnStatement.expression
+						.map(e -> let(explicateExpressionReturningValue(e, strict), t -> new ReturnAfterFinallies(Maybe.of(t), breakables.reverse()))) // Reverse so that the list is innermost-to-outermost
+						.orJust(new ReturnAfterFinallies(Maybe.empty(), breakables));
+			}
 			return new Return(
 				returnStatement.expression.map(e -> explicateExpressionReturningValue(e, strict))
 			);
@@ -632,7 +641,7 @@ public class Explicator {
 			BreakTarget outerTarget = new BreakTarget();
 			BreakTarget innerTarget = new BreakTarget();
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
-			Break breakNode = new Break(outerTarget, 0);
+			Break breakNode = new Break(outerTarget, ImmutableList.empty());
 			Block body = new Block(ImmutableList.<Node>of(
 				new IfElse(
 					explicateExpressionReturningValue(whileStatement.test, strict),

@@ -83,7 +83,7 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
 
     @Nonnull
     protected Node visitBreak(@Nonnull Break _break) {
-        return new Break(_break.target, _break.finalliesBroken); // TODO is not in fact cloning targets
+        return new Break(_break.target, _break.broken); // TODO is not in fact cloning targets
     }
 
     @Nonnull
