@@ -265,14 +265,7 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 	@Nonnull
 	@Override
 	public State reduceReturnStatement(@Nonnull ReturnStatement node, @Nonnull Maybe<State> expression) {
-		return new State(
-				HashTable.emptyUsingIdentity(),
-				HashTable.emptyUsingEquality(),
-				HashTable.emptyUsingIdentity(),
-				HashTable.emptyUsingEquality(),
-				HashTable.<ReturnStatement, ImmutableList<BrokenThrough>>emptyUsingIdentity().put(node, ImmutableList.empty()),
-				HashTable.emptyUsingIdentity()
-		);
+		return super.reduceReturnStatement(node, expression).observeReturn(node);
 	}
 
 	@Nonnull
@@ -369,12 +362,24 @@ public class FinallyJumpReducer extends MonoidalReducer<FinallyJumpReducer.State
 		@Nonnull
 		State observeFinally() {
 			return new State(
-				this.unlabelledBreaks.map(x -> x.cons(BrokenThrough.FINALLY)),
-				this.labelledBreaks.map(l -> l.map(p -> new Pair<>(p.left, p.right.cons(BrokenThrough.FINALLY)))),
-				this.unlabelledContinues.map(x -> x.cons(BrokenThrough.FINALLY)),
-				this.labelledContinues.map(l -> l.map(p -> new Pair<>(p.left, p.right.cons(BrokenThrough.FINALLY)))),
-				this.returns.map(x -> x.cons(BrokenThrough.FINALLY)),
-				this.knownJumps
+					this.unlabelledBreaks.map(x -> x.cons(BrokenThrough.FINALLY)),
+					this.labelledBreaks.map(l -> l.map(p -> new Pair<>(p.left, p.right.cons(BrokenThrough.FINALLY)))),
+					this.unlabelledContinues.map(x -> x.cons(BrokenThrough.FINALLY)),
+					this.labelledContinues.map(l -> l.map(p -> new Pair<>(p.left, p.right.cons(BrokenThrough.FINALLY)))),
+					this.returns.map(x -> x.cons(BrokenThrough.FINALLY)),
+					this.knownJumps
+			);
+		}
+
+		@Nonnull
+		State observeReturn(ReturnStatement node) {
+			return new State(
+					this.unlabelledBreaks,
+					this.labelledBreaks,
+					this.unlabelledContinues,
+					this.labelledContinues,
+					this.returns.put(node, ImmutableList.empty()),
+					this.knownJumps
 			);
 		}
 	}
