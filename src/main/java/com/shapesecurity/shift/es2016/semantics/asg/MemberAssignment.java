@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import javax.annotation.Nonnull;
@@ -46,9 +47,9 @@ public class MemberAssignment implements NodeWithValue {
 	}
 
 	public MemberAssignment(
-		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression,
-		@Nonnull MemberAssignmentProperty.StaticValue property,
-		boolean strict
+			@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression,
+			@Nonnull MemberAssignmentProperty.StaticValue property,
+			boolean strict
 	) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;
@@ -57,7 +58,7 @@ public class MemberAssignment implements NodeWithValue {
 	}
 
 	public MemberAssignment(
-		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull NodeWithValue staticValue, boolean strict
+			@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull NodeWithValue staticValue, boolean strict
 	) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;

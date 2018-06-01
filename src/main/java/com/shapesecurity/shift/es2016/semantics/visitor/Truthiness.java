@@ -50,270 +50,272 @@ import static com.shapesecurity.shift.es2016.semantics.visitor.ECMA262Operations
 
 
 final class Truthiness implements FAlgebraNodeWithValue<Maybe<Boolean>> {
-    private Truthiness() {}
-    public static final Truthiness INSTANCE = new Truthiness();
+	private Truthiness() {
+	}
 
-    public static Maybe<Boolean> truthiness(@Nonnull NodeWithValue node) {
-        return CataNodeWithValue.cata(Truthiness.INSTANCE, node);
-    }
+	public static final Truthiness INSTANCE = new Truthiness();
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(BlockWithValue blockWithValue) {
-        return truthiness(blockWithValue.result);
-    }
+	public static Maybe<Boolean> truthiness(@Nonnull NodeWithValue node) {
+		return CataNodeWithValue.cata(Truthiness.INSTANCE, node);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Call call) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(BlockWithValue blockWithValue) {
+		return truthiness(blockWithValue.result);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(DeleteGlobalProperty deleteGlobalProperty) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Call call) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(DeleteProperty deleteProperty) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(DeleteGlobalProperty deleteGlobalProperty) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(GlobalReference globalReference) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(DeleteProperty deleteProperty) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Halt halt) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(GlobalReference globalReference) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Keys keys) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Halt halt) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralBoolean literalBoolean) {
-        return Maybe.of(literalBoolean.value);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Keys keys) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralEmptyArray literalEmptyArray) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralBoolean literalBoolean) {
+		return Maybe.of(literalBoolean.value);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralEmptyObject literalEmptyObject) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralEmptyArray literalEmptyArray) {
+		return Maybe.of(true);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralFunction literalFunction) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralEmptyObject literalEmptyObject) {
+		return Maybe.of(true);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralInfinity literalInfinity) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralFunction literalFunction) {
+		return Maybe.of(true);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralNull literalNull) {
-        return Maybe.of(false);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralInfinity literalInfinity) {
+		return Maybe.of(true);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralNumber literalNumber) {
-        return Maybe.of(literalNumber.value != 0 && !Double.isNaN(literalNumber.value));
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralNull literalNull) {
+		return Maybe.of(false);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralRegExp literalRegExp) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralNumber literalNumber) {
+		return Maybe.of(literalNumber.value != 0 && !Double.isNaN(literalNumber.value));
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralString literalString) {
-        return Maybe.of(!(literalString.value.isEmpty()));
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralRegExp literalRegExp) {
+		return Maybe.of(true);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralSymbol literalSymbol) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralString literalString) {
+		return Maybe.of(!(literalString.value.isEmpty()));
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LiteralUndefined literalUndefined) {
-        return Maybe.of(false);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralSymbol literalSymbol) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(MemberAccess memberAccess) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LiteralUndefined literalUndefined) {
+		return Maybe.of(false);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(MemberAssignment memberAssignment) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(MemberAccess memberAccess) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(New new_) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(MemberAssignment memberAssignment) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(RequireObjectCoercible requireObjectCoercible) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(New new_) {
+		return Maybe.of(true);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(LocalReference localReference) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(RequireObjectCoercible requireObjectCoercible) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(TemporaryReference temporaryReference) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(LocalReference localReference) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(This this_) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(TemporaryReference temporaryReference) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(TypeCoercionNumber typeCoercionNumber) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(This this_) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(TypeCoercionString typeCoercionString) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(TypeCoercionNumber typeCoercionNumber) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(TypeofGlobal typeofGlobal) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(TypeCoercionString typeCoercionString) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(VariableAssignment variableAssignment) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(TypeofGlobal typeofGlobal) {
+		return Maybe.of(true);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Equality equality) {
-        NodeWithValue left = equality.left();
-        NodeWithValue right = equality.right();
-        if (!(left instanceof LiteralNumber && Double.isNaN(((LiteralNumber) left).value)) &&
-                Type(left).map(t -> t != Type.Object).orJust(false) && left.equals(right)) {
-            Equality.Operator operator = equality.operator;
-            return Maybe.of(operator == Equality.Operator.StrictEq || operator == Equality.Operator.Eq);
-        }
-        // TODO: implement non-strict equality algorithm
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(VariableAssignment variableAssignment) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(FloatMath floatMath) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Equality equality) {
+		NodeWithValue left = equality.left();
+		NodeWithValue right = equality.right();
+		if (!(left instanceof LiteralNumber && Double.isNaN(((LiteralNumber) left).value)) &&
+				Type(left).map(t -> t != Type.Object).orJust(false) && left.equals(right)) {
+			Equality.Operator operator = equality.operator;
+			return Maybe.of(operator == Equality.Operator.StrictEq || operator == Equality.Operator.Eq);
+		}
+		// TODO: implement non-strict equality algorithm
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(In in_) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(FloatMath floatMath) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(InstanceOf instanceOf) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(In in_) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(IntMath intMath) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(InstanceOf instanceOf) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Logic logic) {
-        NodeWithValue left = logic.left();
-        NodeWithValue right = logic.right();
-        if (logic.operator == Logic.Operator.And) {
-            return truthiness(left).flatMap(x -> truthiness(right).map(y -> x && y));
-        } else {
-            return truthiness(left).flatMap(x -> truthiness(right).map(y -> x || y));
-        }
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(IntMath intMath) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(RelationalComparison relationalComparison) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Logic logic) {
+		NodeWithValue left = logic.left();
+		NodeWithValue right = logic.right();
+		if (logic.operator == Logic.Operator.And) {
+			return truthiness(left).flatMap(x -> truthiness(right).map(y -> x && y));
+		} else {
+			return truthiness(left).flatMap(x -> truthiness(right).map(y -> x || y));
+		}
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(BitwiseNot bitwiseNot) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(RelationalComparison relationalComparison) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Negation negation) {
-        return Maybe.empty();
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(BitwiseNot bitwiseNot) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Not not) {
-        return truthiness(not.expression()).map(x -> !x);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Negation negation) {
+		return Maybe.empty();
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(Typeof typeof) {
-        return Maybe.of(true);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Not not) {
+		return truthiness(not.expression()).map(x -> !x);
+	}
 
-    @Nonnull
-    @Override
-    public Maybe<Boolean> apply(VoidOp voidOp) {
-        return Maybe.of(false);
-    }
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(Typeof typeof) {
+		return Maybe.of(true);
+	}
+
+	@Nonnull
+	@Override
+	public Maybe<Boolean> apply(VoidOp voidOp) {
+		return Maybe.of(false);
+	}
 }

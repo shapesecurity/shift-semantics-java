@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation;
 
 import com.shapesecurity.shift.es2016.semantics.asg.NodeWithValue;
+
 import javax.annotation.Nonnull;
 
 public abstract class UnaryOperation implements NodeWithValue {
-    @Nonnull
-    public abstract NodeWithValue expression();
+	@Nonnull
+	public abstract NodeWithValue expression();
 }

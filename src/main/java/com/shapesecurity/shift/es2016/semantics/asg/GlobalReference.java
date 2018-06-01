@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import javax.annotation.Nonnull;
@@ -34,7 +35,8 @@ public class GlobalReference implements NodeWithValue {
 		return Objects.hash(name);
 	}
 
-	@Nonnull public final String name;
+	@Nonnull
+	public final String name;
 
 	public GlobalReference(@Nonnull String name) {
 		this.name = name;

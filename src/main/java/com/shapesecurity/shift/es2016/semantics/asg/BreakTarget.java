@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 public class BreakTarget implements Node { // no-op. target of a break.
 
-    public BreakTarget() {}
+	public BreakTarget() {
+	}
 }

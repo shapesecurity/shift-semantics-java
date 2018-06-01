@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import com.shapesecurity.functional.data.Either;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -44,7 +46,7 @@ public class VariableAssignment implements NodeWithValue {
 	public final boolean strict;
 
 	public VariableAssignment(
-		@Nonnull Either<GlobalReference, LocalReference> ref, @Nonnull NodeWithValue value, boolean strict
+			@Nonnull Either<GlobalReference, LocalReference> ref, @Nonnull NodeWithValue value, boolean strict
 	) {
 		this.ref = ref;
 		this.value = value;

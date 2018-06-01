@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation;
 
 import com.shapesecurity.shift.es2016.semantics.asg.NodeWithValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

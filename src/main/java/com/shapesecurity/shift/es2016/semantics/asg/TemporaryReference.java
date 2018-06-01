@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
@@ -23,9 +24,9 @@ import javax.annotation.Nonnull;
 public class TemporaryReference extends LocalReference {
 	public TemporaryReference() {
 		super(new Variable(
-			"LOCAL",
-			ImmutableList.empty(),
-			ImmutableList.empty()
+				"LOCAL",
+				ImmutableList.empty(),
+				ImmutableList.empty()
 		)); // TODO consider if this is what we actually want to do
 	}
 

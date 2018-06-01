@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
@@ -24,10 +25,14 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class LiteralFunction implements Literal {
-	@Nonnull public final Maybe<Variable> name;
-	@Nonnull public final Maybe<Variable> arguments;
-	@Nonnull public final ImmutableList<Variable> parameters;
-	@Nonnull public final ImmutableList<Variable> locals;
+	@Nonnull
+	public final Maybe<Variable> name;
+	@Nonnull
+	public final Maybe<Variable> arguments;
+	@Nonnull
+	public final ImmutableList<Variable> parameters;
+	@Nonnull
+	public final ImmutableList<Variable> locals;
 
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -48,12 +53,15 @@ public class LiteralFunction implements Literal {
 		return Objects.hash(name, arguments, parameters, locals, captured, body, isStrict);
 	}
 
-	@Nonnull public final ImmutableList<Variable> captured;
-	@Nonnull public final Block body;
-	@Nonnull public final boolean isStrict;
+	@Nonnull
+	public final ImmutableList<Variable> captured;
+	@Nonnull
+	public final Block body;
+	@Nonnull
+	public final boolean isStrict;
 
 	public LiteralFunction(
-			@Nonnull Maybe<Variable> name,@Nonnull Maybe<Variable> arguments,@Nonnull ImmutableList<Variable> parameters,@Nonnull ImmutableList<Variable> locals,
+			@Nonnull Maybe<Variable> name, @Nonnull Maybe<Variable> arguments, @Nonnull ImmutableList<Variable> parameters, @Nonnull ImmutableList<Variable> locals,
 			@Nonnull ImmutableList<Variable> captured, @Nonnull Block body, boolean isStrict
 	) {
 		this.name = name;

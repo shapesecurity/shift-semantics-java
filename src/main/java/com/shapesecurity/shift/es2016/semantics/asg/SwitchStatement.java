@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.ImmutableList;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -51,8 +53,8 @@ public class SwitchStatement implements Node {
 	public final ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases;
 
 	public SwitchStatement(
-		@Nonnull LocalReference discriminant, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases,
-		@Nonnull Block defaultCase, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases
+			@Nonnull LocalReference discriminant, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases,
+			@Nonnull Block defaultCase, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases
 	) {
 		this.discriminant = discriminant;
 		this.preDefaultCases = preDefaultCases;

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import javax.annotation.Nonnull;
@@ -20,19 +21,19 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class LiteralNull implements Literal {
-    @Nonnull
-    public static final LiteralNull INSTANCE = new LiteralNull();
+	@Nonnull
+	public static final LiteralNull INSTANCE = new LiteralNull();
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        return o == INSTANCE;
-    }
+	@Override
+	public boolean equals(@Nullable Object o) {
+		return o == INSTANCE;
+	}
 
-    private LiteralNull() {
-    }
+	private LiteralNull() {
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash();
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash();
+	}
 }

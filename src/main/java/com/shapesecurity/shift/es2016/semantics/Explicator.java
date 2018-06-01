@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.shapesecurity.shift.es2016.semantics;
 
 import com.shapesecurity.functional.F;
@@ -1042,8 +1043,9 @@ public class Explicator {
 				}
 
 				return new Typeof(explicateExpressionReturningValue(unaryExpression.operand, strict));
+			default:
+				throw new RuntimeException("Not reached");
 		}
-		throw new RuntimeException("Not reached");
 	}
 
 	@Nonnull
@@ -1196,9 +1198,9 @@ public class Explicator {
 					left,
 					right
 				);
+			default:
+				throw new RuntimeException("Not reached");
 		}
-
-		throw new RuntimeException("Not reached");
 	}
 
 	@Nonnull
