@@ -18,86 +18,10 @@ package com.shapesecurity.shift.es2016.semantics;
 
 import com.shapesecurity.functional.F;
 import com.shapesecurity.functional.Pair;
-import com.shapesecurity.functional.data.Either;
-import com.shapesecurity.functional.data.HashTable;
-import com.shapesecurity.functional.data.ImmutableList;
-import com.shapesecurity.functional.data.Maybe;
-import com.shapesecurity.shift.es2016.ast.ArrayExpression;
-import com.shapesecurity.shift.es2016.ast.AssignmentExpression;
-import com.shapesecurity.shift.es2016.ast.AssignmentTarget;
-import com.shapesecurity.shift.es2016.ast.AssignmentTargetIdentifier;
-import com.shapesecurity.shift.es2016.ast.BinaryExpression;
-import com.shapesecurity.shift.es2016.ast.BindingIdentifier;
-import com.shapesecurity.shift.es2016.ast.BlockStatement;
-import com.shapesecurity.shift.es2016.ast.BreakStatement;
-import com.shapesecurity.shift.es2016.ast.CallExpression;
-import com.shapesecurity.shift.es2016.ast.CatchClause;
-import com.shapesecurity.shift.es2016.ast.CompoundAssignmentExpression;
-import com.shapesecurity.shift.es2016.ast.ComputedMemberAssignmentTarget;
-import com.shapesecurity.shift.es2016.ast.ComputedMemberExpression;
-import com.shapesecurity.shift.es2016.ast.ComputedPropertyName;
-import com.shapesecurity.shift.es2016.ast.ConditionalExpression;
-import com.shapesecurity.shift.es2016.ast.ContinueStatement;
-import com.shapesecurity.shift.es2016.ast.DataProperty;
-import com.shapesecurity.shift.es2016.ast.DebuggerStatement;
-import com.shapesecurity.shift.es2016.ast.Directive;
-import com.shapesecurity.shift.es2016.ast.DoWhileStatement;
-import com.shapesecurity.shift.es2016.ast.EmptyStatement;
-import com.shapesecurity.shift.es2016.ast.Expression;
-import com.shapesecurity.shift.es2016.ast.ExpressionStatement;
-import com.shapesecurity.shift.es2016.ast.ExpressionSuper;
-import com.shapesecurity.shift.es2016.ast.ForInStatement;
-import com.shapesecurity.shift.es2016.ast.ForStatement;
-import com.shapesecurity.shift.es2016.ast.FormalParameters;
-import com.shapesecurity.shift.es2016.ast.FunctionBody;
-import com.shapesecurity.shift.es2016.ast.FunctionDeclaration;
-import com.shapesecurity.shift.es2016.ast.FunctionExpression;
-import com.shapesecurity.shift.es2016.ast.Getter;
-import com.shapesecurity.shift.es2016.ast.IdentifierExpression;
-import com.shapesecurity.shift.es2016.ast.IfStatement;
-import com.shapesecurity.shift.es2016.ast.LabeledStatement;
-import com.shapesecurity.shift.es2016.ast.LiteralBooleanExpression;
-import com.shapesecurity.shift.es2016.ast.LiteralInfinityExpression;
-import com.shapesecurity.shift.es2016.ast.LiteralNullExpression;
-import com.shapesecurity.shift.es2016.ast.LiteralNumericExpression;
-import com.shapesecurity.shift.es2016.ast.LiteralRegExpExpression;
-import com.shapesecurity.shift.es2016.ast.LiteralStringExpression;
-import com.shapesecurity.shift.es2016.ast.MemberExpression;
-import com.shapesecurity.shift.es2016.ast.Module;
-import com.shapesecurity.shift.es2016.ast.NewExpression;
-import com.shapesecurity.shift.es2016.ast.ObjectExpression;
-import com.shapesecurity.shift.es2016.ast.ObjectProperty;
-import com.shapesecurity.shift.es2016.ast.PropertyName;
-import com.shapesecurity.shift.es2016.ast.ReturnStatement;
-import com.shapesecurity.shift.es2016.ast.Script;
-import com.shapesecurity.shift.es2016.ast.Setter;
-import com.shapesecurity.shift.es2016.ast.SpreadElementExpression;
-import com.shapesecurity.shift.es2016.ast.Statement;
-import com.shapesecurity.shift.es2016.ast.StaticMemberAssignmentTarget;
-import com.shapesecurity.shift.es2016.ast.StaticMemberExpression;
-import com.shapesecurity.shift.es2016.ast.StaticPropertyName;
-import com.shapesecurity.shift.es2016.ast.Super;
-import com.shapesecurity.shift.es2016.ast.SwitchCase;
-import com.shapesecurity.shift.es2016.ast.SwitchStatementWithDefault;
-import com.shapesecurity.shift.es2016.ast.ThisExpression;
-import com.shapesecurity.shift.es2016.ast.ThrowStatement;
-import com.shapesecurity.shift.es2016.ast.TryCatchStatement;
-import com.shapesecurity.shift.es2016.ast.TryFinallyStatement;
-import com.shapesecurity.shift.es2016.ast.UnaryExpression;
-import com.shapesecurity.shift.es2016.ast.UpdateExpression;
-import com.shapesecurity.shift.es2016.ast.VariableDeclaration;
-import com.shapesecurity.shift.es2016.ast.VariableDeclarationAssignmentTarget;
-import com.shapesecurity.shift.es2016.ast.VariableDeclarationExpression;
-import com.shapesecurity.shift.es2016.ast.VariableDeclarationStatement;
-import com.shapesecurity.shift.es2016.ast.WhileStatement;
-import com.shapesecurity.shift.es2016.ast.WithStatement;
+import com.shapesecurity.functional.data.*;
+import com.shapesecurity.shift.es2016.ast.*;
 import com.shapesecurity.shift.es2016.ast.operators.UpdateOperator;
-import com.shapesecurity.shift.es2016.scope.Declaration;
-import com.shapesecurity.shift.es2016.scope.GlobalScope;
-import com.shapesecurity.shift.es2016.scope.Scope;
-import com.shapesecurity.shift.es2016.scope.ScopeAnalyzer;
-import com.shapesecurity.shift.es2016.scope.ScopeLookup;
-import com.shapesecurity.shift.es2016.scope.Variable;
+import com.shapesecurity.shift.es2016.scope.*;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.BinaryOperation;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.BinaryOperator;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Equality;
@@ -138,6 +62,7 @@ import com.shapesecurity.shift.es2016.semantics.asg.Throw;
 import com.shapesecurity.shift.es2016.semantics.asg.TryCatch;
 import com.shapesecurity.shift.es2016.semantics.asg.TryFinally;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionNumber;
+import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionObject;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionString;
 import com.shapesecurity.shift.es2016.semantics.asg.TypeofGlobal;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Negation;
@@ -158,11 +83,13 @@ import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.BitwiseNot;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.VoidOp;
 import com.shapesecurity.shift.es2016.semantics.asg.VariableAssignment;
 import com.shapesecurity.shift.es2016.semantics.visitor.FinallyJumpReducer;
+import com.shapesecurity.shift.es2016.semantics.visitor.FindWithsReducer;
 
 import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.function.Function;
 
 public class Explicator {
 	@Nonnull
@@ -181,6 +108,12 @@ public class Explicator {
 	// Stack of function-local temporaries. Whenever you begin explicating a function, push a new empty list; when you finish, pop it. TODO this is a somewhat hacky way of accomplishing this. It would be better to be intraproceedural or something.
 	@Nonnull
 	final IdentityHashMap<LiteralFunction, Scope> functionScopes;
+	@Nonnull
+	final MultiHashTable<Reference, WithStatement> withReferences;
+	@Nonnull
+	final IdentityHashMap<WithStatement, LocalReference> withObjects;
+	@Nonnull
+	final MultiHashTable<FunctionBody, WithStatement> withStatementsInFunctions;
 
 	// todo runtime errors for with, direct eval
 	Explicator(@Nonnull Script script) {
@@ -189,6 +122,9 @@ public class Explicator {
 		this.jumpMap = FinallyJumpReducer.analyze(script);
 		this.scopeLookup = new ScopeLookup(this.scope);
 		this.functionScopes = new IdentityHashMap<>();
+		this.withReferences = findWithReferences(this.scope);
+		this.withObjects = new IdentityHashMap<>();
+		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
 	}
 
 	Explicator(@Nonnull Module module) {
@@ -197,6 +133,9 @@ public class Explicator {
 		this.jumpMap = FinallyJumpReducer.analyze(module);
 		this.scopeLookup = new ScopeLookup(this.scope);
 		this.functionScopes = new IdentityHashMap<>();
+		this.withReferences = findWithReferences(this.scope);
+		this.withObjects = new IdentityHashMap<>();
+		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
 	}
 
 	@Nonnull
@@ -227,6 +166,20 @@ public class Explicator {
 			script -> explicateBody(script.statements, isStrict(script.directives)),
 			module -> explicateBody(module.items.map(i -> (Statement) i), true)
 		);
+	}
+
+	private static MultiHashTable<Reference, WithStatement> findWithReferences(Scope scope) {
+		MultiHashTable<Reference, WithStatement> table = MultiHashTable.emptyUsingIdentity();
+		if (scope.type == Scope.Type.With) {
+			table = scope.through.foldLeft(
+					(acc, p) -> p.right.foldLeft(
+							(innerAcc, r) -> innerAcc.put(r, (WithStatement) scope.astNode),
+							acc
+					),
+					table
+			);
+		}
+		return scope.children.foldLeft((acc, s) -> acc.merge(findWithReferences(s)), table);
 	}
 
 	ImmutableList<Variable> simpleParamsHelper(@Nonnull FormalParameters params) {
@@ -371,7 +324,7 @@ public class Explicator {
 		this.temporaries = this.temporaries.maybeTail().fromJust();
 		ImmutableList<Variable> locals = fnTemporaries.append(functionVariablesHelper(scope)); // todo concatlists, I guess
 		// TODO capture may have duplicate entries: `function g(x){function h(){x+x}}`
-		ImmutableList<Variable> captured = scope.through.entries()
+		ImmutableList<Variable> capturedNormalVariables = scope.through.entries()
 			.flatMap(p -> p.right.map(r -> {
 				if (r.node instanceof BindingIdentifier) {
 					return scopeLookup.findVariableReferencedBy((BindingIdentifier) r.node).fromJust();
@@ -381,7 +334,16 @@ public class Explicator {
 					return scopeLookup.findVariableReferencedBy((IdentifierExpression) r.node);
 				}
 			}))
-			.filter(v -> !scopeLookup.isGlobal(v)); // everything needing capture
+			.filter(v -> !scopeLookup.isGlobal(v));
+
+		ImmutableSet<WithStatement> containedWiths = this.withStatementsInFunctions.get(functionBody).uniqByIdentity();
+		ImmutableList<Variable> capturedTemporariesForWiths = scope.through.entries()
+				.flatMap(p -> p.right.flatMap(r ->
+					withReferences.get(r).filter(s -> !containedWiths.contains(s)).map(s -> withObjects.get(s).variable)
+				));
+
+		ImmutableList<Variable> captured = capturedNormalVariables.append(capturedTemporariesForWiths);
+
 		LiteralFunction out = new LiteralFunction(name, arguments, parameters, locals, captured, body, strict);
 		this.functionScopes.put(out, scope);
 		return out;
@@ -394,12 +356,19 @@ public class Explicator {
 			VariableDeclaration variableDeclaration = (VariableDeclaration) lhs;
 			assert variableDeclaration.declarators.length == 1;
 			assert variableDeclaration.declarators.maybeHead().fromJust().init.isNothing(); // TODO this was true in ES5 but not in practice, and is no longer true in ES2017
-			Either<GlobalReference, LocalReference> reference = refHelper((BindingIdentifier) variableDeclaration.declarators.maybeHead().fromJust().binding);
-			return new VariableAssignment(reference, rhs, strict);
+			BindingIdentifier binding = (BindingIdentifier) variableDeclaration.declarators.maybeHead().fromJust().binding;
+			Either<GlobalReference, LocalReference> reference = refHelper(binding);
+			return wrapVariableWriteForWith(
+					binding,
+					ignored -> rhs,
+					new VariableAssignment(reference, rhs, strict),
+					strict
+			);
 		} else {
 			AssignmentTarget lhsAsTarget = (AssignmentTarget) lhs;
 			return explicateAssignment(lhsAsTarget, rhs, strict);
 		}
+		// TODO `for (a.b in c);`
 	}
 
 	@Nonnull
@@ -655,7 +624,13 @@ public class Explicator {
 			Loop loop = new Loop(body);
 			return new Block(ImmutableList.of(loop, outerTarget));
 		} else if (statement instanceof WithStatement) {
-			return Halt.INSTANCE; // TODO maybe warn.
+			WithStatement withStatement = (WithStatement) statement;
+			return let(
+				new TypeCoercionObject(explicateExpressionReturningValue(withStatement.object, false)),
+				t -> {
+					withObjects.put(withStatement, t); // This sort of mutation makes me unhappy, but it works. We'll refer to this when explicating references passing through the `with`.
+					return explicateStatement(withStatement.body, false);
+				});
 		}
 		throw new UnsupportedOperationException("ES6 not supported: " + statement.getClass().getSimpleName());
 	}
@@ -704,15 +679,18 @@ public class Explicator {
 		} else if (lhs instanceof AssignmentTargetIdentifier) {
 			AssignmentTargetIdentifier assignmentTargetIdentifier = (AssignmentTargetIdentifier) lhs;
 			Either<GlobalReference, LocalReference> ref = refHelper(assignmentTargetIdentifier);
-			return variableAssignmentHelper(
-					ref,
-					rhs,
+
+			return wrapVariableWriteForWith(
+					(AssignmentTargetIdentifier) lhs,
+					ignored -> rhs,
+					variableAssignmentHelper(ref, rhs, strict),
 					strict
 			);
 		} else {
 			throw new UnsupportedOperationException("ES6 not supported: " + lhs.getClass().getSimpleName());
 		}
 	}
+
 
 	// Here, keepValue is just used for statements like i++, to avoid creating unnecessary temporaries.
 	@Nonnull
@@ -775,6 +753,9 @@ public class Explicator {
 						);
 				return new MemberCall(explicateExpressionSuper(memberExpression.object, strict), field, arguments);
 			}
+			if (c.callee instanceof IdentifierExpression) {
+				return makeCallInWith((IdentifierExpression) c.callee, arguments);
+			}
 			NodeWithValue callee = explicateExpressionSuper(c.callee, strict);
 			return new Call(callee, arguments);
 		} else if (expression instanceof CompoundAssignmentExpression) {
@@ -787,25 +768,10 @@ public class Explicator {
 			);
 		} else if (expression instanceof ConditionalExpression) {
 			ConditionalExpression conditionalExpression = (ConditionalExpression) expression;
-			return makeTemporary(
-				// TODO there are several other ways of doing this; the temporary is not necessary if we have proper completion values
-				ref -> new BlockWithValue(
-					ImmutableList.of(
-						new IfElse(
-							explicateExpressionReturningValue(conditionalExpression.test, strict),
-							new Block(new VariableAssignment(
-								ref,
-								explicateExpressionReturningValue(conditionalExpression.consequent, strict),
-								false
-							)),
-							new Block(new VariableAssignment(
-								ref,
-								explicateExpressionReturningValue(conditionalExpression.alternate, strict),
-								false
-							))
-						)),
-					ref
-				)
+			return makeConditional(
+					explicateExpressionReturningValue(conditionalExpression.test, strict),
+					explicateExpressionReturningValue(conditionalExpression.consequent, strict),
+					explicateExpressionReturningValue(conditionalExpression.alternate, strict)
 			);
 		} else if (expression instanceof FunctionExpression) {
 			FunctionExpression functionExpression = (FunctionExpression) expression;
@@ -824,7 +790,7 @@ public class Explicator {
 			);
 		} else if (expression instanceof IdentifierExpression) {
 			IdentifierExpression identifierExpression = (IdentifierExpression) expression;
-			return Either.extract(refHelper(identifierExpression));
+			return wrapVariableReadForWith(identifierExpression);
 		} else if (expression instanceof LiteralBooleanExpression) {
 			return new LiteralBoolean(((LiteralBooleanExpression) expression).value);
 		} else if (expression instanceof LiteralInfinityExpression) {
@@ -864,32 +830,24 @@ public class Explicator {
 			UpdateExpression updateExpression = (UpdateExpression) expression;
 			if (updateExpression.operand instanceof AssignmentTargetIdentifier) {
 				Either<GlobalReference, LocalReference> binding = refHelper((AssignmentTargetIdentifier) updateExpression.operand);
-				NodeWithValue valExpr = new TypeCoercionNumber(Either.extract(binding));
 				if (keepValue && !updateExpression.isPrefix) {
-					return letWithValue(
-						valExpr,
-						oldVal -> new BlockWithValue(
-							new Block(variableAssignmentHelper(
-								binding,
-								new FloatMath(
-									updateExpression.operator == UpdateOperator.Increment ? FloatMath.Operator.Plus : FloatMath.Operator.Minus,
-									oldVal,
-									new LiteralNumber(1)
-								),
-								strict
-							)),
-							oldVal
-						)
-					);
+					return makePostfixUpdateInWith((AssignmentTargetIdentifier) updateExpression.operand, updateExpression.operator, strict);
 				} else {
-					return variableAssignmentHelper(
-						binding,
-						new FloatMath(
+					Function<NodeWithValue, NodeWithValue> makeRhs = ref -> new FloatMath(
 							updateExpression.operator == UpdateOperator.Increment ? FloatMath.Operator.Plus : FloatMath.Operator.Minus,
-							valExpr,
+							ref,
 							new LiteralNumber(1)
-						),
+					);
+					NodeWithValue assignment = variableAssignmentHelper(
+						binding,
+						makeRhs.apply(new TypeCoercionNumber(Either.extract(binding))),
 						strict
+					);
+					return wrapVariableWriteForWith(
+							(AssignmentTargetIdentifier) updateExpression.operand,
+							makeRhs,
+							assignment,
+							strict
 					);
 				}
 			} else {
@@ -977,13 +935,22 @@ public class Explicator {
 	@Nonnull
 	Node explicateVariableDeclaration(@Nonnull VariableDeclaration variableDeclaration, boolean strict) {
 		return new Block(
-			Maybe.catMaybes(variableDeclaration.declarators.map(d -> d.init.isNothing() ? Maybe.empty() :
-				Maybe.of(new VariableAssignment(
-					refHelper((BindingIdentifier) d.binding),
-					explicateExpressionReturningValue(d.init.fromJust(), strict),
-					strict
-				))
-			))
+			Maybe.catMaybes(variableDeclaration.declarators.map(d -> {
+				if (d.init.isNothing()) {
+					return Maybe.empty();
+				}
+				NodeWithValue rhs = explicateExpressionReturningValue(d.init.fromJust(), strict);
+				return Maybe.of(wrapVariableWriteForWith(
+						(BindingIdentifier) d.binding,
+						ignored -> rhs,
+						new VariableAssignment(
+								refHelper((BindingIdentifier) d.binding),
+								rhs,
+								strict
+						),
+						strict
+				));
+			}))
 		);
 	}
 
@@ -1004,12 +971,7 @@ public class Explicator {
 				if (unaryExpression.operand instanceof IdentifierExpression) {
 					IdentifierExpression identifierExpression = (IdentifierExpression) unaryExpression.operand;
 					assert !strict; // In strict mode, this is a syntax error.
-					if (scopeLookup.isGlobal(scopeLookup.findVariableReferencedBy(identifierExpression))) {
-						return new DeleteGlobalProperty(identifierExpression.name);
-					} else {
-						// No local variables may be deleted.
-						return new LiteralBoolean(false);
-					}
+					return makeDeleteInWith(identifierExpression);
 				} else if (unaryExpression.operand instanceof ComputedMemberExpression) {
 					ComputedMemberExpression computedMemberExpression = (ComputedMemberExpression) unaryExpression.operand;
 					return new DeleteProperty(
@@ -1052,7 +1014,7 @@ public class Explicator {
 	NodeWithValue explicateBinaryExpression(@Nonnull BinaryExpression binaryExpression, boolean strict) {
 		NodeWithValue right = explicateExpressionReturningValue(binaryExpression.right, strict);
 
-		if (binaryExpression.operator == com.shapesecurity.shift.es2016.ast.operators.BinaryOperator.Sequence) { // unlike all other cases, we do not need the RHS.
+		if (binaryExpression.operator == com.shapesecurity.shift.es2016.ast.operators.BinaryOperator.Sequence) { // unlike all other cases, we do not need the LHS.
 			return new BlockWithValue(
 				ImmutableList.of(explicateExpressionDiscardingValue(binaryExpression.left, strict)),
 				right
@@ -1248,14 +1210,24 @@ public class Explicator {
 		if (compoundAssignmentExpression.binding instanceof AssignmentTargetIdentifier) {
 			Either<GlobalReference, LocalReference> binding = refHelper((AssignmentTargetIdentifier) compoundAssignmentExpression.binding);
 			NodeWithValue reference = Either.extract(binding);
-			return variableAssignmentHelper(
-				binding,
-				BinaryOperation.fromOperator(
+
+			Function<NodeWithValue, NodeWithValue> makeRhs = ref -> BinaryOperation.fromOperator(
 					operator,
-					reference,
+					ref,
 					explicateExpressionReturningValue(compoundAssignmentExpression.expression, strict)
-				),
+			);
+
+			NodeWithValue assignment = variableAssignmentHelper(
+				binding,
+				makeRhs.apply(reference),
 				strict
+			);
+
+			return wrapVariableWriteForWith(
+					(AssignmentTargetIdentifier) compoundAssignmentExpression.binding,
+					makeRhs,
+					assignment,
+					strict
 			);
 		} else {
 			NodeWithValue object;
@@ -1408,5 +1380,192 @@ public class Explicator {
 				new VariableAssignment(ref, value, false),
 				function.apply(ref)
 			)));
+	}
+
+
+	@Nonnull
+	NodeWithValue makeConditional(NodeWithValue test, NodeWithValue consequent, NodeWithValue alternate) {
+		return makeTemporary(
+			// TODO there are several other ways of doing this; the temporary is not necessary if we have proper completion values
+			ref -> new BlockWithValue(
+				ImmutableList.of(
+					new IfElse(
+						test,
+						new Block(new VariableAssignment(
+							ref,
+							consequent,
+							false
+						)),
+						new Block(new VariableAssignment(
+							ref,
+							alternate,
+							false
+						))
+					)),
+				ref
+			)
+		);
+	}
+
+	@Nonnull
+	private Pair<Variable, Reference> findScopeInfo(VariableReference node) {
+		// TODO: improve the scopeLookup interface, 'cause this is dumb
+		Variable var = node instanceof AssignmentTargetIdentifier
+			? scopeLookup.findVariableReferencedBy((AssignmentTargetIdentifier) node)
+			: node instanceof BindingIdentifier
+			? scopeLookup.findVariableReferencedBy((BindingIdentifier) node).fromJust()
+			: scopeLookup.findVariableReferencedBy((IdentifierExpression) node);
+		Reference ref = var.references.find(r -> r.node == node).fromJust();
+		return Pair.of(var, ref);
+	}
+
+	@Nonnull
+	private NodeWithValue wrapVariableReadForWith(VariableReference node) {
+		Pair<Variable, Reference> info = findScopeInfo(node);
+		return wrapForWith(
+			info.left.name,
+			info.right,
+			obj -> new MemberAccess(
+				obj,
+				new LiteralString(info.left.name)
+			),
+			Either.extract(refHelper(info.left))
+		);
+	}
+
+	@Nonnull
+	private NodeWithValue wrapVariableWriteForWith(VariableReference node, Function<NodeWithValue, NodeWithValue> rhsIfInObject, NodeWithValue assignmentIfNotInObject, boolean strict) {
+		Pair<Variable, Reference> info = findScopeInfo(node);
+		return wrapForWith(
+			info.left.name,
+			info.right,
+			obj -> new MemberAssignment(
+				obj,
+				new LiteralString(info.left.name),
+				rhsIfInObject.apply(new MemberAccess(obj, new LiteralString(info.left.name))),
+				strict
+			),
+			assignmentIfNotInObject
+		);
+	}
+
+	@Nonnull
+	private NodeWithValue makeCallInWith(IdentifierExpression callee, ImmutableList<NodeWithValue> arguments) {
+		Pair<Variable, Reference> info = findScopeInfo(callee);
+		return wrapForWith(
+			info.left.name,
+			info.right,
+			obj -> new MemberCall(
+				obj,
+				new LiteralString(info.left.name),
+				arguments
+			),
+			new Call(Either.extract(refHelper(info.left)), arguments)
+		);
+	}
+
+	@Nonnull
+	private NodeWithValue makeDeleteInWith(IdentifierExpression binding) {
+		Pair<Variable, Reference> info = findScopeInfo(binding);
+		return wrapForWith(
+			info.left.name,
+			info.right,
+			obj -> new DeleteProperty(
+				obj,
+				new LiteralString(info.left.name),
+				false // `delete x` is a syntax error in strict code, so this must be sloppy
+			),
+			scopeLookup.isGlobal(info.left) ? new DeleteGlobalProperty(binding.name) : new LiteralBoolean(false) // non-global variables cannot be deleted, absent direct eval
+		);
+	}
+
+	@Nonnull
+	private NodeWithValue makePostfixUpdateInWith(AssignmentTargetIdentifier binding, UpdateOperator operator, boolean strict) {
+		/*
+		  A typical postfix update desugars
+
+		  f(i++)
+
+		  into roughly
+
+		  f(function(){
+		    var old = +i;
+		    i = old + 1;
+		    return old;
+		  }())
+		 */
+		Pair<Variable, Reference> info = findScopeInfo(binding);
+
+		Function<NodeWithValue, NodeWithValue> makeRhs = oldVal -> new FloatMath(
+			operator == UpdateOperator.Increment ? FloatMath.Operator.Plus : FloatMath.Operator.Minus,
+			oldVal,
+			new LiteralNumber(1)
+		);
+
+		return wrapForWith(
+			info.left.name,
+			info.right,
+			obj -> letWithValue(
+				new TypeCoercionNumber(new MemberAccess(obj, new LiteralString(info.left.name))),
+				oldVal -> new BlockWithValue(
+					new Block(new MemberAssignment(
+						obj,
+						new LiteralString(info.left.name),
+						makeRhs.apply(oldVal),
+						strict
+					)),
+					oldVal
+				)
+			),
+			letWithValue(
+				new TypeCoercionNumber(Either.extract(refHelper(info.left))),
+				oldVal -> new BlockWithValue(
+					new Block(variableAssignmentHelper(
+						refHelper(info.left),
+						makeRhs.apply(oldVal),
+						strict
+					)),
+					oldVal
+				)
+			)
+		);
+	}
+
+	@Nonnull
+	private NodeWithValue wrapForWith(String propertyName, Reference reference, Function<NodeWithValue, NodeWithValue> withAction, NodeWithValue baseAction) {
+		/*
+		  "withAction" is the action to be performed on the with'd object, if the scope'd object has the property in question. For example, this might read a property of the object.
+		  "baseAction" is the action to be performed if none of the with'd objects have the property in question. For example, this might read a local variable.
+
+		  The general desugaring takes
+
+		  with (1) {
+		    with (2) {
+		      x;
+		    }
+		  }
+
+		  into code which is equivalent to
+
+		  var _temp_a = ToObject(1);
+		  var _temp_b = ToObject(2);
+
+		  ('x' in _temp_b)
+		    ? _temp_b.x
+		    : ('x' in temp_a)
+		      ? _temp_a.x
+		      : x;
+		 */
+		return withReferences.get(reference).foldLeft(
+			(v, with) -> {
+				LocalReference obj = withObjects.get(with);
+				return makeConditional(
+					new In(new LiteralString(propertyName), obj),
+					withAction.apply(obj),
+					v
+				);
+			},
+			baseAction
+		);
 	}
 }

@@ -828,6 +828,7 @@ public class Dottifier {
 		out += reduce(node.property.value);
 		String lhs = indent() + name(node) + " -> ";
 		out += lhs + name(node.object) + " [label=\"object\"];\n";
+		out += lhs + name(node.fieldExpression) + " [label=\"fieldExpression\"];\n";
 		out += lhs + name(node.property.value) + " [label=\"value\"];\n";
 		--indentationLevel;
 		return out;
