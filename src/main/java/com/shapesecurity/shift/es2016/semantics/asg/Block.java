@@ -17,6 +17,7 @@
 package com.shapesecurity.shift.es2016.semantics.asg;
 
 import com.shapesecurity.functional.data.ImmutableList;
+import com.shapesecurity.shift.es2016.ast.Directive;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,8 +28,21 @@ public class Block implements Node {
 	@Nonnull
 	public final ImmutableList<Node> children;
 
+	// Note: Directives are being added to blocks in the cases where we are transforming the AST with new blocks and want
+	// to ensure the directives are being applied to the block (i.e ensuring directives in IIFE's are executed). This is
+	// not meant for users inserting directives in their code for blocks, but for the explicator to populate in situations
+	// needing this functionality.
+	@Nonnull
+	public final ImmutableList<Directive> directives;
+
 	public Block(@Nonnull ImmutableList<Node> children) {
 		this.children = children;
+		this.directives = ImmutableList.empty();
+	}
+
+	public Block(@Nonnull ImmutableList<Node> children, @Nonnull ImmutableList<Directive> directives) {
+		this.children = children;
+		this.directives = directives;
 	}
 
 	@Override
@@ -46,6 +60,7 @@ public class Block implements Node {
 
 	public Block(@Nonnull Node child) {
 		this.children = ImmutableList.of(child);
+		this.directives = ImmutableList.empty();
 	}
 
 	public boolean isNoOp() {

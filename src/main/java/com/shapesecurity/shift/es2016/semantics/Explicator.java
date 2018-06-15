@@ -82,6 +82,7 @@ import com.shapesecurity.shift.es2016.semantics.asg.RequireObjectCoercible;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.BitwiseNot;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.VoidOp;
 import com.shapesecurity.shift.es2016.semantics.asg.VariableAssignment;
+import com.shapesecurity.shift.es2016.semantics.ast.ThisOrArgumentsOrTryCatchFinallyChecker;
 import com.shapesecurity.shift.es2016.semantics.visitor.FinallyJumpReducer;
 import com.shapesecurity.shift.es2016.semantics.visitor.FindWithsReducer;
 
@@ -103,9 +104,11 @@ public class Explicator {
 	@Nonnull
 	HashTable<com.shapesecurity.shift.es2016.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingEquality();
 	// map from AST loops and labelled statement to their corresponding Target nodes. Loops have an outer and an inner, for break and continue respectively.
+
 	@Nonnull
-	ImmutableList<ImmutableList<Variable>> temporaries = ImmutableList.of(ImmutableList.empty());
-	// Stack of function-local temporaries. Whenever you begin explicating a function, push a new empty list; when you finish, pop it. TODO this is a somewhat hacky way of accomplishing this. It would be better to be intraproceedural or something.
+	private ImmutableList<PerFunctionState> oldStates = ImmutableList.empty();
+	@Nonnull
+	PerFunctionState currentState = new PerFunctionState();
 	@Nonnull
 	final IdentityHashMap<LiteralFunction, Scope> functionScopes;
 	@Nonnull
@@ -114,8 +117,9 @@ public class Explicator {
 	final IdentityHashMap<WithStatement, LocalReference> withObjects;
 	@Nonnull
 	final MultiHashTable<FunctionBody, WithStatement> withStatementsInFunctions;
+	@Nonnull
+	final F<ImmutableList<Directive>, Boolean> isCandidateForInlining;
 
-	// todo runtime errors for with, direct eval
 	Explicator(@Nonnull Script script) {
 		this.program = Either.left(script);
 		this.scope = ScopeAnalyzer.analyze(script);
@@ -125,6 +129,7 @@ public class Explicator {
 		this.withReferences = findWithReferences(this.scope);
 		this.withObjects = new IdentityHashMap<>();
 		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
+		this.isCandidateForInlining = list -> false;
 	}
 
 	Explicator(@Nonnull Module module) {
@@ -136,28 +141,54 @@ public class Explicator {
 		this.withReferences = findWithReferences(this.scope);
 		this.withObjects = new IdentityHashMap<>();
 		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
+		this.isCandidateForInlining = list -> false;
+	}
+
+	Explicator(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
+		this.program = Either.left(script);
+		this.scope = ScopeAnalyzer.analyze(script);
+		this.jumpMap = FinallyJumpReducer.analyze(script);
+		this.scopeLookup = new ScopeLookup(this.scope);
+		this.functionScopes = new IdentityHashMap<>();
+		this.withReferences = findWithReferences(this.scope);
+		this.withObjects = new IdentityHashMap<>();
+		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
+		this.isCandidateForInlining = isCandidateForInlining;
+	}
+
+	@Nonnull
+	public static Semantics deriveSemantics(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
+		return deriveSemanticsHelper(script, new Explicator(script, isCandidateForInlining));
 	}
 
 	@Nonnull
 	public static Semantics deriveSemantics(@Nonnull Script script) {
-		Explicator exp = new Explicator(script);
-		Node result = exp.explicate();
-		ImmutableList<Variable> maybeGlobals = exp.functionVariablesHelper(script);
-		ImmutableList<Variable> scriptLocals =
-			maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.temporaries.maybeHead().fromJust());
-		ImmutableList<String> scriptVarDecls =
-			maybeGlobals.filter(x -> exp.scopeLookup.isGlobal(x) && x.declarations.isNotEmpty()).map(x -> x.name);
-		return new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes);
+		return deriveSemanticsHelper(script, new Explicator(script));
 	}
 
 	@Nonnull
 	public static Semantics deriveSemantics(@Nonnull Module module) {
-		Explicator exp = new Explicator(module);
+		return deriveSemanticsHelper(module, new Explicator(module));
+	}
+
+	@Nonnull
+	private static Semantics deriveSemanticsHelper(@Nonnull Script script, @Nonnull Explicator exp) {
+		Node result = exp.explicate();
+		ImmutableList<Variable> maybeGlobals = exp.functionVariablesHelper(script);
+		ImmutableList<Variable> scriptLocals =
+				maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.currentState.getAdditionalVariables());
+		ImmutableList<String> scriptVarDecls =
+				maybeGlobals.filter(x -> exp.scopeLookup.isGlobal(x) && x.declarations.isNotEmpty()).map(x -> x.name);
+		return new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes);
+	}
+
+	@Nonnull
+	public static Semantics deriveSemanticsHelper(@Nonnull Module module, @Nonnull Explicator exp) {
 		Node result = exp.explicate();
 		ImmutableList<Variable> scriptLocals =
-			exp.functionVariablesHelper(module)
-				.filter(x -> !exp.scopeLookup.isGlobal(x))
-				.append(exp.temporaries.maybeHead().fromJust());
+				exp.functionVariablesHelper(module)
+						.filter(x -> !exp.scopeLookup.isGlobal(x))
+						.append(exp.currentState.getAdditionalVariables());
 		return new Semantics(result, scriptLocals, ImmutableList.empty(), exp.scopeLookup, exp.functionScopes);
 	}
 
@@ -318,11 +349,13 @@ public class Explicator {
 			}
 		}
 		strict = strict || isStrict(functionBody.directives);
-		this.temporaries = this.temporaries.cons(ImmutableList.empty());
+		PerFunctionState oldState = currentState;
+		currentState = new PerFunctionState();
+		this.oldStates = this.oldStates.cons(currentState);
 		Block body = explicateBody(functionBody.statements, strict);
-		ImmutableList<Variable> fnTemporaries = this.temporaries.maybeHead().fromJust();
-		this.temporaries = this.temporaries.maybeTail().fromJust();
-		ImmutableList<Variable> locals = fnTemporaries.append(functionVariablesHelper(scope)); // todo concatlists, I guess
+		this.oldStates = this.oldStates.maybeTail().fromJust();
+		ImmutableList<Variable> locals = currentState.getAdditionalVariables().append(functionVariablesHelper(scope)); // todo concatlists, I guess
+		currentState = oldState;
 		// TODO capture may have duplicate entries: `function g(x){function h(){x+x}}`
 		ImmutableList<Variable> capturedNormalVariables = scope.through.entries()
 			.flatMap(p -> p.right.map(r -> {
@@ -519,6 +552,19 @@ public class Explicator {
 			return new Block(ImmutableList.of(explicateStatement(labeledStatement.body, strict), target));
 		} else if (statement instanceof ReturnStatement) {
 			ReturnStatement returnStatement = (ReturnStatement) statement;
+			Maybe<InlineFunctionState> inlineFunctionStateMaybe = this.currentState.getCurrentInlineFunction();
+			if (inlineFunctionStateMaybe.isJust()) {
+				InlineFunctionState inlineFunctionState = inlineFunctionStateMaybe.fromJust();
+				Break funcBreak = new Break(inlineFunctionState.getEndOfFunction(), ImmutableList.empty());
+				if (returnStatement.expression.isJust()) {
+					return new Block(ImmutableList.of(
+							new VariableAssignment(inlineFunctionState.getReturnVar(), explicateExpressionReturningValue(returnStatement.expression.fromJust(), strict), strict),
+							funcBreak));
+				} else {
+					return funcBreak;
+				}
+			}
+
 			ImmutableList<BrokenThrough> breakables = jumpMap.get(statement).fromJust().right;
 
 			if (breakables.exists(BrokenThrough.TRY_WITH_FINALLY::equals)) {
@@ -737,6 +783,19 @@ public class Explicator {
 			return explicateBinaryExpression((BinaryExpression) expression, strict);
 		} else if (expression instanceof CallExpression) {
 			CallExpression c = (CallExpression) expression;
+			if (canInlineIIFE(c)) {
+				FunctionExpression f = (FunctionExpression) c.callee;
+				InlineFunctionState inlineFunctionState = this.currentState.enterInlineFunction(new TemporaryReference(), new BreakTarget());
+				Scope inlineFuncScope = scopeLookup.findScopeFor(f).fromJust();
+				functionVariablesHelper(inlineFuncScope).forEach(this.currentState::addVariable);
+				boolean bodyIsStrict = strict || isStrict(f.body.directives);
+				BlockWithValue functionOps = new BlockWithValue(
+						new Block(ImmutableList.of(explicateBody(f.body.statements, bodyIsStrict), inlineFunctionState.getEndOfFunction()), f.body.directives),
+						inlineFunctionState.getReturnVar());
+				BlockWithValue functionBlock = new BlockWithValue(ImmutableList.of(new VariableAssignment(inlineFunctionState.getReturnVar(), LiteralUndefined.INSTANCE, strict)), functionOps);
+				this.currentState.exitInlineFunction();
+				return functionBlock;
+			}
 			// abort on direct eval. todo maybe warn.
 			if (c.callee instanceof IdentifierExpression && (((IdentifierExpression) c.callee).name.equals("eval"))) {
 				return Halt.INSTANCE;
@@ -823,7 +882,7 @@ public class Explicator {
 			NodeWithValue callee = explicateExpressionSuper(c.callee, strict);
 			return new New(callee, arguments);
 		} else if (expression instanceof ThisExpression) {
-			return new This(strict && this.temporaries.length > 1); // temporaries.length > 1 iff we are within a function. global-code `this` is the same in non-strict mode as strict.
+			return new This(strict && this.oldStates.length > 0); // oldStates.length > 0 iff we are within a function. global-code `this` is the same in non-strict mode as strict.
 		} else if (expression instanceof UnaryExpression) {
 			return explicateUnaryExpression((UnaryExpression) expression, strict);
 		} else if (expression instanceof UpdateExpression) {
@@ -1352,16 +1411,14 @@ public class Explicator {
 	@Nonnull
 	NodeWithValue makeTemporary(@Nonnull F<LocalReference, NodeWithValue> withTemporary) {
 		LocalReference ref = new TemporaryReference();
-		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().fromJust().cons(ref.variable);
-		this.temporaries = this.temporaries.maybeTail().fromJust().cons(curTemps);
+		this.currentState.addVariable(ref.variable);
 		return withTemporary.apply(ref);
 	}
 
 	@Nonnull
 	Node makeUnvaluedTemporary(@Nonnull F<LocalReference, Node> withTemporary) { // TODO would be nice to join this with the above
 		LocalReference ref = new TemporaryReference();
-		ImmutableList<Variable> curTemps = this.temporaries.maybeHead().fromJust().cons(ref.variable);
-		this.temporaries = this.temporaries.maybeTail().fromJust().cons(curTemps);
+		this.currentState.addVariable(ref.variable);
 		return withTemporary.apply(ref);
 	}
 
@@ -1489,9 +1546,9 @@ public class Explicator {
 		  into roughly
 
 		  f(function(){
-		    var old = +i;
-		    i = old + 1;
-		    return old;
+			var old = +i;
+			i = old + 1;
+			return old;
 		  }())
 		 */
 		Pair<Variable, Reference> info = findScopeInfo(binding);
@@ -1540,9 +1597,9 @@ public class Explicator {
 		  The general desugaring takes
 
 		  with (1) {
-		    with (2) {
-		      x;
-		    }
+			with (2) {
+			  x;
+			}
 		  }
 
 		  into code which is equivalent to
@@ -1551,10 +1608,10 @@ public class Explicator {
 		  var _temp_b = ToObject(2);
 
 		  ('x' in _temp_b)
-		    ? _temp_b.x
-		    : ('x' in temp_a)
-		      ? _temp_a.x
-		      : x;
+			? _temp_b.x
+			: ('x' in temp_a)
+			  ? _temp_a.x
+			  : x;
 		 */
 		return withReferences.get(reference).foldLeft(
 			(v, with) -> {
@@ -1567,5 +1624,13 @@ public class Explicator {
 			},
 			baseAction
 		);
+	}
+
+	private boolean canInlineIIFE(CallExpression c) {
+		// checks that CallExpression calls FunctionExpression, has no arguments, does not contain this/arguments/try-catch-finally statements,
+		// and the return doesn't have a try with finally
+		return c.callee instanceof FunctionExpression && c.arguments.isEmpty() &&
+				!ThisOrArgumentsOrTryCatchFinallyChecker.containsThisOrArgumentsOrTryCatchFinally((FunctionExpression) c.callee) &&
+				this.isCandidateForInlining.apply(((FunctionExpression) c.callee).body.directives);
 	}
 }

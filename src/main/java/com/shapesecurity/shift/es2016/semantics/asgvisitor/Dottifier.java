@@ -6,57 +6,15 @@ import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.es2016.scope.Variable;
 import com.shapesecurity.shift.es2016.semantics.Semantics;
+import com.shapesecurity.shift.es2016.semantics.asg.*;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.BinaryOperation;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Equality;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.FloatMath;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.IntMath;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.RelationalComparison;
-import com.shapesecurity.shift.es2016.semantics.asg.DeleteGlobalProperty;
-import com.shapesecurity.shift.es2016.semantics.asg.GlobalReference;
-import com.shapesecurity.shift.es2016.semantics.asg.Halt;
-import com.shapesecurity.shift.es2016.semantics.asg.Keys;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralBoolean;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralEmptyObject;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralFunction;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralInfinity;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralNull;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralRegExp;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralString;
-import com.shapesecurity.shift.es2016.semantics.asg.LocalReference;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberAccess;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignmentProperty;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberCall;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberDefinition;
-import com.shapesecurity.shift.es2016.semantics.asg.New;
-import com.shapesecurity.shift.es2016.semantics.asg.Node;
-import com.shapesecurity.shift.es2016.semantics.asg.Return;
-import com.shapesecurity.shift.es2016.semantics.asg.SwitchStatement;
-import com.shapesecurity.shift.es2016.semantics.asg.This;
-import com.shapesecurity.shift.es2016.semantics.asg.Throw;
-import com.shapesecurity.shift.es2016.semantics.asg.TryCatch;
-import com.shapesecurity.shift.es2016.semantics.asg.TryFinally;
-import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionString;
-import com.shapesecurity.shift.es2016.semantics.asg.TypeofGlobal;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.UnaryOperation;
-import com.shapesecurity.shift.es2016.semantics.asg.Void;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Logic;
-import com.shapesecurity.shift.es2016.semantics.asg.Block;
-import com.shapesecurity.shift.es2016.semantics.asg.BlockWithValue;
-import com.shapesecurity.shift.es2016.semantics.asg.Break;
-import com.shapesecurity.shift.es2016.semantics.asg.BreakTarget;
-import com.shapesecurity.shift.es2016.semantics.asg.Call;
-import com.shapesecurity.shift.es2016.semantics.asg.DeleteProperty;
-import com.shapesecurity.shift.es2016.semantics.asg.IfElse;
-import com.shapesecurity.shift.es2016.semantics.asg.Literal;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralEmptyArray;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralNumber;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralUndefined;
-import com.shapesecurity.shift.es2016.semantics.asg.Loop;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignment;
-import com.shapesecurity.shift.es2016.semantics.asg.NodeWithValue;
-import com.shapesecurity.shift.es2016.semantics.asg.RequireObjectCoercible;
-import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionNumber;
-import com.shapesecurity.shift.es2016.semantics.asg.VariableAssignment;
+import com.shapesecurity.shift.es2016.semantics.asg.Void;
 
 import javax.annotation.Nonnull;
 
@@ -198,7 +156,7 @@ public class Dottifier {
 				.append(" [\n");
 		++indentationLevel;
 		out.append(indent())
-				.append("shape=\"record\";\n")
+				.append("shape=\"record\" ")
 				.append(indent())
 				.append("label=\"");
 		boolean first = true;
@@ -221,7 +179,7 @@ public class Dottifier {
 			variableNames.put(variable, structName + ":" + name);
 		}
 		--indentationLevel;
-		out.append("\";\n")
+		out.append("\"\n")
 				.append(indent())
 				.append("];\n");
 		return Pair.of(structName, out.toString());
@@ -273,7 +231,7 @@ public class Dottifier {
 				.append(" [\n");
 		++indentationLevel;
 		builder.append(indent())
-				.append("shape=\"record\";\n")
+				.append("shape=\"record\" ")
 				.append(indent())
 				.append("label=\"");
 		boolean first = true;
@@ -310,7 +268,7 @@ public class Dottifier {
 					.append(nodeLabel);
 		}
 		--indentationLevel;
-		builder.append("\";\n")
+		builder.append("\"\n")
 				.append(indent())
 				.append("];\n")
 				.append(after);
@@ -411,6 +369,8 @@ public class Dottifier {
 			return reduceTryFinally((TryFinally) node);
 		} else if (node instanceof TypeCoercionNumber) {
 			return reduceTypeCoercionNumber((TypeCoercionNumber) node);
+		} else if (node instanceof TypeCoercionObject) {
+			return reduceTypeCoercionObject((TypeCoercionObject) node);
 		} else if (node instanceof TypeCoercionString) {
 			return reduceTypeCoercionString((TypeCoercionString) node);
 		} else if (node instanceof TypeofGlobal) {
@@ -653,7 +613,7 @@ public class Dottifier {
 				.append(" [\n");
 		++indentationLevel;
 		out.append(indent())
-				.append("shape=\"record\";\n")
+				.append("shape=\"record\" ")
 				.append(indent())
 				.append("label=\"");
 		boolean first = true;
@@ -676,7 +636,7 @@ public class Dottifier {
 			variableNames.put(variable, paramsName + ":" + name);
 		}
 		--indentationLevel;
-		out.append("\";\n")
+		out.append("\"\n")
 				.append(indent())
 				.append("];\n");
 		after.append(lhs)
@@ -690,7 +650,7 @@ public class Dottifier {
 				.append(" [\n");
 		++indentationLevel;
 		out.append(indent())
-				.append("shape=\"record\";\n")
+				.append("shape=\"record\" ")
 				.append(indent())
 				.append("label=\"");
 		first = true;
@@ -726,7 +686,7 @@ public class Dottifier {
 			}
 		}
 		--indentationLevel;
-		out.append("\";\n")
+		out.append("\"\n")
 				.append(indent())
 				.append("];\n");
 		after.append(lhs)
@@ -931,7 +891,7 @@ public class Dottifier {
 				.append(" [\n");
 		++indentationLevel;
 		out.append(indent())
-				.append("shape=\"record\";\n")
+				.append("shape=\"record\" ")
 				.append(indent())
 				.append("label=\"");
 		boolean first = true;
@@ -996,7 +956,7 @@ public class Dottifier {
 				.append(" [\n");
 		++indentationLevel;
 		out.append(indent())
-				.append("shape=\"record\";\n")
+				.append("shape=\"record\" ")
 				.append(indent())
 				.append("label=\"");
 		first = true;
@@ -1120,6 +1080,17 @@ public class Dottifier {
 
 	@Nonnull
 	private String reduceTypeCoercionNumber(@Nonnull TypeCoercionNumber node) {
+		String out = ensureDeclared(node);
+		++indentationLevel;
+		out += reduce(node.expression);
+		String lhs = indent() + name(node) + " -> ";
+		out += lhs + name(node.expression) + " [label=\"expression\"];\n";
+		--indentationLevel;
+		return out;
+	}
+
+	@Nonnull
+	private String reduceTypeCoercionObject(@Nonnull TypeCoercionObject node) {
 		String out = ensureDeclared(node);
 		++indentationLevel;
 		out += reduce(node.expression);
