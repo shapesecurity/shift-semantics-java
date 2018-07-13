@@ -120,39 +120,23 @@ public class Explicator {
 	@Nonnull
 	final F<ImmutableList<Directive>, Boolean> isCandidateForInlining;
 
-	Explicator(@Nonnull Script script) {
-		this.program = Either.left(script);
-		this.scope = ScopeAnalyzer.analyze(script);
-		this.jumpMap = FinallyJumpReducer.analyze(script);
+	Explicator(@Nonnull Program program, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
+		if (program instanceof Script) {
+			Script script = (Script) program;
+			this.program = Either.left(script);
+			this.scope = ScopeAnalyzer.analyze(script);
+			this.jumpMap = FinallyJumpReducer.analyze(script);
+		} else {
+			Module module = (Module) program;
+			this.program = Either.right(module);
+			this.scope = ScopeAnalyzer.analyze(module);
+			this.jumpMap = FinallyJumpReducer.analyze(module);
+		}
 		this.scopeLookup = new ScopeLookup(this.scope);
 		this.functionScopes = new IdentityHashMap<>();
 		this.withReferences = findWithReferences(this.scope);
 		this.withObjects = new IdentityHashMap<>();
-		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
-		this.isCandidateForInlining = list -> false;
-	}
-
-	Explicator(@Nonnull Module module) {
-		this.program = Either.right(module);
-		this.scope = ScopeAnalyzer.analyze(module);
-		this.jumpMap = FinallyJumpReducer.analyze(module);
-		this.scopeLookup = new ScopeLookup(this.scope);
-		this.functionScopes = new IdentityHashMap<>();
-		this.withReferences = findWithReferences(this.scope);
-		this.withObjects = new IdentityHashMap<>();
-		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
-		this.isCandidateForInlining = list -> false;
-	}
-
-	Explicator(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-		this.program = Either.left(script);
-		this.scope = ScopeAnalyzer.analyze(script);
-		this.jumpMap = FinallyJumpReducer.analyze(script);
-		this.scopeLookup = new ScopeLookup(this.scope);
-		this.functionScopes = new IdentityHashMap<>();
-		this.withReferences = findWithReferences(this.scope);
-		this.withObjects = new IdentityHashMap<>();
-		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
+		this.withStatementsInFunctions = FindWithsReducer.reduce(program).right;
 		this.isCandidateForInlining = isCandidateForInlining;
 	}
 
@@ -162,34 +146,27 @@ public class Explicator {
 	}
 
 	@Nonnull
-	public static Semantics deriveSemantics(@Nonnull Script script) {
-		return deriveSemanticsHelper(script, new Explicator(script));
+	public static Semantics deriveSemantics(@Nonnull Program program) {
+		return deriveSemanticsHelper(program, new Explicator(program, list -> false));
 	}
 
 	@Nonnull
-	public static Semantics deriveSemantics(@Nonnull Module module) {
-		return deriveSemanticsHelper(module, new Explicator(module));
-	}
-
-	@Nonnull
-	private static Semantics deriveSemanticsHelper(@Nonnull Script script, @Nonnull Explicator exp) {
+	private static Semantics deriveSemanticsHelper(@Nonnull Program program, @Nonnull Explicator exp) {
 		Node result = exp.explicate();
-		ImmutableList<Variable> maybeGlobals = exp.functionVariablesHelper(script);
-		ImmutableList<Variable> scriptLocals =
+		if (program instanceof Script) {
+			ImmutableList<Variable> maybeGlobals = exp.functionVariablesHelper(program);
+			ImmutableList<Variable> scriptLocals =
 				maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.currentState.getAdditionalVariables());
-		ImmutableList<String> scriptVarDecls =
+			ImmutableList<String> scriptVarDecls =
 				maybeGlobals.filter(x -> exp.scopeLookup.isGlobal(x) && x.declarations.isNotEmpty()).map(x -> x.name);
-		return new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes);
-	}
-
-	@Nonnull
-	public static Semantics deriveSemanticsHelper(@Nonnull Module module, @Nonnull Explicator exp) {
-		Node result = exp.explicate();
-		ImmutableList<Variable> scriptLocals =
-				exp.functionVariablesHelper(module)
-						.filter(x -> !exp.scopeLookup.isGlobal(x))
-						.append(exp.currentState.getAdditionalVariables());
-		return new Semantics(result, scriptLocals, ImmutableList.empty(), exp.scopeLookup, exp.functionScopes);
+			return new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes);
+		} else {
+			ImmutableList<Variable> scriptLocals =
+				exp.functionVariablesHelper(program)
+					.filter(x -> !exp.scopeLookup.isGlobal(x))
+					.append(exp.currentState.getAdditionalVariables());
+			return new Semantics(result, scriptLocals, ImmutableList.empty(), exp.scopeLookup, exp.functionScopes);
+		}
 	}
 
 	Node explicate() {

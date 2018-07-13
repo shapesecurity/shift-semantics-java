@@ -22,7 +22,7 @@ public class ExplicatorWithLocation {
 		final WeakHashMap<LiteralFunction, FunctionBody> locations = new WeakHashMap<>();
 
 		Implementation(@Nonnull Script script) {
-			super(script);
+			super(script, list -> false);
 		}
 
 		Implementation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
