@@ -22,11 +22,11 @@ public class ExplicatorWithLocation {
 		final WeakHashMap<LiteralFunction, FunctionBody> locations = new WeakHashMap<>();
 
 		Implementation(@Nonnull Script script) {
-			super(script, list -> false);
+			super(script, list -> false, false);
 		}
 
-		Implementation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-			super(script, isCandidateForInlining);
+		Implementation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, boolean throwOnEval) {
+			super(script, isCandidateForInlining, throwOnEval);
 		}
 
 		@Override
@@ -47,8 +47,8 @@ public class ExplicatorWithLocation {
 	}
 
 	@Nonnull
-	public static Pair<Semantics, WeakHashMap<LiteralFunction, FunctionBody>> deriveSemanticsWithLocation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-		return deriveSemanticsWithLocationHelper(script, new Implementation(script, isCandidateForInlining));
+	public static Pair<Semantics, WeakHashMap<LiteralFunction, FunctionBody>> deriveSemanticsWithLocation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, boolean throwOnEval) {
+		return deriveSemanticsWithLocationHelper(script, new Implementation(script, isCandidateForInlining, throwOnEval));
 	}
 
 	@Nonnull

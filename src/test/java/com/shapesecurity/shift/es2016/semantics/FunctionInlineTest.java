@@ -10,7 +10,7 @@ public class FunctionInlineTest {
 	@Test
 	public void testFunctionInlines() throws JsError {
 		String source = "(function() { var x = 0; var y = 9; return x + y; })()";
-		Semantics s = Explicator.deriveSemantics(Parser.parseScript(source), list -> true);
+		Semantics s = Explicator.deriveSemantics(Parser.parseScript(source), list -> true, false);
 		Assert.assertTrue(s.node instanceof Block);
 		Block b = (Block) s.node;
 		Assert.assertEquals(1, b.children.length);

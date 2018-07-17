@@ -21,6 +21,7 @@ import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.*;
 import com.shapesecurity.shift.es2016.ast.*;
 import com.shapesecurity.shift.es2016.ast.operators.UpdateOperator;
+import com.shapesecurity.shift.es2016.parser.JsError;
 import com.shapesecurity.shift.es2016.scope.*;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.BinaryOperation;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.BinaryOperator;
@@ -119,8 +120,9 @@ public class Explicator {
 	final MultiHashTable<FunctionBody, WithStatement> withStatementsInFunctions;
 	@Nonnull
 	final F<ImmutableList<Directive>, Boolean> isCandidateForInlining;
+	final boolean throwOnEval;
 
-	Explicator(@Nonnull Program program, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
+	Explicator(@Nonnull Program program, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, boolean throwOnEval) {
 		if (program instanceof Script) {
 			Script script = (Script) program;
 			this.program = Either.left(script);
@@ -138,16 +140,17 @@ public class Explicator {
 		this.withObjects = new IdentityHashMap<>();
 		this.withStatementsInFunctions = FindWithsReducer.reduce(program).right;
 		this.isCandidateForInlining = isCandidateForInlining;
+		this.throwOnEval = throwOnEval;
 	}
 
 	@Nonnull
-	public static Semantics deriveSemantics(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-		return deriveSemanticsHelper(script, new Explicator(script, isCandidateForInlining));
+	public static Semantics deriveSemantics(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, boolean throwOnEval) {
+		return deriveSemanticsHelper(script, new Explicator(script, isCandidateForInlining, throwOnEval));
 	}
 
 	@Nonnull
 	public static Semantics deriveSemantics(@Nonnull Program program) {
-		return deriveSemanticsHelper(program, new Explicator(program, list -> false));
+		return deriveSemanticsHelper(program, new Explicator(program, list -> false, false));
 	}
 
 	@Nonnull
@@ -773,8 +776,10 @@ public class Explicator {
 				this.currentState.exitInlineFunction();
 				return functionBlock;
 			}
-			// abort on direct eval. todo maybe warn.
 			if (c.callee instanceof IdentifierExpression && (((IdentifierExpression) c.callee).name.equals("eval"))) {
+				if (this.throwOnEval) {
+					throw new RuntimeException("Direct eval!");
+				}
 				return Halt.INSTANCE;
 			}
 			ImmutableList<NodeWithValue> arguments =
