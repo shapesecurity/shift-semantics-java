@@ -427,7 +427,7 @@ public class Explicator {
 			becomes
 
 			__o = o;
-			if (__o != null) {
+			if (__o != null) { // actually more complicated for document.all
 				__o = ToObject(o);
 				__t = keys(__o);
 				__i = 0;
@@ -450,7 +450,7 @@ public class Explicator {
 				object -> makeUnvaluedTemporary(
 					counter -> makeUnvaluedTemporary(keys -> {
 						NodeWithValue assignment = new VariableAssignment(object, explicateExpressionReturningValue(forInStatement.right, strict), false);
-						NodeWithValue nullTest = new Equality(Equality.Operator.Neq, object, LiteralNull.INSTANCE);
+						NodeWithValue nullTest = new Logic(Logic.Operator.And, new Equality(Equality.Operator.StrictNeq, object, LiteralNull.INSTANCE), new Equality(Equality.Operator.StrictNeq, object, LiteralUndefined.INSTANCE));
 						NodeWithValue coercion = new VariableAssignment(object, new TypeCoercionObject(object), false);
 						NodeWithValue keyAssign = new VariableAssignment(keys, new Keys(object), false);
 						NodeWithValue indexAssign = new VariableAssignment(counter, new LiteralNumber(0), false);
