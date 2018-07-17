@@ -426,15 +426,18 @@ public class Explicator {
 
 			becomes
 
-			__o = ToObject(o);
-			__t = keys(__o);
-			__i = 0;
-			while(__i < __t.length) {
-				if(__t[__i] in __o) {
-					x = __t[__i];
-					...
+			__o = o;
+			if (__o != null) {
+				__o = ToObject(o);
+				__t = keys(__o);
+				__i = 0;
+				while(__i < __t.length) {
+					if(__t[__i] in __o) {
+						x = __t[__i];
+						...
+					}
+					__i = __i + 1;
 				}
-				__i = __i + 1;
 			}
 			 */
 			ForInStatement forInStatement = (ForInStatement) statement;
@@ -443,42 +446,56 @@ public class Explicator {
 			targets = targets.put(statement, new Pair<>(outerTarget, Maybe.of(innerTarget)));
 			Break breakNode = new Break(outerTarget, ImmutableList.empty());
 
-			return makeUnvaluedTemporary(object -> makeUnvaluedTemporary(counter -> makeUnvaluedTemporary(keys -> {
-				Block body = new Block(ImmutableList.<Node>of(
-					new IfElse(
-						new RelationalComparison(
-							RelationalComparison.Operator.LessThan,
-							counter,
-							new MemberAccess(keys, new LiteralString("length"))
-						),
-						new Block(Void.INSTANCE),
-						new Block(breakNode)
-					))
-					.append(ImmutableList.of(
-						new IfElse(
-							new In(new MemberAccess(keys, counter), object),
-							new Block(ImmutableList.of(
-								makeForInUpdate(forInStatement.left, keys, counter, strict),
-								explicateStatement(forInStatement.body, strict)
-							)),
+			return makeUnvaluedTemporary(
+				object -> makeUnvaluedTemporary(
+					counter -> makeUnvaluedTemporary(keys -> {
+						NodeWithValue assignment = new VariableAssignment(object, explicateExpressionReturningValue(forInStatement.right, strict), false);
+						NodeWithValue nullTest = new Equality(Equality.Operator.Neq, object, LiteralNull.INSTANCE);
+						NodeWithValue coercion = new VariableAssignment(object, new TypeCoercionObject(object), false);
+						NodeWithValue keyAssign = new VariableAssignment(keys, new Keys(object), false);
+						NodeWithValue indexAssign = new VariableAssignment(counter, new LiteralNumber(0), false);
+						Loop loop = new Loop(
+							new Block(ImmutableList.<Node>of(
+								new IfElse(
+									new RelationalComparison(
+										RelationalComparison.Operator.LessThan,
+										counter,
+										new MemberAccess(keys, new LiteralString("length"))
+									),
+									new Block(Void.INSTANCE),
+									new Block(breakNode)
+								))
+								.append(ImmutableList.of(
+									new IfElse(
+										new In(new MemberAccess(keys, counter), object),
+										new Block(ImmutableList.of(
+											makeForInUpdate(forInStatement.left, keys, counter, strict),
+											explicateStatement(forInStatement.body, strict)
+										)),
+										new Block(Void.INSTANCE)
+									),
+									innerTarget,
+									new VariableAssignment(
+										counter,
+										new FloatMath(FloatMath.Operator.Plus, counter, new LiteralNumber(1)),
+										false
+									)
+								))
+							)
+						);
+						Node ifStatement = new IfElse(
+							nullTest,
+							new Block(ImmutableList.of(coercion, keyAssign, indexAssign, loop)),
 							new Block(Void.INSTANCE)
-						),
-						innerTarget,
-						new VariableAssignment(
-							counter,
-							new FloatMath(FloatMath.Operator.Plus, counter, new LiteralNumber(1)),
-							false
-						)
-					)));
-				Loop loop = new Loop(body);
-				return new Block(ImmutableList.of(
-					new VariableAssignment(object, new TypeCoercionObject(explicateExpressionReturningValue(forInStatement.right, strict)), false),
-					new VariableAssignment(keys, new Keys(object), false),
-					new VariableAssignment(counter, new LiteralNumber(0), false),
-					loop,
-					outerTarget
-				));
-			})));
+						);
+						return new Block(ImmutableList.of(
+							assignment,
+							ifStatement,
+							outerTarget
+						));
+					})
+				)
+			);
 		} else if (statement instanceof ForStatement) {
 			ForStatement forStatement = (ForStatement) statement;
 			BreakTarget outerTarget = new BreakTarget();
