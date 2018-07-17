@@ -426,7 +426,7 @@ public class Explicator {
 
 			becomes
 
-			__o = o;
+			__o = ToObject(o);
 			__t = keys(__o);
 			__i = 0;
 			while(__i < __t.length) {
@@ -472,7 +472,7 @@ public class Explicator {
 					)));
 				Loop loop = new Loop(body);
 				return new Block(ImmutableList.of(
-					new VariableAssignment(object, explicateExpressionReturningValue(forInStatement.right, strict), false),
+					new VariableAssignment(object, new TypeCoercionObject(explicateExpressionReturningValue(forInStatement.right, strict)), false),
 					new VariableAssignment(keys, new Keys(object), false),
 					new VariableAssignment(counter, new LiteralNumber(0), false),
 					loop,
