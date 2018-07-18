@@ -692,11 +692,14 @@ public class Explicator {
 	NodeWithValue explicateAssignment(AssignmentTarget lhs, NodeWithValue rhs, boolean strict) {
 		if (lhs instanceof StaticMemberAssignmentTarget) {
 			StaticMemberAssignmentTarget staticMemberAssignmentTarget = (StaticMemberAssignmentTarget) lhs;
-			return new MemberAssignment(
-					explicateExpressionSuper(staticMemberAssignmentTarget.object, strict),
+			return letWithValue(
+				explicateExpressionSuper(staticMemberAssignmentTarget.object, strict),
+				objRef -> new MemberAssignment(
+					objRef,
 					new LiteralString(staticMemberAssignmentTarget.property),
 					rhs,
 					strict
+				)
 			);
 		} else if (lhs instanceof ComputedMemberAssignmentTarget) {
 			ComputedMemberAssignmentTarget computedMemberAssignmentTarget = (ComputedMemberAssignmentTarget) lhs;
