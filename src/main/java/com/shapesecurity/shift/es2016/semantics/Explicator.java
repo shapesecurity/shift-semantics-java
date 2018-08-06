@@ -21,6 +21,7 @@ import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.*;
 import com.shapesecurity.shift.es2016.ast.*;
 import com.shapesecurity.shift.es2016.ast.operators.UpdateOperator;
+import com.shapesecurity.shift.es2016.parser.JsError;
 import com.shapesecurity.shift.es2016.scope.*;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.BinaryOperation;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.BinaryOperator;
@@ -91,6 +92,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Explicator {
 	@Nonnull
@@ -119,77 +121,56 @@ public class Explicator {
 	final MultiHashTable<FunctionBody, WithStatement> withStatementsInFunctions;
 	@Nonnull
 	final F<ImmutableList<Directive>, Boolean> isCandidateForInlining;
+	final Supplier<NodeWithValue> getDirectEval;
 
-	Explicator(@Nonnull Script script) {
-		this.program = Either.left(script);
-		this.scope = ScopeAnalyzer.analyze(script);
-		this.jumpMap = FinallyJumpReducer.analyze(script);
+	Explicator(@Nonnull Program program, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, Supplier<NodeWithValue> getDirectEval) {
+		if (program instanceof Script) {
+			Script script = (Script) program;
+			this.program = Either.left(script);
+			this.scope = ScopeAnalyzer.analyze(script);
+			this.jumpMap = FinallyJumpReducer.analyze(script);
+		} else {
+			Module module = (Module) program;
+			this.program = Either.right(module);
+			this.scope = ScopeAnalyzer.analyze(module);
+			this.jumpMap = FinallyJumpReducer.analyze(module);
+		}
 		this.scopeLookup = new ScopeLookup(this.scope);
 		this.functionScopes = new IdentityHashMap<>();
 		this.withReferences = findWithReferences(this.scope);
 		this.withObjects = new IdentityHashMap<>();
-		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
-		this.isCandidateForInlining = list -> false;
-	}
-
-	Explicator(@Nonnull Module module) {
-		this.program = Either.right(module);
-		this.scope = ScopeAnalyzer.analyze(module);
-		this.jumpMap = FinallyJumpReducer.analyze(module);
-		this.scopeLookup = new ScopeLookup(this.scope);
-		this.functionScopes = new IdentityHashMap<>();
-		this.withReferences = findWithReferences(this.scope);
-		this.withObjects = new IdentityHashMap<>();
-		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
-		this.isCandidateForInlining = list -> false;
-	}
-
-	Explicator(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-		this.program = Either.left(script);
-		this.scope = ScopeAnalyzer.analyze(script);
-		this.jumpMap = FinallyJumpReducer.analyze(script);
-		this.scopeLookup = new ScopeLookup(this.scope);
-		this.functionScopes = new IdentityHashMap<>();
-		this.withReferences = findWithReferences(this.scope);
-		this.withObjects = new IdentityHashMap<>();
-		this.withStatementsInFunctions = FindWithsReducer.reduce(Either.extract(program)).right;
+		this.withStatementsInFunctions = FindWithsReducer.reduce(program).right;
 		this.isCandidateForInlining = isCandidateForInlining;
+		this.getDirectEval = getDirectEval;
 	}
 
 	@Nonnull
-	public static Semantics deriveSemantics(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-		return deriveSemanticsHelper(script, new Explicator(script, isCandidateForInlining));
+	public static Semantics deriveSemantics(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, Supplier<NodeWithValue> getDirectEval) {
+		return deriveSemanticsHelper(script, new Explicator(script, isCandidateForInlining, getDirectEval));
 	}
 
 	@Nonnull
-	public static Semantics deriveSemantics(@Nonnull Script script) {
-		return deriveSemanticsHelper(script, new Explicator(script));
+	public static Semantics deriveSemantics(@Nonnull Program program) {
+		return deriveSemanticsHelper(program, new Explicator(program, list -> false, () -> Halt.INSTANCE));
 	}
 
 	@Nonnull
-	public static Semantics deriveSemantics(@Nonnull Module module) {
-		return deriveSemanticsHelper(module, new Explicator(module));
-	}
-
-	@Nonnull
-	private static Semantics deriveSemanticsHelper(@Nonnull Script script, @Nonnull Explicator exp) {
+	private static Semantics deriveSemanticsHelper(@Nonnull Program program, @Nonnull Explicator exp) {
 		Node result = exp.explicate();
-		ImmutableList<Variable> maybeGlobals = exp.functionVariablesHelper(script);
-		ImmutableList<Variable> scriptLocals =
+		if (program instanceof Script) {
+			ImmutableList<Variable> maybeGlobals = exp.functionVariablesHelper(program);
+			ImmutableList<Variable> scriptLocals =
 				maybeGlobals.filter(x -> !exp.scopeLookup.isGlobal(x)).append(exp.currentState.getAdditionalVariables());
-		ImmutableList<String> scriptVarDecls =
+			ImmutableList<String> scriptVarDecls =
 				maybeGlobals.filter(x -> exp.scopeLookup.isGlobal(x) && x.declarations.isNotEmpty()).map(x -> x.name);
-		return new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes);
-	}
-
-	@Nonnull
-	public static Semantics deriveSemanticsHelper(@Nonnull Module module, @Nonnull Explicator exp) {
-		Node result = exp.explicate();
-		ImmutableList<Variable> scriptLocals =
-				exp.functionVariablesHelper(module)
-						.filter(x -> !exp.scopeLookup.isGlobal(x))
-						.append(exp.currentState.getAdditionalVariables());
-		return new Semantics(result, scriptLocals, ImmutableList.empty(), exp.scopeLookup, exp.functionScopes);
+			return new Semantics(result, scriptLocals, scriptVarDecls, exp.scopeLookup, exp.functionScopes);
+		} else {
+			ImmutableList<Variable> scriptLocals =
+				exp.functionVariablesHelper(program)
+					.filter(x -> !exp.scopeLookup.isGlobal(x))
+					.append(exp.currentState.getAdditionalVariables());
+			return new Semantics(result, scriptLocals, ImmutableList.empty(), exp.scopeLookup, exp.functionScopes);
+		}
 	}
 
 	Node explicate() {
@@ -796,9 +777,8 @@ public class Explicator {
 				this.currentState.exitInlineFunction();
 				return functionBlock;
 			}
-			// abort on direct eval. todo maybe warn.
 			if (c.callee instanceof IdentifierExpression && (((IdentifierExpression) c.callee).name.equals("eval"))) {
-				return Halt.INSTANCE;
+				return this.getDirectEval.get();
 			}
 			ImmutableList<NodeWithValue> arguments =
 				c.arguments.map(a -> explicateExpressionReturningValue((Expression) a, strict));

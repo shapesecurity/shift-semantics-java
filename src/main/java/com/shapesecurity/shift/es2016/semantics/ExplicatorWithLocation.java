@@ -9,12 +9,15 @@ import com.shapesecurity.shift.es2016.ast.FunctionBody;
 import com.shapesecurity.shift.es2016.ast.Script;
 import com.shapesecurity.shift.es2016.scope.Scope;
 import com.shapesecurity.shift.es2016.scope.Variable;
+import com.shapesecurity.shift.es2016.semantics.asg.Halt;
 import com.shapesecurity.shift.es2016.semantics.asg.LiteralFunction;
 import com.shapesecurity.shift.es2016.semantics.asg.Node;
+import com.shapesecurity.shift.es2016.semantics.asg.NodeWithValue;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.WeakHashMap;
+import java.util.function.Supplier;
 
 public class ExplicatorWithLocation {
 	private static class Implementation extends Explicator {
@@ -22,11 +25,11 @@ public class ExplicatorWithLocation {
 		final WeakHashMap<LiteralFunction, FunctionBody> locations = new WeakHashMap<>();
 
 		Implementation(@Nonnull Script script) {
-			super(script);
+			super(script, list -> false, () -> Halt.INSTANCE);
 		}
 
-		Implementation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-			super(script, isCandidateForInlining);
+		Implementation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, Supplier<NodeWithValue> getDirectEval) {
+			super(script, isCandidateForInlining, getDirectEval);
 		}
 
 		@Override
@@ -47,8 +50,8 @@ public class ExplicatorWithLocation {
 	}
 
 	@Nonnull
-	public static Pair<Semantics, WeakHashMap<LiteralFunction, FunctionBody>> deriveSemanticsWithLocation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining) {
-		return deriveSemanticsWithLocationHelper(script, new Implementation(script, isCandidateForInlining));
+	public static Pair<Semantics, WeakHashMap<LiteralFunction, FunctionBody>> deriveSemanticsWithLocation(@Nonnull Script script, @Nonnull F<ImmutableList<Directive>, Boolean> isCandidateForInlining, Supplier<NodeWithValue> getDirectEval) {
+		return deriveSemanticsWithLocationHelper(script, new Implementation(script, isCandidateForInlining, getDirectEval));
 	}
 
 	@Nonnull

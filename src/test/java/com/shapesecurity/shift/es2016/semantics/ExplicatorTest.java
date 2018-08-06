@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ExplicatorTest {
 	@Test
@@ -79,6 +80,18 @@ public class ExplicatorTest {
 		Block b = (Block) s.node;
 		LiteralFunction f = (LiteralFunction) b.children.maybeHead().fromJust();
 		assertTrue(s.functionScopes.containsKey(f));
+	}
+
+	@Test
+	public void testDirectEval() throws Exception {
+		try {
+			Explicator.deriveSemantics(Parser.parseScript("eval()"), list -> false, () -> {
+				throw new RuntimeException("catch me");
+			});
+			fail("should have thrown");
+		} catch (RuntimeException e) {
+			// pass
+		}
 	}
 
 	@Nonnull
