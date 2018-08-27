@@ -69,7 +69,8 @@ public class FloatMath extends BinaryOperation {
 		Minus("-"),
 		Mul("*"),
 		Div("/"),
-		Rem("%");
+		Rem("%"),
+		Exp("**");
 
 		@Nonnull
 		public final String name;

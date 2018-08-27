@@ -1153,6 +1153,12 @@ public class Explicator {
 					left,
 					right
 				);
+			case Exp:
+				return new FloatMath(
+					FloatMath.Operator.Exp,
+					left,
+					right
+				);
 			case BitwiseAnd:
 				return new IntMath(
 					IntMath.Operator.BitwiseAnd,
