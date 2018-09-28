@@ -386,6 +386,27 @@ public class Explicator {
 	}
 
 	@Nonnull
+	Node handleIfFunction(@Nonnull Statement statement, boolean strict) {
+		if (statement instanceof FunctionDeclaration) {
+			FunctionDeclaration functionDeclaration = (FunctionDeclaration) statement;
+			Pair<Variable, Maybe<Variable>> functionVariables = scopeLookup.findVariablesForFuncDecl(functionDeclaration);
+
+			// 'void' is appropriate for the case where `functionVariables.right` is Nothing because that indicates hoisting failed, and the declaration does nothing.
+			return functionVariables.right.maybe(Void.INSTANCE, hoistedVar -> {
+				Scope myScope = scopeLookup.findScopeFor(functionDeclaration).fromJust();
+				ImmutableList<Variable> parameters = simpleParamsHelper(functionDeclaration.params);
+				return new VariableAssignment(
+					refHelper(hoistedVar),
+					explicateGeneralFunction(Maybe.empty(), myScope, parameters, functionDeclaration.body, strict),
+					strict
+				);
+			});
+		} else {
+			return explicateStatement(statement, strict);
+		}
+	}
+
+	@Nonnull
 	Node explicateStatement(@Nonnull Statement statement, boolean strict) {
 		if (statement instanceof BlockStatement) {
 			return explicateBody(((BlockStatement) statement).block.statements, strict);
@@ -523,8 +544,11 @@ public class Explicator {
 		} else if (statement instanceof IfStatement) {
 			IfStatement ifStatement = (IfStatement) statement;
 			NodeWithValue test = explicateExpressionReturningValue(ifStatement.test, strict);
-			Node consequent = explicateStatement(ifStatement.consequent, strict);
-			Node alternate = ifStatement.alternate.map(s -> explicateStatement(s, strict)).orJust(Void.INSTANCE);
+
+			// If statements need special care for B.3.3.
+			Node consequent = handleIfFunction(ifStatement.consequent, strict);
+			Node alternate = ifStatement.alternate.maybe(Void.INSTANCE, s -> handleIfFunction(s, strict));
+
 			return new IfElse(test, new Block(consequent), new Block(alternate));
 		} else if (statement instanceof LabeledStatement) {
 			LabeledStatement labeledStatement = (LabeledStatement) statement;
