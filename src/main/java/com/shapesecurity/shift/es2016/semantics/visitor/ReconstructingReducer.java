@@ -17,6 +17,7 @@
 package com.shapesecurity.shift.es2016.semantics.visitor;
 
 import com.shapesecurity.functional.data.Either;
+import com.shapesecurity.shift.es2016.semantics.asg.*;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Equality;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.FloatMath;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.In;
@@ -24,55 +25,12 @@ import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.InstanceOf;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.IntMath;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.Logic;
 import com.shapesecurity.shift.es2016.semantics.asg.BinaryOperation.RelationalComparison;
-import com.shapesecurity.shift.es2016.semantics.asg.Block;
-import com.shapesecurity.shift.es2016.semantics.asg.BlockWithValue;
-import com.shapesecurity.shift.es2016.semantics.asg.Break;
-import com.shapesecurity.shift.es2016.semantics.asg.BreakTarget;
-import com.shapesecurity.shift.es2016.semantics.asg.Call;
-import com.shapesecurity.shift.es2016.semantics.asg.DeleteGlobalProperty;
-import com.shapesecurity.shift.es2016.semantics.asg.DeleteProperty;
-import com.shapesecurity.shift.es2016.semantics.asg.GlobalReference;
-import com.shapesecurity.shift.es2016.semantics.asg.Halt;
-import com.shapesecurity.shift.es2016.semantics.asg.IfElse;
-import com.shapesecurity.shift.es2016.semantics.asg.Keys;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralBoolean;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralEmptyArray;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralEmptyObject;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralFunction;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralInfinity;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralNull;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralNumber;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralRegExp;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralString;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralUndefined;
-import com.shapesecurity.shift.es2016.semantics.asg.LocalReference;
-import com.shapesecurity.shift.es2016.semantics.asg.Loop;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberAccess;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignment;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberAssignmentProperty;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberCall;
-import com.shapesecurity.shift.es2016.semantics.asg.MemberDefinition;
-import com.shapesecurity.shift.es2016.semantics.asg.New;
-import com.shapesecurity.shift.es2016.semantics.asg.Node;
-import com.shapesecurity.shift.es2016.semantics.asg.NodeWithValue;
-import com.shapesecurity.shift.es2016.semantics.asg.RequireObjectCoercible;
-import com.shapesecurity.shift.es2016.semantics.asg.SwitchStatement;
-import com.shapesecurity.shift.es2016.semantics.asg.TemporaryReference;
-import com.shapesecurity.shift.es2016.semantics.asg.This;
-import com.shapesecurity.shift.es2016.semantics.asg.Throw;
-import com.shapesecurity.shift.es2016.semantics.asg.TryCatch;
-import com.shapesecurity.shift.es2016.semantics.asg.TryFinally;
-import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionNumber;
-import com.shapesecurity.shift.es2016.semantics.asg.TypeCoercionString;
-import com.shapesecurity.shift.es2016.semantics.asg.TypeofGlobal;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.BitwiseNot;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Negation;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Not;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.Typeof;
 import com.shapesecurity.shift.es2016.semantics.asg.UnaryOperation.VoidOp;
-import com.shapesecurity.shift.es2016.semantics.asg.VariableAssignment;
 import com.shapesecurity.shift.es2016.semantics.asg.Void;
-import com.shapesecurity.shift.es2016.semantics.asg.LiteralSymbol;
 
 import javax.annotation.Nonnull;
 
@@ -168,6 +126,8 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
 			return visitTypeCoercionString((TypeCoercionString) expression);
 		} else if (expression instanceof TypeCoercionNumber) {
 			return visitTypeCoercionNumber((TypeCoercionNumber) expression);
+		} else if (expression instanceof TypeCoercionObject) {
+			return visitTypeCoercionObject((TypeCoercionObject) expression);
 		} else if (expression instanceof Keys) {
 			return visitKeys((Keys) expression);
 		} else if (expression instanceof TypeofGlobal) {
@@ -309,6 +269,11 @@ public class ReconstructingReducer implements FAlgebraNodeWithValue<NodeWithValu
 	@Nonnull
 	protected NodeWithValue visitTypeCoercionNumber(@Nonnull TypeCoercionNumber typeCoercionNumber) {
 		return new TypeCoercionNumber(typeCoercionNumber.expression);
+	}
+
+	@Nonnull
+	protected NodeWithValue visitTypeCoercionObject(@Nonnull TypeCoercionObject typeCoercionObject) {
+		return new TypeCoercionObject(typeCoercionObject.expression);
 	}
 
 	@Nonnull
