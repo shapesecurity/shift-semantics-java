@@ -7,7 +7,7 @@ This project derives a representation of an ECMAScript program's semantics from 
 
 ```java
 import com.shapesecurity.shift.es2017.parser.Parser;
-import Explicator;
+import com.shapesecurity.shift.es2017.semantics.Explicator;
 
 Script program = Parser.parseScript(programText);
 Semantics semantics = Explicator.deriveSemantics(program);
