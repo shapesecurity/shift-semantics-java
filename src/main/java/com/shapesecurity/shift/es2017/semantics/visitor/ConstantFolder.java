@@ -3,18 +3,11 @@ package com.shapesecurity.shift.es2017.semantics.visitor;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.es2017.semantics.Semantics;
+import com.shapesecurity.shift.es2017.semantics.asg.*;
 import com.shapesecurity.shift.es2017.semantics.asg.BinaryOperation.FloatMath;
 import com.shapesecurity.shift.es2017.semantics.asg.BinaryOperation.IntMath;
 import com.shapesecurity.shift.es2017.semantics.asg.BinaryOperation.Logic;
-import com.shapesecurity.shift.es2017.semantics.asg.BlockWithValue;
-import com.shapesecurity.shift.es2017.semantics.asg.IfElse;
-import com.shapesecurity.shift.es2017.semantics.asg.LiteralBoolean;
-import com.shapesecurity.shift.es2017.semantics.asg.LiteralNumber;
-import com.shapesecurity.shift.es2017.semantics.asg.LiteralString;
-import com.shapesecurity.shift.es2017.semantics.asg.Node;
-import com.shapesecurity.shift.es2017.semantics.asg.NodeWithValue;
 import com.shapesecurity.shift.es2017.semantics.asg.UnaryOperation.Not;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
@@ -25,52 +18,53 @@ import static com.shapesecurity.shift.es2017.semantics.visitor.ECMA262Operations
 import static com.shapesecurity.shift.es2017.semantics.visitor.ECMA262Operations.Type;
 
 public class ConstantFolder extends ReconstructingReducer {
-	private final Semantics semantics;
 
-	public ConstantFolder(Semantics semantics) {
-		this.semantics = semantics;
+	public static Reducer<Node> create() {
+		return new NodeAdaptingReducer(new ConstantFolder());
 	}
 
-	@Nonnull
-	public static Semantics reduce(Semantics input) {
-		return new Semantics(new ConstantFolder(input).go(), input.locals, input.scriptVarDecls, input.scopeLookup, input.functionScopes);
+	protected ConstantFolder() {
+		super();
 	}
 
-	@Nonnull
-	private Node go() {
-		return this.visitNode(this.semantics.node);
+	public static Semantics reduce(@Nonnull Semantics semantics) {
+		return new Semantics(
+			new Director<>(ConstantFolder.create()).reduceNode(semantics.node),
+			semantics.locals,
+			semantics.scriptVarDecls,
+			semantics.scopeLookup,
+			semantics.functionScopes
+		);
 	}
 
 	@Nonnull
 	@Override
-	protected NodeWithValue visitNot(@Nonnull Not not) {
-		not = (Not) super.visitNot(not);
-		if (not.expression instanceof LiteralNumber) {
-			LiteralNumber n = (LiteralNumber) not.expression;
+	public NodeWithValue reduceNot(@Nonnull Not not, @Nonnull NodeWithValue expression) {
+		if (expression instanceof LiteralNumber) {
+			LiteralNumber n = (LiteralNumber) expression;
 			return new LiteralBoolean(n.value == 0);
-		} else if (not.expression instanceof LiteralBoolean) {
-			return new LiteralBoolean(!((LiteralBoolean) not.expression).value);
-		} else if (not.expression instanceof Not) {
-			if (((Not) not.expression).expression instanceof Not) {
-				return visitNot((Not) ((Not) not.expression).expression);
+		} else if (expression instanceof LiteralBoolean) {
+			return new LiteralBoolean(!((LiteralBoolean) expression).value);
+		} else if (expression instanceof Not) {
+			Not subNot = (Not) expression;
+			if (subNot.expression instanceof Not) {
+				Not subSubNot = (Not) subNot.expression;
+				return reduceNot(subSubNot, subSubNot.expression);
 			}
 		}
-		return not;
+		return super.reduceNot(not, expression);
 	}
 
 	@Nonnull
 	@Override
-	protected Node visitIfElse(@Nonnull IfElse ifElse) {
-		final IfElse ifElsef = (IfElse) super.visitIfElse(ifElse);
-		Maybe<Boolean> t = Truthiness.truthiness(ifElsef.test);
-		return t.<Node>map(x -> x ? ifElsef.consequent : ifElsef.alternate).orJust(ifElsef);
+	public Node reduceIfElse(@Nonnull IfElse ifElse, @Nonnull NodeWithValue test, @Nonnull Block consequent, @Nonnull Block alternate) {
+		Maybe<Boolean> t = Truthiness.truthiness(test);
+		return t.<Node>map(x -> x ? consequent : alternate).orJustLazy(() -> super.reduceIfElse(ifElse, test, consequent, alternate));
 	}
 
 	@Nonnull
 	@Override
-	public NodeWithValue visitFloatMath(@NotNull FloatMath floatMath) {
-		NodeWithValue left = visitNodeWithValue(floatMath.left());
-		NodeWithValue right = visitNodeWithValue(floatMath.right());
+	public NodeWithValue reduceFloatMath(@Nonnull FloatMath floatMath, @Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
 		if (floatMath.operator == FloatMath.Operator.Plus) {
 			if (Type(left).maybe(false, x -> x == Type.String) || Type(right).maybe(false, x -> x == Type.String)) {
 				Maybe<LiteralString> lstr = ToString(left);
@@ -82,14 +76,12 @@ public class ConstantFolder extends ReconstructingReducer {
 				return lnum.<NodeWithValue>flatMap(l -> rnum.map(r -> new LiteralNumber(l.value + r.value))).orJustLazy(() -> new FloatMath(floatMath.operator, left, right));
 			}
 		}
-		return new FloatMath(floatMath.operator, left, right);
+		return super.reduceFloatMath(floatMath, left, right);
 	}
 
 	@Nonnull
 	@Override
-	public NodeWithValue visitIntMath(@NotNull IntMath intMath) {
-		NodeWithValue left = visitNodeWithValue(intMath.left());
-		NodeWithValue right = visitNodeWithValue(intMath.right());
+	public NodeWithValue reduceIntMath(@Nonnull IntMath intMath, @Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
 		switch (intMath.operator) {
 			case LeftShift: {
 				Maybe<Integer> lnum = ToInt32(left);
@@ -117,25 +109,25 @@ public class ConstantFolder extends ReconstructingReducer {
 				// TODO BitwiseAnd, BitwiseOr, BitwiseXor
 			}
 			default:
-				return new IntMath(intMath.operator, left, right);
+				return super.reduceIntMath(intMath, left, right);
 		}
 	}
 
-	@Override
 	@Nonnull
-	public NodeWithValue visitLogic(@Nonnull Logic logic) {
-		NodeWithValue left = visitNodeWithValue(logic.left());
-		switch (logic.operator) {
+	@Override
+	public NodeWithValue reduceLogic(@Nonnull Logic expression, @Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
+		switch (expression.operator) {
 			case And:
 				return Truthiness.truthiness(left)
-							.map(leftIsTruthy -> leftIsTruthy ? new BlockWithValue(ImmutableList.of(left), visitNodeWithValue(logic.right())) : left)
-							.orJustLazy(() -> new Logic(logic.operator, left, visitNodeWithValue(logic.right())));
+							.map(leftIsTruthy -> leftIsTruthy ? new BlockWithValue(ImmutableList.of(left), right) : left)
+							.orJustLazy(() -> super.reduceLogic(expression, left, right));
 			case Or:
 				return Truthiness.truthiness(left)
-							.map(leftIsTruthy -> leftIsTruthy ? left : new BlockWithValue(ImmutableList.of(left), visitNodeWithValue(logic.right())))
-							.orJustLazy(() -> new Logic(logic.operator, left, visitNodeWithValue(logic.right())));
+							.map(leftIsTruthy -> leftIsTruthy ? left : new BlockWithValue(ImmutableList.of(left), right))
+							.orJustLazy(() -> super.reduceLogic(expression, left, right));
 			default:
 				throw new RuntimeException("Not reached");
 		}
 	}
+
 }

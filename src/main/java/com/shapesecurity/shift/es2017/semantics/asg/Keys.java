@@ -17,23 +17,9 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class Keys implements NodeWithValue {
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Keys)) return false;
-		Keys keys = (Keys) o;
-		return Objects.equals(_object, keys._object);
-	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(_object);
-	}
 
 	@Nonnull
 	public final NodeWithValue _object;

@@ -19,31 +19,13 @@ package com.shapesecurity.shift.es2017.semantics.asg;
 import com.shapesecurity.functional.data.ImmutableList;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class BlockWithValue implements NodeWithValue {
 	@Nonnull
 	public Block head;
-
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof BlockWithValue)) return false;
-		BlockWithValue that = (BlockWithValue) o;
-		return Objects.equals(head, that.head) &&
-				Objects.equals(result, that.result);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(head, result);
-	}
-
 	@Nonnull
-
 	public NodeWithValue result;
+
 
 	public BlockWithValue(@Nonnull Block head, @Nonnull NodeWithValue result) {
 		this.head = head;

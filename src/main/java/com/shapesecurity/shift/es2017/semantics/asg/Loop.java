@@ -17,26 +17,11 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class Loop implements Node {
 	@Nonnull
 	public final Block block;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Loop)) return false;
-		Loop loop = (Loop) o;
-		return Objects.equals(block, loop.block);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(block);
-	}
 
 	public Loop(@Nonnull Block block) {
 		this.block = block;

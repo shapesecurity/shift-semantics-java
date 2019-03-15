@@ -19,23 +19,9 @@ package com.shapesecurity.shift.es2017.semantics.asg.UnaryOperation;
 import com.shapesecurity.shift.es2017.semantics.asg.NodeWithValue;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class Negation extends UnaryOperation {
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Negation)) return false;
-		Negation negation = (Negation) o;
-		return Objects.equals(expression, negation.expression);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(expression);
-	}
 
 	@Nonnull
 	public final NodeWithValue expression;

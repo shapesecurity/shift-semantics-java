@@ -20,9 +20,6 @@ import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.shift.es2017.semantics.BrokenThrough;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class Break implements Node {
 	@Nonnull
@@ -31,22 +28,15 @@ public class Break implements Node {
 	@Nonnull
 	public final ImmutableList<BrokenThrough> broken;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Break)) return false;
-		Break aBreak = (Break) o;
-		return Objects.equals(target, aBreak.target) &&
-				Objects.equals(broken, aBreak.broken);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(target, broken);
-	}
 
 	public Break(@Nonnull BreakTarget target, @Nonnull ImmutableList<BrokenThrough> broken) {
 		this.target = target;
 		this.broken = broken;
+	}
+
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof Break && this.broken.equals(((Break) node).broken);
 	}
 }

@@ -17,22 +17,11 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class LiteralUndefined implements Literal {
 	@Nonnull
 	public static final LiteralUndefined INSTANCE = new LiteralUndefined();
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		return o == INSTANCE;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash();
-	}
 
 	private LiteralUndefined() {
 	}

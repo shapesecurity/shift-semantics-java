@@ -144,7 +144,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((BlockWithValue) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof IfElse);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue(((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof VariableAssignment);
 			assertTrue(((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value instanceof LiteralNumber);
 			assertEquals(1.0, ((LiteralNumber) ((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value).value, 0.0);
@@ -155,7 +155,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((BlockWithValue) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof IfElse);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue(((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof VariableAssignment);
 			assertTrue(((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value instanceof LiteralNumber);
 			assertEquals(1.0, ((LiteralNumber) ((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value).value, 0.0);
@@ -167,7 +167,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((BlockWithValue) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof IfElse);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue(((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof VariableAssignment);
 			assertTrue(((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value instanceof LiteralString);
 			assertEquals("1", ((LiteralString) ((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value).value);
@@ -178,7 +178,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((BlockWithValue) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof IfElse);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue(((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof VariableAssignment);
 			assertTrue(((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value instanceof LiteralNull);
 		}
@@ -188,7 +188,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((BlockWithValue) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof IfElse);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue(((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust() instanceof VariableAssignment);
 			assertTrue(((VariableAssignment) ((BlockWithValue) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).head.children.maybeHead().fromJust()).value instanceof LiteralFunction);
 		}
@@ -202,7 +202,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((FloatMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof FloatMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(13.33, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -212,7 +212,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((FloatMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof FloatMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralString);
 			assertEquals("ab", ((LiteralString) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value);
 		}
@@ -222,7 +222,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((FloatMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof FloatMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralString);
 			assertEquals("a11.33", ((LiteralString) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value);
 		}
@@ -232,7 +232,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((FloatMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof FloatMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralString);
 			assertEquals("11.33a", ((LiteralString) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value);
 		}
@@ -246,7 +246,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(10, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -256,7 +256,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(10, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -266,7 +266,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(10, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -276,7 +276,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(10, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -286,7 +286,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(-2147483648, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -297,7 +297,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -307,7 +307,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -317,7 +317,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -327,7 +327,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -337,7 +337,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(-1, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -347,7 +347,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(0, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -357,7 +357,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(-5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -368,7 +368,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -378,7 +378,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -388,7 +388,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -398,7 +398,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(5, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -408,7 +408,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(1, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -418,7 +418,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(2147483643, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}
@@ -428,7 +428,7 @@ public class ConstantFolderTest {
 			Semantics asg = Explicator.deriveSemantics(ast);
 			assertTrue(((IntMath) ((Call) ((Block) asg.node).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).operator instanceof IntMath.Operator);
 			Semantics reducedAsg = ConstantFolder.reduce(asg);
-			Node reducedNode = new BlockSquasher().visit(reducedAsg.node);
+			Node reducedNode = BlockSquasher.reduce(reducedAsg).node;
 			assertTrue((((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()) instanceof LiteralNumber);
 			assertEquals(0, ((LiteralNumber) ((Call) ((Block) reducedNode).children.maybeHead().fromJust()).arguments.maybeHead().fromJust()).value, 0.0);
 		}

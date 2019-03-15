@@ -17,22 +17,11 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class LiteralEmptyArray implements Literal {
 	@Nonnull
 	public static final LiteralEmptyArray INSTANCE = new LiteralEmptyArray();
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		return o == INSTANCE;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash();
-	}
 
 	private LiteralEmptyArray() {
 	}

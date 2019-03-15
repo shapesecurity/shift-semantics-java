@@ -17,27 +17,11 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class MemberAccess implements NodeWithValue {
 	@Nonnull
 	public final NodeWithValue object;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof MemberAccess)) return false;
-		MemberAccess that = (MemberAccess) o;
-		return Objects.equals(object, that.object) &&
-				Objects.equals(fieldExpression, that.fieldExpression);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(object, fieldExpression);
-	}
 
 	@Nonnull
 	public final NodeWithValue fieldExpression;

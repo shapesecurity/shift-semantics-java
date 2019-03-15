@@ -18,26 +18,12 @@ package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.Objects;
 
-public interface MemberAssignmentProperty {
+public interface MemberAssignmentProperty extends Node {
 	class StaticValue implements MemberAssignmentProperty {
 		@Nonnull
 		public final NodeWithValue value;
-
-		@Override
-		public boolean equals(@Nullable Object o) {
-			if (this == o) return true;
-			if (!(o instanceof StaticValue)) return false;
-			StaticValue that = (StaticValue) o;
-			return Objects.equals(value, that.value);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(value);
-		}
 
 		public StaticValue(@Nonnull NodeWithValue value) {
 			this.value = value;
@@ -50,19 +36,6 @@ public interface MemberAssignmentProperty {
 
 		public Getter(@Nonnull LiteralFunction value) {
 			this.value = value;
-		}
-
-		@Override
-		public boolean equals(@Nullable Object o) {
-			if (this == o) return true;
-			if (!(o instanceof Getter)) return false;
-			Getter getter = (Getter) o;
-			return Objects.equals(value, getter.value);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(value);
 		}
 	}
 

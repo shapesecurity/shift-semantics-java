@@ -17,8 +17,6 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class LiteralRegExp implements Literal {
 	@Nonnull
@@ -29,24 +27,6 @@ public class LiteralRegExp implements Literal {
 	public final boolean sticky;
 	public final boolean unicode;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof LiteralRegExp)) return false;
-		LiteralRegExp that = (LiteralRegExp) o;
-		return Objects.equals(pattern, that.pattern) &&
-				global == that.global &&
-				ignoreCase == that.ignoreCase &&
-				multiLine == that.multiLine &&
-				sticky == that.sticky &&
-				unicode == that.unicode;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(pattern, global, ignoreCase, multiLine, sticky, unicode);
-	}
-
 
 	public LiteralRegExp(@Nonnull String pattern, boolean global, boolean ignoreCase, boolean multiLine, boolean sticky, boolean unicode) {
 		this.pattern = pattern;
@@ -55,5 +35,16 @@ public class LiteralRegExp implements Literal {
 		this.multiLine = multiLine;
 		this.sticky = sticky;
 		this.unicode = unicode;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof LiteralRegExp &&
+			this.pattern.equals(((LiteralRegExp) node).pattern) &&
+			this.global == ((LiteralRegExp) node).global &&
+			this.ignoreCase == ((LiteralRegExp) node).ignoreCase &&
+			this.multiLine == ((LiteralRegExp) node).ignoreCase &&
+			this.sticky == ((LiteralRegExp) node).sticky &&
+			this.unicode == ((LiteralRegExp) node).unicode;
 	}
 }

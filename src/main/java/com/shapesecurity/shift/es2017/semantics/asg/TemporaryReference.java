@@ -24,9 +24,9 @@ import javax.annotation.Nonnull;
 public class TemporaryReference extends LocalReference {
 	public TemporaryReference() {
 		super(new Variable(
-				"LOCAL",
-				ImmutableList.empty(),
-				ImmutableList.empty()
+			"LOCAL",
+			ImmutableList.empty(),
+			ImmutableList.empty()
 		)); // TODO consider if this is what we actually want to do
 	}
 

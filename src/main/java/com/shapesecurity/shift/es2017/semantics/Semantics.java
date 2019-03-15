@@ -16,15 +16,19 @@
 
 package com.shapesecurity.shift.es2017.semantics;
 
+import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.shift.es2017.scope.Scope;
 import com.shapesecurity.shift.es2017.scope.ScopeLookup;
 import com.shapesecurity.shift.es2017.scope.Variable;
 import com.shapesecurity.shift.es2017.semantics.asg.LiteralFunction;
 import com.shapesecurity.shift.es2017.semantics.asg.Node;
+import com.shapesecurity.shift.es2017.semantics.visitor.EqualityChecker;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.IdentityHashMap;
+import java.util.stream.Collectors;
 
 public class Semantics {
 	@Nonnull
@@ -44,5 +48,19 @@ public class Semantics {
 		this.scriptVarDecls = scriptVarDecls;
 		this.scopeLookup = scopeLookup;
 		this.functionScopes = functionScopes;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (!(other instanceof Semantics)) {
+			return false;
+		}
+		// other fields are metadata generated from node, effectively.
+		return EqualityChecker.nodesAreEqual(this.node, ((Semantics) other).node);
+	}
+
+	@Override
+	public int hashCode() {
+		throw new UnsupportedOperationException("hashCode is not implemented on Semantics");
 	}
 }

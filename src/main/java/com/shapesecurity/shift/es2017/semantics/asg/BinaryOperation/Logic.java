@@ -19,9 +19,6 @@ package com.shapesecurity.shift.es2017.semantics.asg.BinaryOperation;
 import com.shapesecurity.shift.es2017.semantics.asg.NodeWithValue;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class Logic extends BinaryOperation {
 	@Nonnull
@@ -29,20 +26,6 @@ public class Logic extends BinaryOperation {
 	@Nonnull
 	public final NodeWithValue left;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Logic)) return false;
-		Logic logic = (Logic) o;
-		return operator == logic.operator &&
-				Objects.equals(left, logic.left) &&
-				Objects.equals(right, logic.right);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(operator, left, right);
-	}
 
 	@Nonnull
 

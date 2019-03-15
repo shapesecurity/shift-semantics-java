@@ -16,5 +16,12 @@
 
 package com.shapesecurity.shift.es2017.semantics.asg;
 
+import javax.annotation.Nonnull;
+
 public interface Node {
+
+	default boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node.getClass() == this.getClass();
+	}
+
 }

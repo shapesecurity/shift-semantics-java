@@ -17,27 +17,18 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class LiteralSymbol implements Literal {
 	@Nonnull
 	public final String description;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof LiteralSymbol)) return false;
-		LiteralSymbol that = (LiteralSymbol) o;
-		return Objects.equals(description, that.description);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.description);
-	}
 
 	public LiteralSymbol(@Nonnull String description) {
 		this.description = description;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof LiteralSymbol && this.description.equals(((LiteralSymbol) node).description);
 	}
 }

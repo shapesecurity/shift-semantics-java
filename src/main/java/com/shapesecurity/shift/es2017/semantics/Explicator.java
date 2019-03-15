@@ -102,7 +102,7 @@ public class Explicator {
 	@Nonnull
 	final ScopeLookup scopeLookup;
 	@Nonnull
-	HashTable<com.shapesecurity.shift.es2017.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingEquality();
+	HashTable<com.shapesecurity.shift.es2017.ast.Node, Pair<BreakTarget, Maybe<BreakTarget>>> targets = HashTable.emptyUsingIdentity();
 	// map from AST loops and labelled statement to their corresponding Target nodes. Loops have an outer and an inner, for break and continue respectively.
 
 	@Nonnull

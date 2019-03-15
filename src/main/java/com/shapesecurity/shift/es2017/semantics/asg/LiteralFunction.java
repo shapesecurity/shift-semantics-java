@@ -21,8 +21,6 @@ import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.es2017.scope.Variable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class LiteralFunction implements Literal {
 	@Nonnull
@@ -34,24 +32,6 @@ public class LiteralFunction implements Literal {
 	@Nonnull
 	public final ImmutableList<Variable> locals;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof LiteralFunction)) return false;
-		LiteralFunction that = (LiteralFunction) o;
-		return isStrict == that.isStrict &&
-				Objects.equals(name, that.name) &&
-				Objects.equals(arguments, that.arguments) &&
-				Objects.equals(parameters, that.parameters) &&
-				Objects.equals(locals, that.locals) &&
-				Objects.equals(captured, that.captured) &&
-				Objects.equals(body, that.body);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(name, arguments, parameters, locals, captured, body, isStrict);
-	}
 
 	@Nonnull
 	public final ImmutableList<Variable> captured;
@@ -61,8 +41,8 @@ public class LiteralFunction implements Literal {
 	public final boolean isStrict;
 
 	public LiteralFunction(
-			@Nonnull Maybe<Variable> name, @Nonnull Maybe<Variable> arguments, @Nonnull ImmutableList<Variable> parameters, @Nonnull ImmutableList<Variable> locals,
-			@Nonnull ImmutableList<Variable> captured, @Nonnull Block body, boolean isStrict
+		@Nonnull Maybe<Variable> name, @Nonnull Maybe<Variable> arguments, @Nonnull ImmutableList<Variable> parameters, @Nonnull ImmutableList<Variable> locals,
+		@Nonnull ImmutableList<Variable> captured, @Nonnull Block body, boolean isStrict
 	) {
 		this.name = name;
 		this.arguments = arguments;
@@ -71,5 +51,16 @@ public class LiteralFunction implements Literal {
 		this.captured = captured;
 		this.body = body;
 		this.isStrict = isStrict;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof LiteralFunction &&
+			this.name.equals(((LiteralFunction) node).name) &&
+			this.arguments.equals(((LiteralFunction) node).arguments) &&
+			this.parameters.equals(((LiteralFunction) node).parameters) &&
+			this.locals.equals(((LiteralFunction) node).locals) &&
+			this.captured.equals(((LiteralFunction) node).captured) &&
+			this.isStrict == ((LiteralFunction) node).isStrict;
 	}
 }

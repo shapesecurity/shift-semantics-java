@@ -19,27 +19,11 @@ package com.shapesecurity.shift.es2017.semantics.asg.BinaryOperation;
 import com.shapesecurity.shift.es2017.semantics.asg.NodeWithValue;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class In extends BinaryOperation {
 	@Nonnull
 	public final NodeWithValue left;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof In)) return false;
-		In in = (In) o;
-		return Objects.equals(left, in.left) &&
-				Objects.equals(right, in.right);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(left, right);
-	}
 
 	@Nonnull
 

@@ -16,26 +16,19 @@
 
 package com.shapesecurity.shift.es2017.semantics.asg;
 
-import javax.annotation.Nullable;
-import java.util.Objects;
+import javax.annotation.Nonnull;
 
 public class LiteralBoolean implements Literal {
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof LiteralBoolean)) return false;
-		LiteralBoolean that = (LiteralBoolean) o;
-		return value == that.value;
-	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(value);
-	}
 
 	public final boolean value;
 
 	public LiteralBoolean(boolean value) {
 		this.value = value;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof LiteralBoolean && this.value == ((LiteralBoolean) node).value;
 	}
 }

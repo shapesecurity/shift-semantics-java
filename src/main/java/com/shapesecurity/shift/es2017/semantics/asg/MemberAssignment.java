@@ -17,9 +17,6 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class MemberAssignment implements NodeWithValue {
 	@Nonnull
@@ -30,26 +27,11 @@ public class MemberAssignment implements NodeWithValue {
 	public final MemberAssignmentProperty.StaticValue property;
 	public final boolean strict;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof MemberAssignment)) return false;
-		MemberAssignment that = (MemberAssignment) o;
-		return strict == that.strict &&
-				Objects.equals(object, that.object) &&
-				Objects.equals(fieldExpression, that.fieldExpression) &&
-				Objects.equals(property, that.property);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(object, fieldExpression, property, strict);
-	}
 
 	public MemberAssignment(
-			@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression,
-			@Nonnull MemberAssignmentProperty.StaticValue property,
-			boolean strict
+		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression,
+		@Nonnull MemberAssignmentProperty.StaticValue property,
+		boolean strict
 	) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;
@@ -58,11 +40,16 @@ public class MemberAssignment implements NodeWithValue {
 	}
 
 	public MemberAssignment(
-			@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull NodeWithValue staticValue, boolean strict
+		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull NodeWithValue staticValue, boolean strict
 	) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;
 		this.property = new MemberAssignmentProperty.StaticValue(staticValue);
 		this.strict = strict;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof MemberAssignment && this.strict == ((MemberAssignment) node).strict;
 	}
 }

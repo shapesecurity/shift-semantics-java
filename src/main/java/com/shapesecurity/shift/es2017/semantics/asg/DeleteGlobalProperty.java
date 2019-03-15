@@ -17,28 +17,19 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class DeleteGlobalProperty implements NodeWithValue {
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof DeleteGlobalProperty)) return false;
-		DeleteGlobalProperty that = (DeleteGlobalProperty) o;
-		return Objects.equals(which, that.which);
-	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(which);
-	}
 
 	@Nonnull
 	public final String which;
 
 	public DeleteGlobalProperty(@Nonnull String which) {
 		this.which = which;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof DeleteGlobalProperty && this.which.equals(((DeleteGlobalProperty) node).which);
 	}
 }

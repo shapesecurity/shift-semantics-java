@@ -17,23 +17,15 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
 
 // Halt. Used for unsupported code, i.e., direct eval and with.
 public class Halt implements NodeWithValue {
 	@Nonnull
 	public static final Halt INSTANCE = new Halt();
 
-	@Override
-	public boolean equals(@Nonnull Object o) {
-		return o == INSTANCE;
-	}
 
 	private Halt() {
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash();
-	}
 }
+

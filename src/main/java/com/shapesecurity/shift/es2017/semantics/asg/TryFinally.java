@@ -17,9 +17,6 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class TryFinally implements Node {
 	@Nonnull
@@ -28,20 +25,6 @@ public class TryFinally implements Node {
 	@Nonnull
 	public final Block finallyBody;
 
-
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof TryFinally)) return false;
-		TryFinally that = (TryFinally) o;
-		return Objects.equals(tryBody, that.tryBody) &&
-				Objects.equals(finallyBody, that.finallyBody);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(tryBody, finallyBody);
-	}
 
 	public TryFinally(@Nonnull Block tryBody, @Nonnull Block finallyBody) {
 		this.tryBody = tryBody;

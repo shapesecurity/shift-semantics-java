@@ -20,9 +20,6 @@ import com.shapesecurity.functional.Pair;
 import com.shapesecurity.functional.data.ImmutableList;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class SwitchStatement implements Node {
 	@Nonnull
@@ -30,21 +27,6 @@ public class SwitchStatement implements Node {
 	@Nonnull
 	public final ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof SwitchStatement)) return false;
-		SwitchStatement that = (SwitchStatement) o;
-		return Objects.equals(discriminant, that.discriminant) &&
-				Objects.equals(preDefaultCases, that.preDefaultCases) &&
-				Objects.equals(defaultCase, that.defaultCase) &&
-				Objects.equals(postDefaultCases, that.postDefaultCases);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(discriminant, preDefaultCases, defaultCase, postDefaultCases);
-	}
 
 	@Nonnull
 
@@ -53,8 +35,8 @@ public class SwitchStatement implements Node {
 	public final ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases;
 
 	public SwitchStatement(
-			@Nonnull LocalReference discriminant, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases,
-			@Nonnull Block defaultCase, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases
+		@Nonnull LocalReference discriminant, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> preDefaultCases,
+		@Nonnull Block defaultCase, @Nonnull ImmutableList<Pair<NodeWithValue, Block>> postDefaultCases
 	) {
 		this.discriminant = discriminant;
 		this.preDefaultCases = preDefaultCases;

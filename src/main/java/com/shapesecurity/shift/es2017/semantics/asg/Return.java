@@ -19,26 +19,11 @@ package com.shapesecurity.shift.es2017.semantics.asg;
 import com.shapesecurity.functional.data.Maybe;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class Return implements Node {
 	@Nonnull
 	public final Maybe<NodeWithValue> expression;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Return)) return false;
-		Return aReturn = (Return) o;
-		return Objects.equals(expression, aReturn.expression);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(expression);
-	}
 
 	public Return(@Nonnull Maybe<NodeWithValue> expression) {
 		this.expression = expression;
@@ -46,5 +31,10 @@ public class Return implements Node {
 
 	public Return(@Nonnull NodeWithValue expression) {
 		this.expression = Maybe.of(expression);
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof Return && this.expression.isJust() == ((Return) node).expression.isJust();
 	}
 }

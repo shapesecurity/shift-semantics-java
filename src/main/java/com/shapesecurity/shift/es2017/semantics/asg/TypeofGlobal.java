@@ -17,27 +17,18 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class TypeofGlobal implements NodeWithValue {
 	@Nonnull
 	public final String which;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof TypeofGlobal)) return false;
-		TypeofGlobal that = (TypeofGlobal) o;
-		return Objects.equals(which, that.which);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(which);
-	}
 
 	public TypeofGlobal(@Nonnull String which) {
 		this.which = which;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof TypeofGlobal && this.which.equals(((TypeofGlobal) node).which);
 	}
 }

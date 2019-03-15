@@ -19,28 +19,18 @@ package com.shapesecurity.shift.es2017.semantics.asg;
 import com.shapesecurity.shift.es2017.scope.Variable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class LocalReference implements NodeWithValue {
 	@Nonnull
 	public Variable variable;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof LocalReference)) return false;
-		LocalReference that = (LocalReference) o;
-		return Objects.equals(variable, that.variable);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(variable);
-	}
 
 	public LocalReference(@Nonnull Variable variable) {
 		this.variable = variable;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node.getClass() == LocalReference.class && this.variable.equals(((LocalReference) node).variable);
 	}
 }

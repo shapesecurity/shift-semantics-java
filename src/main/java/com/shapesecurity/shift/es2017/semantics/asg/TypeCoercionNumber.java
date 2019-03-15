@@ -17,26 +17,11 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class TypeCoercionNumber implements NodeWithValue {
 	@Nonnull
 	public final NodeWithValue expression;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof TypeCoercionNumber)) return false;
-		TypeCoercionNumber that = (TypeCoercionNumber) o;
-		return Objects.equals(expression, that.expression);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(expression);
-	}
 
 	public TypeCoercionNumber(@Nonnull NodeWithValue expression) {
 		this.expression = expression;

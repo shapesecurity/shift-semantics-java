@@ -17,21 +17,11 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
 
 public class Void implements Node {
 	@Nonnull
 	public static final Void INSTANCE = new Void();
 
-	@Override
-	public boolean equals(Object o) {
-		return o == INSTANCE;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash();
-	}
 
 	private Void() {
 	}

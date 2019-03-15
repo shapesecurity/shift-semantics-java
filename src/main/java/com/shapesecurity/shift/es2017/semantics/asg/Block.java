@@ -20,9 +20,6 @@ import com.shapesecurity.functional.data.ImmutableList;
 import com.shapesecurity.shift.es2017.ast.Directive;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class Block implements Node {
 	@Nonnull
@@ -45,22 +42,14 @@ public class Block implements Node {
 		this.directives = directives;
 	}
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Block)) return false;
-		Block block = (Block) o;
-		return Objects.equals(children, block.children);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(children);
-	}
-
 	public Block(@Nonnull Node child) {
 		this.children = ImmutableList.of(child);
 		this.directives = ImmutableList.empty();
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof Block && this.directives.equals(((Block) node).directives);
 	}
 
 	public boolean isNoOp() {

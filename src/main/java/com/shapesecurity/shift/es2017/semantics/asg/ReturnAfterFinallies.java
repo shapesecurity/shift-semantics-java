@@ -5,7 +5,6 @@ import com.shapesecurity.functional.data.Maybe;
 import com.shapesecurity.shift.es2017.semantics.BrokenThrough;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
 
 public class ReturnAfterFinallies implements Node {
 	@Nonnull
@@ -20,16 +19,12 @@ public class ReturnAfterFinallies implements Node {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		ReturnAfterFinallies that = (ReturnAfterFinallies) o;
-		return Objects.equals(savedValue, that.savedValue) &&
-				Objects.equals(broken, that.broken);
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof ReturnAfterFinallies &&
+			this.savedValue.isJust() == ((ReturnAfterFinallies) node).savedValue.isJust()
+			&& this.broken.equals(((ReturnAfterFinallies) node).broken);
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(savedValue, broken);
-	}
 }
+
+

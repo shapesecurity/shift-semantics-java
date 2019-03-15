@@ -17,28 +17,19 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class GlobalReference implements NodeWithValue {
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof GlobalReference)) return false;
-		GlobalReference that = (GlobalReference) o;
-		return Objects.equals(name, that.name);
-	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(name);
-	}
 
 	@Nonnull
 	public final String name;
 
 	public GlobalReference(@Nonnull String name) {
 		this.name = name;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof GlobalReference && this.name.equals(((GlobalReference) node).name);
 	}
 }

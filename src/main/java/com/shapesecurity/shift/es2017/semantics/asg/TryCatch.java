@@ -20,9 +20,6 @@ import com.shapesecurity.functional.Pair;
 import com.shapesecurity.shift.es2017.scope.Variable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class TryCatch implements Node {
 	@Nonnull
@@ -30,22 +27,14 @@ public class TryCatch implements Node {
 	@Nonnull
 	public final Pair<Variable, Block> catchBody;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof TryCatch)) return false;
-		TryCatch that = (TryCatch) o;
-		return Objects.equals(tryBody, that.tryBody) &&
-				Objects.equals(catchBody, that.catchBody);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(tryBody, catchBody);
-	}
 
 	public TryCatch(@Nonnull Block tryBody, @Nonnull Pair<Variable, Block> catchBody) {
 		this.tryBody = tryBody;
 		this.catchBody = catchBody;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof TryCatch && this.catchBody.left.equals(((TryCatch) node).catchBody.left);
 	}
 }

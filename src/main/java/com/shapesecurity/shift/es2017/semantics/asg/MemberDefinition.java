@@ -17,9 +17,6 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class MemberDefinition implements Node {
 	@Nonnull
@@ -27,26 +24,12 @@ public class MemberDefinition implements Node {
 	@Nonnull
 	public final NodeWithValue fieldExpression;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof MemberDefinition)) return false;
-		MemberDefinition that = (MemberDefinition) o;
-		return Objects.equals(object, that.object) &&
-				Objects.equals(fieldExpression, that.fieldExpression) &&
-				Objects.equals(property, that.property);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(object, fieldExpression, property);
-	}
 
 	@Nonnull
 	public final MemberAssignmentProperty property;
 
 	public MemberDefinition(
-			@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull MemberAssignmentProperty property
+		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull MemberAssignmentProperty property
 	) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;
@@ -54,10 +37,15 @@ public class MemberDefinition implements Node {
 	}
 
 	public MemberDefinition(
-			@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull NodeWithValue staticValue
+		@Nonnull NodeWithValue object, @Nonnull NodeWithValue fieldExpression, @Nonnull NodeWithValue staticValue
 	) {
 		this.object = object;
 		this.fieldExpression = fieldExpression;
 		this.property = new MemberAssignmentProperty.StaticValue(staticValue);
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof MemberDefinition && this.property.getClass() == ((MemberDefinition) node).property.getClass();
 	}
 }

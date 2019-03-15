@@ -16,8 +16,15 @@
 
 package com.shapesecurity.shift.es2017.semantics.asg;
 
+import javax.annotation.Nonnull;
+
 public class BreakTarget implements Node { // no-op. target of a break.
 
 	public BreakTarget() {
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node == this;
 	}
 }

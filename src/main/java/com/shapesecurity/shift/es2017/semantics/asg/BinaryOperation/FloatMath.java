@@ -19,9 +19,6 @@ package com.shapesecurity.shift.es2017.semantics.asg.BinaryOperation;
 import com.shapesecurity.shift.es2017.semantics.asg.NodeWithValue;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class FloatMath extends BinaryOperation {
 	@Nonnull
@@ -31,20 +28,6 @@ public class FloatMath extends BinaryOperation {
 	@Nonnull
 	public final NodeWithValue right;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof FloatMath)) return false;
-		FloatMath floatMath = (FloatMath) o;
-		return operator == floatMath.operator &&
-				Objects.equals(left, floatMath.left) &&
-				Objects.equals(right, floatMath.right);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(operator, left, right);
-	}
 
 	public FloatMath(@Nonnull Operator operator, @Nonnull NodeWithValue left, @Nonnull NodeWithValue right) {
 		this.operator = operator;

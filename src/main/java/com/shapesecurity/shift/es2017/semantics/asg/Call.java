@@ -19,27 +19,11 @@ package com.shapesecurity.shift.es2017.semantics.asg;
 import com.shapesecurity.functional.data.ImmutableList;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class Call implements NodeWithValue {
 	@Nonnull
 	public final NodeWithValue callee;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Call)) return false;
-		Call call = (Call) o;
-		return Objects.equals(callee, call.callee) &&
-				Objects.equals(arguments, call.arguments);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(callee, arguments);
-	}
 
 	@Nonnull
 	public final ImmutableList<NodeWithValue> arguments;

@@ -16,26 +16,18 @@
 
 package com.shapesecurity.shift.es2017.semantics.asg;
 
-import javax.annotation.Nullable;
-import java.util.Objects;
+import javax.annotation.Nonnull;
 
 public class This implements NodeWithValue {
 	public final boolean strict;
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof This)) return false;
-		This aThis = (This) o;
-		return strict == aThis.strict;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(strict);
-	}
 
 	public This(boolean strict) {
 		this.strict = strict;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof This && this.strict == ((This) node).strict;
 	}
 }

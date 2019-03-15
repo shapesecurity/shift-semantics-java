@@ -16,26 +16,19 @@
 
 package com.shapesecurity.shift.es2017.semantics.asg;
 
-import javax.annotation.Nullable;
-import java.util.Objects;
+import javax.annotation.Nonnull;
 
 public class LiteralNumber implements Node, Literal {
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof LiteralNumber)) return false;
-		LiteralNumber that = (LiteralNumber) o;
-		return Double.compare(that.value, value) == 0;
-	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(value);
-	}
 
 	public final double value;
 
 	public LiteralNumber(double value) {
 		this.value = value;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof LiteralNumber && this.value == ((LiteralNumber) node).value;
 	}
 }

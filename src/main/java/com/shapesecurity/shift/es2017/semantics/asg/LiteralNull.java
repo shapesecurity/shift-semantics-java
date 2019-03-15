@@ -17,23 +17,14 @@
 package com.shapesecurity.shift.es2017.semantics.asg;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class LiteralNull implements Literal {
 	@Nonnull
 	public static final LiteralNull INSTANCE = new LiteralNull();
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		return o == INSTANCE;
-	}
 
 	private LiteralNull() {
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash();
-	}
 }
+

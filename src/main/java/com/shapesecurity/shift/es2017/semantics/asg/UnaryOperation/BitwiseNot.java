@@ -19,8 +19,6 @@ package com.shapesecurity.shift.es2017.semantics.asg.UnaryOperation;
 import com.shapesecurity.shift.es2017.semantics.asg.NodeWithValue;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class BitwiseNot extends UnaryOperation {
 	@Nonnull
@@ -32,18 +30,6 @@ public class BitwiseNot extends UnaryOperation {
 		return expression;
 	}
 
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof BitwiseNot)) return false;
-		BitwiseNot that = (BitwiseNot) o;
-		return Objects.equals(expression, that.expression);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(expression);
-	}
 
 	public BitwiseNot(@Nonnull NodeWithValue expression) {
 		this.expression = expression;

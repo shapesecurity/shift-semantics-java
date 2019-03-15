@@ -19,25 +19,9 @@ package com.shapesecurity.shift.es2017.semantics.asg;
 import com.shapesecurity.functional.data.Either;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.util.Objects;
 
 public class VariableAssignment implements NodeWithValue {
-	@Override
-	public boolean equals(@Nullable Object o) {
-		if (this == o) return true;
-		if (!(o instanceof VariableAssignment)) return false;
-		VariableAssignment that = (VariableAssignment) o;
-		return strict == that.strict &&
-				Objects.equals(ref, that.ref) &&
-				Objects.equals(value, that.value);
-	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(ref, value, strict);
-	}
 
 	@Nonnull
 	public final Either<GlobalReference, LocalReference> ref;
@@ -46,7 +30,7 @@ public class VariableAssignment implements NodeWithValue {
 	public final boolean strict;
 
 	public VariableAssignment(
-			@Nonnull Either<GlobalReference, LocalReference> ref, @Nonnull NodeWithValue value, boolean strict
+		@Nonnull Either<GlobalReference, LocalReference> ref, @Nonnull NodeWithValue value, boolean strict
 	) {
 		this.ref = ref;
 		this.value = value;
@@ -63,5 +47,10 @@ public class VariableAssignment implements NodeWithValue {
 		this.ref = Either.right(ref);
 		this.value = value;
 		this.strict = strict;
+	}
+
+	@Override
+	public boolean equalsIgnoringChildren(@Nonnull Node node) {
+		return node instanceof VariableAssignment && this.strict == ((VariableAssignment) node).strict;
 	}
 }
